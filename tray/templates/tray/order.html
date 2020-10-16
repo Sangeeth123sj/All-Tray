@@ -1,0 +1,23 @@
+{% extends "tray/base.html" %}
+
+{% block title %} Order {% endblock %}
+
+{% block content %}
+
+<p>Welcome {{ name }} </p>
+<p>You register no. is: {{reg}}</p>
+<br/>
+
+
+<form action="/order_items/" method="POST">
+    {% csrf_token %}
+    <h2>order</h2>
+    <p>item</p>
+    <input type="text" name="order"><br/><br/>
+    <p>quantity</p>
+    <input type="number" name="quantity" min="1" max="100"><br/><br/>
+    <input type="submit">
+</form>
+
+
+{% endblock %}

@@ -1,0 +1,61 @@
+<html>
+    {% load static %}
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+<style>
+    
+    body{
+        background-image: url('{% static "tray/images/homesunset.jpg" %}');
+        background-size: 1800px 800px;
+        background-repeat: no-repeat;
+    }
+    .heading{
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 190px;
+        color: #454442;
+    }
+    .button { 
+        cursor: pointer; 
+        border: 1px solid #454442; 
+        background-color: #E7E9D1; 
+        height: 400px; 
+        width: 200px; 
+        color:#454442; 
+        font-size: 1.5em; 
+        box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
+        filter: grayscale(10%);
+        background-color: rgba(255, 255, 255, .35);
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 20px;
+    }
+    .foot {
+        color:blanchedalmond;
+    }
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body >
+    <center>
+        <br/>
+        <div class="heading">
+        <h1><strong>All Tray</strong> </h1>
+        </div>
+        <br/> <br/>
+    
+    {% block content%} {% endblock %}
+
+    {% block footer %}
+<div class="foot">
+<p> Thanks for using All Tray </p>
+<p>Sunset over the hills of Central California at the start of a long road trip.credits <span>Photo by <a href="https://unsplash.com/@jeremybishop?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Jeremy Bishop</a> on <a href="https://unsplash.com/s/photos/landscape?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></p>
+    {% endblock %}
+</div>
+</center>
+</body>
+
+</html>

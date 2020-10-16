@@ -1,0 +1,58 @@
+<html>
+    {% load static %}
+
+<head>
+    <title>Home</title>
+<style>
+    
+    body{
+        background-image: url('{% static "tray/images/homesunset.jpg" %}');
+        background-size: 1800px 800px;
+        background-repeat: no-repeat;
+    }
+    .heading{
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 70px;
+        color: #454442;
+    }
+    .button { 
+        cursor: pointer; 
+        border: 1px solid #454442; 
+        background-color: #E7E9D1; 
+        height: 400px; 
+        width: 200px; 
+        color:#454442; 
+        font-size: 1.5em; 
+        box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
+        filter: grayscale(10%);
+        background-color: rgba(255, 255, 255, .35);
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 20px;
+    }
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body bgcolor="powderblue">
+
+
+    <center>
+        <br/>
+        <div class="heading">
+        <strong>All Tray</strong>
+        </div>
+        <p><strong>Swipe your id card </strong></p>
+        
+        <br/> <br/>
+        <div class="row">
+        <div class="col-sm-6"><button class="button"> <strong>Stationary</strong></button></div>
+        <div class="col-sm-6"><button class="button"><strong>Canteen</strong></button></div>
+        <div class="col-sm-6"><a href="/order/2/">Canteen</a></div>
+        </div>
+    </center>
+</body>
+
+</html>
