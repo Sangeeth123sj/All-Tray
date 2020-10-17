@@ -15,12 +15,13 @@ def order(request, name_id):
     id_of = Student.objects.get(id = name_id)
     name = id_of.name
     reg_no = id_of.reg_no
-    return render (request, 'tray/order.html', {'name': name, 'reg': reg_no})
+    balance = id_of.balance
+    return render (request, 'tray/order.html', {'name': name, 'reg': reg_no, 'balance': balance})
 
 def order_items(request):
     if request.method == 'POST':
         name = request.POST['order']
         quantity = request.POST['quantity']
-        t = Items(item = name, quantity = quantity)
+        t = Items(item1 = name, quantity1 = quantity)
         t.save()
-    return HttpResponse("Order saved! item: %s." %t.quantity)
+    return HttpResponse("Order saved! item: %s." %t.item1)
