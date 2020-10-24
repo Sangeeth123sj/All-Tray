@@ -7,7 +7,7 @@ class Student(models.Model):
     reg_no = models.IntegerField(default=0)
     balance = models.IntegerField(default=0)
 
-class Items(models.Model):
+class Item(models.Model):
     item1 = models.CharField(max_length=200)
     quantity1 = models.IntegerField(default=1)
 

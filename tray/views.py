@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Student,Items,Store
+from .models import Student,Item,Store
 from tray.forms import OrderForm
 # Create your views here.
 
@@ -22,7 +22,7 @@ def order_items(request):
     if request.method == 'POST':
         name = request.POST['order']
         quantity = request.POST['quantity']
-        t = Items(item1 = name, quantity1 = quantity)
+        t = Item(item1 = name, quantity1 = quantity)
         t.save()
         student_id = request.POST['balance'] 
         s = Student.objects.get(id = student_id)
@@ -49,5 +49,10 @@ def store_home(request, store_id):
     else:
         s = Store.objects.get(id = store_id)
         name = s.store_name
-        c = s.store_status
+        status = s.store_status
+        if status == True:
+            c = "Active"
+        else:
+            c = "Inactive"
+
     return render(request, 'tray/store_home.html',{'name':name, 'status':c})
