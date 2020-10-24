@@ -1,0 +1,13 @@
+{% extends "tray/base.html" %}
+
+{% block title %} Your Store {% endblock %}
+
+{% block content %}
+<h4> <strong> Register Your Store </strong></h4>
+<form action="/store_home/0/" method="POST">
+{% csrf_token %}
+<p>Store name</p>
+<input type="text" name="store_name"><br/><br/>
+<input type="submit" value="Open Store">
+</form>
+{% endblock %}
