@@ -3,17 +3,13 @@
 {% block title %} Your Store {% endblock %}
 
 {% block content %}
-<h4> <strong> Register Your Store </strong></h4>
-<form action="/store_home/0/" method="POST">
+<h4> <strong> Login to Your Store </strong></h4>
+<form action="/login_verify/" method="POST">
 {% csrf_token %}
-<p>Store name</p>
-<input type="text" name="store_name"><br/><br/>
 <p>username</p>
 <input type="text" name="username"><br/><br/>
-<p>email id</p>
-<input type="email" name="email"><br/><br/>
 <p>password</p>
 <input type="password" name="password"><br/><br/>
-<input type="submit" value="Open Store">
+<input type="submit" value="Login" class="btn btn-success" type="button">
 </form>
 {% endblock %}
