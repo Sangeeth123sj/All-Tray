@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Student,Item,Store
+from .models import Student,Item,Store,User
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate, login
 
@@ -13,31 +13,26 @@ def index(request, name_id):
 def home(request):
     return render (request, 'tray/home.html')
 
-def order(request, name_id):
-    s = Student.objects.get(id = name_id)
-    name = s.name
-    reg_no = s.reg_no
-    balance = s.balance
-    return render (request, 'tray/order.html', {'name': name, 'reg': reg_no, 'balance': balance, 'student_id':name_id})
+def order(request):
+    store_id = request.session['store_id']
+    
+    return render (request, 'tray/order.html',{'store_id': store_id})
 
 def order_items(request):
     if request.method == 'POST':
         name = request.POST['order']
         quantity = request.POST['quantity']
-        t = Item(item1 = name, quantity1 = quantity)
-        t.save()
-        student_id = request.POST['balance'] 
-        s = Student.objects.get(id = student_id)
-        bal = s.balance - 10
-        s.balance = bal
-        s.save()
-    return HttpResponse("Order saved! balance: %s." %s.balance)
+        store_id = request.POST['store_id']
+        store_object = Store.objects.get(id = store_id)
+        new_item = Item(item = name, quantity = quantity, store = store_object)
+        new_item.save()
+    return redirect(store_home)
 
 def open_store(request):
     
     return render(request, 'tray/open_store.html' )
 
-def store_home(request, store_id):
+def open_store_success(request):
     if request.method == 'POST':
         name = request.POST['store_name']
         username = request.POST['username']
@@ -45,24 +40,23 @@ def store_home(request, store_id):
         password = request.POST['password']
         user = User.objects.create_user(username,email,password)
         user.save()
-        s = Store(store_name= name, store_status = True)
+        s = Store(store_name= name, store_status = True, user = user)
         s.save()
-        status = s.store_status
-        if status == True:
-            c = "Active"
-        else:
-            c = "Inactive"
+        return redirect(store_login)
 
+def store_home(request):
+    store_id = request.session['store_id']
+    s = Store.objects.get(id = store_id)
+    store_name = s.store_name
+    items = s.item_set.all()
+    status = s.store_status
+    request.session['store_id'] = store_id
+    if status == True:
+        c = "Active"
     else:
-        s = Store.objects.get(id = store_id)
-        name = s.store_name
-        status = s.store_status
-        if status == True:
-            c = "Active"
-        else:
-            c = "Inactive"
+        c = "Inactive"
 
-    return render(request, 'tray/store_home.html',{'name':name, 'status':c})
+    return render(request, 'tray/store_home.html',{'store_name':store_name, 'status':c, 'items':items})
 
 def store_login(request):
     return render(request, 'tray/login_store.html' )
@@ -75,7 +69,9 @@ def store_login_processing(request):
 
     if user is not None:
         login(request, user)
-        return render(request, 'tray/store_home.html')
+        store_id = user.store.id
+        request.session['store_id'] = store_id
+        return redirect(store_home)
     else:
         c = "Sorry login failed!"
         return HttpResponse(c)
