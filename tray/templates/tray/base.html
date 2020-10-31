@@ -4,7 +4,11 @@
 <head>
     <title>{% block title %}{% endblock %}</title>
 <style>
-    
+    table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+    }
+
     body{
         background-image: url('{% static "tray/images/homesunset.jpg" %}');
         background-size: 1800px 800px;
