@@ -11,7 +11,8 @@ def index(request, name_id):
     return HttpResponse("Hello django, you are seeing student %s." %s.name )
 
 def home(request):
-    return render (request, 'tray/home.html')
+    stores = Store.objects.all()
+    return render (request, 'tray/home.html', {'stores':stores})
 
 def order(request):
     store_id = request.session['store_id']

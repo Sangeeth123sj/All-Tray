@@ -15,7 +15,7 @@
         font-size: 60px;
         color: #454442;
     }
-    .button { 
+    .store-button { 
         cursor: pointer; 
         border: 1px solid #454442; 
         background-color: #E7E9D1; 
@@ -46,13 +46,18 @@
         </div>
         <p><strong>Swipe your id card </strong></p>
         
+     <form action="" method="">
+        {% csrf_token %}
+            <input type="number" name="student_id" >
+            <br/><br/>
         <br/>
         <div class="row">
-        <div class="col-sm-6"><button class="button"> <strong>Stationary</strong></button></div>
-        <div class="col-sm-6"><button class="button"><strong>Canteen</strong></button></div>
-        <div class="col-sm-6"><a href="/order/2/">Canteen</a></div>
+            {% for store in stores %}
+                <input type="submit" value="{{store.store_name}}" class="button store-button" type="button">" "
+            {% endfor %}
         </div>
     </center>
+     </form>
 </body>
 
 </html>
