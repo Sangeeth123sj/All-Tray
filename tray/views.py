@@ -14,6 +14,14 @@ def home(request):
     stores = Store.objects.all()
     return render (request, 'tray/home.html', {'stores':stores})
 
+def order_page(request):
+    if request.method == 'POST':
+        student_id = request.POST['student_id']
+        store_id = request.POST['store_id']
+        student = Student.objects.get(id = student_id)
+        store = Store.objects.get(id = store_id)
+    return render (request, 'tray/order_page.html', {'student': student, 'store': store})
+
 def order(request):
     store_id = request.session['store_id']
     
@@ -30,7 +38,6 @@ def order_items(request):
     return redirect(store_home)
 
 def open_store(request):
-    
     return render(request, 'tray/open_store.html' )
 
 def open_store_success(request):

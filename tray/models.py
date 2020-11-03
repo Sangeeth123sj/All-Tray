@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import Model
 from django.contrib.auth.models import User
+from django.utils.timezone import now
+from datetime import datetime
+
 # Create your models here.
 
 BREAKS = (  
@@ -37,3 +40,5 @@ class Order(models.Model):
     cost1 = models.IntegerField(default=0)
     Time = models.CharField(max_length=200, choices=BREAKS)
     Student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

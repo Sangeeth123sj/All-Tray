@@ -1,0 +1,37 @@
+{% extends "tray/base.html" %}
+
+{% block title%} Welcome to {{store.store_name}} {% endblock %}
+
+{% block content %}
+
+<p> You are {{student.name}}</p>
+<p> Welcome to {{store.store_name}} {{store.id}} </p>
+
+<form action="" method="POST">
+
+
+
+
+    <select name="ingredients[]" id="ingredients" multiple="multiple">
+        <option value="cheese">Cheese</option>
+        <option value="tomatoes">Tomatoes</option>
+        <option value="mozarella">Mozzarella</option>
+        <option value="mushrooms">Mushrooms</option>
+        <option value="pepperoni">Pepperoni</option>
+        <option value="onions">Onions</option>
+    </select>
+    $(document).ready(function() {
+            $('#ingredients').multiselect();
+        });
+
+
+
+
+
+
+
+
+
+
+</form>
+{% endblock %}

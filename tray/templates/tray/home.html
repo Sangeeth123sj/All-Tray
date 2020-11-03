@@ -46,18 +46,20 @@
         </div>
         <p><strong>Swipe your id card </strong></p>
         
-     <form action="" method="">
+     <form action="/order_page/" method="POST">
         {% csrf_token %}
             <input type="number" name="student_id" >
+            
             <br/><br/>
         <br/>
         <div class="row">
             {% for store in stores %}
-                <input type="submit" value="{{store.store_name}}" class="button store-button" type="button">" "
+                <input type="hidden" name="store_id" value="{{store.id}}">
+                <input type="submit" value="{{store.store_name}}{{store.id}}" class="button store-button" type="button">
             {% endfor %}
         </div>
-    </center>
      </form>
+    </center>
 </body>
 
 </html>
