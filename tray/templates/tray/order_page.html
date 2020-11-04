@@ -8,28 +8,22 @@
 <p> Welcome to {{store.store_name}} {{store.id}} </p>
 
 <form action="" method="POST">
-
-
-
-
-    <select name="ingredients[]" id="ingredients" multiple="multiple">
-        <option value="cheese">Cheese</option>
-        <option value="tomatoes">Tomatoes</option>
-        <option value="mozarella">Mozzarella</option>
-        <option value="mushrooms">Mushrooms</option>
-        <option value="pepperoni">Pepperoni</option>
-        <option value="onions">Onions</option>
-    </select>
-    $(document).ready(function() {
-            $('#ingredients').multiselect();
-        });
+<table>
+    
+    {% for i in loop %}
+    <select id="test">
+        {% for item in items %}
+        <option input value="{{item.item}}">{{item.item}}</option>
+        <option input value="{{item.quantity}}">{{item.quantity}}</option>
+        {% endfor %}
+    </select><br/>
+    {% endfor %}
 
 
 
 
 
-
-
+</table>
 
 
 

@@ -17,10 +17,13 @@ def home(request):
 def order_page(request):
     if request.method == 'POST':
         student_id = request.POST['student_id']
-        store_id = request.POST['store_id']
+        store_name = request.POST['store_name']
         student = Student.objects.get(id = student_id)
-        store = Store.objects.get(id = store_id)
-    return render (request, 'tray/order_page.html', {'student': student, 'store': store})
+        store = Store.objects.get(store_name = store_name)
+        items = store.item_set.all()
+
+        loop = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    return render (request, 'tray/order_page.html', {'student': student, 'store': store, 'items': items, 'loop': loop})
 
 def order(request):
     store_id = request.session['store_id']
