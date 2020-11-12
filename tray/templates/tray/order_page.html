@@ -6,26 +6,61 @@
 
 <p> You are {{student.name}}</p>
 <p> Welcome to {{store.store_name}} {{store.id}} </p>
+<br/>
+<form action="/order_placed/" method="POST">
+    {% csrf_token %}
+{{ form }}
 
-<form action="" method="POST">
 <table>
-    
-    {% for i in loop %}
-    <select id="test">
-        {% for item in items %}
-        <option input value="{{item.item}}">{{item.item}}</option>
-        <option input value="{{item.quantity}}">{{item.quantity}}</option>
-        {% endfor %}
-    </select><br/>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th> Item | Price/unit</th>
+            <th> Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <select name="item_name" aria-placeholder="selects">
+                    
+                    
+                        <option value="none" selected disabled hidden> 
+                            Select an Option 
+                        </option> 
 
-
-
-
-
+                    {% for item in items %}
+                    <option input value="{{item.item}}">{{item.item}} : Rs.{{item.price}}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            
+            <td>
+                <input type="number" name="quantity" required>
+            </td>
+        </tr>
+    </tbody>
 </table>
+<br/>
+
+<p>Time of pickup:</p>
+<select name="time" required>
+<option input value="Now">Now</option>
+<option input value="First Break">First Break</option>
+<option input value="Lunch Break">Lunch Break</option>
+<option input value="Last Break">Last Break</option>
+</select>
+
+<br/>
+<input type="hidden" name="store_id" value="{{store.id}}">
+<input type="hidden" name="student_id" value="{{student.id}}">
+
+<br/>
+<input type="submit" value="Buy" class="btn btn-success">    
 
 
 
 </form>
+{% block footer %}
+{% endblock %}
+
 {% endblock %}

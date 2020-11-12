@@ -1,0 +1,9 @@
+{% extends 'tray/base.html'%}
+
+{% block content %}
+<h1>You orders are:</h1>
+{% for order in your_orders %}
+    <p>{{order.item1}} {{order.stock}} {{order.Time}} {{order.Student.name}}</p>
+{% endfor %}
+
+{% endblock %}

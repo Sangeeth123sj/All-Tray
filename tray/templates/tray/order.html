@@ -2,6 +2,34 @@
 
 {% block title %} Order {% endblock %}
 
+{% block javascript %}
+<script>
+$("#item_name").change(function () {
+      var order = $(this).val();
+
+$.ajax({
+    url: '/ajax/validate_store_item/',
+    data: {
+        'order': order
+    },
+    dataType: 'json',
+    success: function (data) {
+        if (data.is_taken) {
+            alert("Item already exists in store");
+        }
+    }
+
+});
+
+});
+
+
+</script>
+
+
+{% endblock %}
+
+
 {% block content %}
 
 <strong>Add Item</strong>
@@ -11,11 +39,13 @@
 <form action="/order_items/" method="POST">
     {% csrf_token %}
     <p>item</p>
-    <input type="text" name="order"><br/><br/>
-    <p>quantity</p>
-    <input type="number" name="quantity" min="1" max="100"><br/><br/>
+    <input type="text" id="item_name" name="order" required><br/><br/>
+    <p>Price</p>
+    <input type="number" name="price" min="0" required><br/><br/>
+    <p>Stock</p>
+    <input type="number" id="stock" name="quantity" min="1" required><br/><br/>
     <input type="hidden" name="store_id" value="{{store_id}}">
-    <input type="submit">
+    <input type="submit" class="btn btn-success">
 </form>
 
 

@@ -2,33 +2,59 @@
 
 {% block title %} Store Home {% endblock %}
 
+
+
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+ 
+        </div>
+        <div class="col-sm-3">
+            <a href="{% url 'logout' %}" class="btn btn-warning">Log Out</a>
+        </div>
+    </div>
+</div>
 
 <h3>{{store_name}}({{status}})</h3>
 <strong>Welcome to your {{store_name}}</strong><br/><br/>
-
-<button type="button" onclick="" class="btn btn-success">Activate Store</button>
+<button type="button" id="activate" onclick="" class="btn btn-success">Activate Store</button>
 <br/> <br/>
-
-
+      
 <table style="width:40%">
     <tr>
         <th>Item </th>
+        <th>Price/unit</th>
         <th>Stock</th>
+        <th>Actions</th>
     </tr>
 {% for item in items %}
-<tr>
+<tr height="50px">
     <td>
         {{item.item}}: 
     </td>
     <td>
+        {{item.price}}
+    </td>
+    <td>
         {{item.quantity}}
+    </td>
+    <td>
+        <a href="{% url 'order' %}" class="btn btn-info">Edit</a>
+        <a href="{% url 'order' %}" class="btn btn-warning">Delete</a>
     </td>
 </tr>
 {% endfor %}
 </table> <br/>
 <div class="container">
+    <div class="row">
+        <div class="col-sm-6">
  <a href="{% url 'order' %}" class="btn btn-success">Add Items</a>
+        </div>
+        <div class="col-sm-6">
+            <a href="{% url 'store_order_list' %}" class="btn btn-primary">Order list</a>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

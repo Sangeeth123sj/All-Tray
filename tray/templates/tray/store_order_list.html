@@ -1,0 +1,53 @@
+{% extends "tray/base.html" %}
+
+{% block title%} Order list {% endblock %}
+
+{% block content %}
+
+<h1> Order List</h1>
+
+<table style="width:40%">
+    <tr>
+        <th>Name </th>
+        <th>Items</th>
+        <th>Quantity</th>
+        <th>Pickup Time</th>
+        <th>Cost</th>
+    </tr>
+
+        {% for order in orders%}
+        <tr>
+    <td>
+    {{order.Student.name}}
+    </td>
+    <td>
+    <p>items: {{order.item1}}</p>
+    </td>
+
+    <td>
+     <p>quantity: {{order.stock}}</p>
+    </td>
+
+    <td>
+     <p>time: {{order.Time}}</p>
+    </td>
+
+    <td>
+     <p>cost: {{order.cost1}}</p>
+    </td>
+</tr>
+{% endfor %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+ 
+        </div>
+        <div class="col-sm-3">
+            <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

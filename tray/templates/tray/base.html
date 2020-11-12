@@ -10,20 +10,20 @@
     }
 
     body{
-        background-image: url('{% static "tray/images/homesunset.jpg" %}');
-        background-size: 1800px 800px;
+        background-image: url('{% static "tray/images/tri.png" %}');
+        background-size: cover;
         background-repeat: no-repeat;
     }
     .heading{
         font-family: 'Courier New', Courier, monospace;
         font-size: 24px;
-        color: #454442;
+        color: #f1e8de;
     }
     .button { 
         cursor: pointer; 
         border: 1px solid #454442; 
         background-color: #E7E9D1; 
-        height: 400px; 
+        height: 200px; 
         width: 200px; 
         color:#454442; 
         font-size: 1.5em; 
@@ -36,17 +36,42 @@
     .foot {
         color:blanchedalmond;
     }
-    .imgcrtsy{
-        color: #758ebd;
+    div.fixed {
+  position: fixed;
+  bottom: 0;
+  right: -999;
+  
+  border: 3px solid #73AD21;
     }
+
+    .centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    }
+
+
 </style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="{% static 'tray/js/app.js' %}"></script>   
 </head>
 <body >
+
+
+    <nav class="navbar navbar-inverse">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="{% url 'entry' %}">Home</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'open_store' %}"><span class="glyphicon glyphicon-user"></span>Store Sign Up</a></li>
+            <li><a href="{%url 'store_login'%}"><span class="glyphicon glyphicon-log-in"></span>Store Log In</a></li>
+        </ul>
+    </nav>
+
     <center>
         <div class="heading">
         <h1><strong>All Tray</strong> </h1>
@@ -57,12 +82,14 @@
     {% block footer %}
 <div class="foot">
 <p> Thanks for using All Tray </p>
-<div class="imgcrtsy" >
-<p>Sunset over the hills of Central California at the start of a long road trip.credits <span>Photo by <a href="https://unsplash.com/@jeremybishop?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Jeremy Bishop</a> on <a href="https://unsplash.com/s/photos/landscape?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></p>
-</div>
     {% endblock %}
 </div>
 </center>
+
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="{% static 'tray/js/app.js' %}"></script>
+{% block javascript %}{% endblock %}
+
 </body>
 
 </html>

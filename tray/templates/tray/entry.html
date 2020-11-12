@@ -1,0 +1,29 @@
+{% extends "tray/base.html" %}
+
+{% block title%} Welcome to All Tray {% endblock %}
+
+{% block content %}
+
+<br/><br/><br/>
+<h3><strong>Swipe your id card </strong></h3>
+
+<form action="/home/" method="POST">
+    {% csrf_token %}
+
+<div class="fixed">
+    <input type="number" name="student_id" autofocus required >
+</div>  
+
+
+
+
+</form>
+
+
+
+
+
+
+
+
+{% endblock %}

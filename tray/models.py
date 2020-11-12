@@ -7,10 +7,10 @@ from datetime import datetime
 # Create your models here.
 
 BREAKS = (  
-    ('A', 'Now'),
-    ('B', 'First Break'),
-    ('C', 'Second Break'),
-    ('D', 'LAst Break'),
+    ('Now', 'Now'),
+    ('First Break', 'First Break'),
+    ('Second Break', 'Second Break'),
+    ('Last Break', 'LAst Break'),
 )
 
 
@@ -31,12 +31,12 @@ class Store(models.Model):
 class Item(models.Model):
     item = models.CharField(max_length=200)
     quantity = models.IntegerField(default=1)
-    prize = models.IntegerField(default=0)
+    price = models.IntegerField(default=0)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
 class Order(models.Model):
     item1 = models.CharField(max_length=200, blank = True)
-    quantity1 = models.IntegerField(default=0)
+    stock = models.IntegerField(default=0)
     cost1 = models.IntegerField(default=0)
     Time = models.CharField(max_length=200, choices=BREAKS)
     Student = models.ForeignKey(Student, on_delete=models.CASCADE)
