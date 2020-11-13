@@ -79,10 +79,6 @@
     
     {% block content%} {% endblock %}
 
-    {% block footer %}
-<div class="foot">
-<p> Thanks for using All Tray </p>
-    {% endblock %}
 </div>
 </center>
 
@@ -91,5 +87,11 @@
 {% block javascript %}{% endblock %}
 
 </body>
-
+{% block footer %}
+<center>
+<div class="foot">
+<p> Thanks for using All Tray </p>
+</div>
+</center>
+    {% endblock %}
 </html>

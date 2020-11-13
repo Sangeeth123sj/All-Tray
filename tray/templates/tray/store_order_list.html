@@ -7,37 +7,41 @@
 <h1> Order List</h1>
 
 <table style="width:40%">
-    <tr>
+    <thead>
         <th>Name </th>
         <th>Items</th>
         <th>Quantity</th>
         <th>Pickup Time</th>
         <th>Cost</th>
-    </tr>
+        <th>Status</th>
+    </thead>
 
         {% for order in orders%}
-        <tr>
-    <td>
+        <tbody>
+    <td align="center">
     {{order.Student.name}}
     </td>
-    <td>
+    <td align="center">
     <p>items: {{order.item1}}</p>
     </td>
 
-    <td>
+    <td align="center">
      <p>quantity: {{order.stock}}</p>
     </td>
 
-    <td>
+    <td align="center">
      <p>time: {{order.Time}}</p>
     </td>
 
-    <td>
+    <td align="center">
      <p>cost: {{order.cost1}}</p>
     </td>
-</tr>
+    <td align="center">
+     <p></p>
+    </td>
+</tbody>
 {% endfor %}
-
+<br/>
 <div class="container">
     <div class="row">
         <div class="col-sm-9">

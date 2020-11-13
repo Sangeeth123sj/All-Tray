@@ -2,8 +2,52 @@
 
 {% block content %}
 <h1>You orders are:</h1>
-{% for order in your_orders %}
-    <p>{{order.item1}} {{order.stock}} {{order.Time}} {{order.Student.name}}</p>
-{% endfor %}
 
+<table width="40%">
+    <thead>
+        <th>
+            Item
+        </th>
+        <th>
+            Quantity
+        </th>
+        <th>
+            Time
+        </th>
+        <th>
+            Cost
+        </th>
+        <th>
+            Cancellation
+        </th>
+        
+    </thead>
+
+{% for order in your_orders %}
+
+    <tbody>
+    <tr height="50px">
+        <td align="center">
+            {{order.item1}}
+        </td>
+        <td align="center">
+            {{order.stock}}
+        </td>
+        <td align="center">
+            {{order.Time}}
+        </td>
+        <td align="center">
+            {{order.cost1}}
+        </td>
+
+        <td align="center">
+            <a href="{% url 'order' %}" class="btn btn-danger">Cancel</a>
+        </td>
+    </tr>
+    </tbody>
+
+
+   
+{% endfor %}
+</table>
 {% endblock %}

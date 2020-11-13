@@ -21,30 +21,38 @@
 <button type="button" id="activate" onclick="" class="btn btn-success">Activate Store</button>
 <br/> <br/>
       
-<table style="width:40%">
+<table  width="40%">
+<thead>
     <tr>
         <th>Item </th>
         <th>Price/unit</th>
         <th>Stock</th>
+        <th>Avialable</th>
         <th>Actions</th>
     </tr>
+</thead>
+<tbody>
 {% for item in items %}
 <tr height="50px">
-    <td>
+    <td align="center">
         {{item.item}}: 
     </td>
-    <td>
+    <td align="center">
         {{item.price}}
     </td>
-    <td>
+    <td align="center">
         {{item.quantity}}
     </td>
-    <td>
+    <td align="center">
+        <input type="checkbox" id="available" name="available" value="available">
+    </td>
+    <td align="center">
         <a href="{% url 'order' %}" class="btn btn-info">Edit</a>
         <a href="{% url 'order' %}" class="btn btn-warning">Delete</a>
     </td>
 </tr>
 {% endfor %}
+</tbody>
 </table> <br/>
 <div class="container">
     <div class="row">
