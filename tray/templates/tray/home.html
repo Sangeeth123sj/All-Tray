@@ -1,11 +1,19 @@
 {% extends "tray/base.html" %}
 
+{% block navbar %} 
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+</nav>
+{% endblock %}
+
+
 
 {% block title%} Tray  {% endblock %}
 
 
 {% block content %}
         <p>Welcome {{student.name}}</p>
+        <p>Your pin: {{student_pin}}</p>
         <form action="/your_orders/" method="POST">
             {% csrf_token %}
         <input type="hidden" name="student_id" value="{{student.id}}">
@@ -21,13 +29,11 @@
         
         <form action="/order_page/" method="POST">
             {% csrf_token %}
-        <div class="row">
+       
             {% for store in stores %}
-                
                 <input type="submit" name="store_name" value="{{store.store_name}}" class="button store-button" type="button">
                 <input type="hidden" name="student_id" value="{{student.id}}">
             {% endfor %}
-        </div>
      </form>
 
 {% endblock %}

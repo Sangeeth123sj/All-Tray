@@ -2,6 +2,8 @@
     {% load static %}
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
 <style>
     table, th, td {
@@ -51,38 +53,55 @@
     }
 
 
+   
+
 </style>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="{% static 'tray/js/app.js' %}"></script>   
+<script src="https://kit.fontawesome.com/803b4ae923.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 </head>
 <body >
 
+{% block navbar %}
 
-    <nav class="navbar navbar-inverse">
-        <ul class="nav navbar-nav">
-            <li class="active"><a href="{% url 'entry' %}">Home</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'open_store' %}"><span class="glyphicon glyphicon-user"></span>Store Sign Up</a></li>
-            <li><a href="{%url 'store_login'%}"><span class="glyphicon glyphicon-log-in"></span>Store Log In</a></li>
-        </ul>
-    </nav>
+<nav class="navbar navbar-dark bg-dark">
+  <ul class="navbar-nav mr-auto" >
+  <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </ul>
 
-    <center>
-        <div class="heading">
+  <li class="nav-item">
+  <a class="navbar-link" href="{% url 'open_store' %}">New Store</a>
+  </li>
+  <li class="nav-item">
+  <a class="navbar-item" href="{% url 'store_login' %}">Store Log In</a>
+  </li>
+</nav>
+
+
+
+
+
+    
+{% endblock %}
+<center>
+      <br/>
+    <div class="heading">
         <h1><strong>All Tray</strong> </h1>
         </div>
     
     {% block content%} {% endblock %}
 
-</div>
+    </div>
 </center>
 
-<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'tray/js/app.js' %}"></script>
 {% block javascript %}{% endblock %}
 

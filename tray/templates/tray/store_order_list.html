@@ -2,6 +2,12 @@
 
 {% block title%} Order list {% endblock %}
 
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'store_home' %}">Store</a>
+  </nav>
+{% endblock %}
+
 {% block content %}
 
 <h1> Order List</h1>
@@ -19,22 +25,22 @@
         {% for order in orders%}
         <tbody>
     <td align="center">
-    {{order.Student.name}}
+    {{order.student.name}}
     </td>
     <td align="center">
-    <p>items: {{order.item1}}</p>
-    </td>
-
-    <td align="center">
-     <p>quantity: {{order.stock}}</p>
+    <p>items: {{order.item}}</p>
     </td>
 
     <td align="center">
-     <p>time: {{order.Time}}</p>
+     <p>quantity: {{order.quantity}}</p>
     </td>
 
     <td align="center">
-     <p>cost: {{order.cost1}}</p>
+     <p>time: {{order.pickup_time}}</p>
+    </td>
+
+    <td align="center">
+     <p>cost: {{order.cost}}</p>
     </td>
     <td align="center">
      <p></p>

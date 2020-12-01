@@ -5,13 +5,11 @@
 {% block content %}
 
 <p> You are {{student.name}}</p>
-<p> Welcome to {{store.store_name}} {{store.id}} </p>
+<p> Welcome to {{store.store_name}}</p>
 <br/>
-<form action="/order_placed/" method="POST">
-    {% csrf_token %}
-{{ form }}
 
-<table>
+
+<table style="width: 20%;" >
     <thead>
         <tr>
             <th> Item | Price/unit</th>
@@ -19,9 +17,9 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
+        <tr >
             <td>
-                <select name="item_name" aria-placeholder="selects">
+                <select name="item_name" id="item" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;">
                     
                     
                         <option value="none" selected disabled hidden> 
@@ -29,13 +27,13 @@
                         </option> 
 
                     {% for item in items %}
-                    <option input value="{{item.item}}">{{item.item}} : Rs.{{item.price}}</option>
+                    <option input value="{{item.item}}">{{item.item}} : Rs. {{item.price}} </option>
                     {% endfor %}
                 </select>
             </td>
             
             <td>
-                <input type="number" name="quantity" required>
+                <input type="number" style="width: 100%;" name="quantity" id="quantity" required>
             </td>
         </tr>
     </tbody>
@@ -43,7 +41,7 @@
 <br/>
 
 <p>Time of pickup:</p>
-<select name="time" required>
+<select name="time" id="pickup_time" class="btn dropdown-toggle" required style="background-color: azure;">
 <option input value="Now">Now</option>
 <option input value="First Break">First Break</option>
 <option input value="Lunch Break">Lunch Break</option>
@@ -55,12 +53,141 @@
 <input type="hidden" name="student_id" value="{{student.id}}">
 
 <br/>
-<input type="submit" value="Buy" class="btn btn-success">    
+
+<button class="btn btn-success" type="button" id="add">Add to cart </button>
+<br/> <br/>
+
+<h3><strong>Cart</strong><i class="fas fa-shopping-cart"></i></h3>
+
+
+<table style="background-color: rgb(249, 251, 252); width: 25%;" class="table table-striped" class="table-responsive-sm">
+<thead>
+    <tr>
+    <th>Item</th>
+    <th>Quantity</th>
+    <th>Price/unit</th>
+    <th>Subtotal</th>
+    </tr>
+</thead>
+<tbody id="body">
+<!--this is the cart table where items are added by jquery-->
+</tbody>
+<tfoot>
+    <tr>
+        <td colspan="1"><strong>Total:</strong></td>
+        <td colspan="3" id="total" >  </td>
+    </tr>
+</tfoot>
+</table>
+
+<br/>
+
+<br/>
+<input type="button"  id="confirm" value="Buy" class="btn btn-success">    
+
+{% with student_id=student.id  %}
+{% with store_id=store.id %}
 
 
 
-</form>
-{% block footer %}
-{% endblock %}
+
+<script>
+//add items to cart
+    $(document).ready(function(){
+        var last_subtotal = 0;
+        var buy_clicked = false;
+            $("#add").click(function(event){
+                var item = $("#item").val();
+                var quantity = $("#quantity").val();
+                
+                if (quantity == ' ' || quantity == 0 ){
+                    alert ("please select atleast one in quantity");1
+                    return;
+                }
+                var  time = $("#pickup_time").val();
+                
+                $.ajax({
+                        url: '/ajax/cart/',
+                        data: {
+                            'status' : 'add_to_cart',
+                            'item_name': item,
+                            'student_id' : '{{student_id}}',
+                            'store_id' : '{{store_id}}',
+                            'time' : time,
+                            'quantity' : quantity
+                        },
+                        dataType: 'json',
+                        success: function (data){
+                            if (data.added == 'success'){
+                                console.log("item add to cart success");
+                                var price = data.item_price;
+                                var subtotal = price * quantity;
+                                $("#body").append("<tr > <td>"+item+"</td> <td>"+quantity+"</td> <td>"+ price +"</td> <td>"+subtotal+"<button>Del</button></td> </tr>");
+                                $("#total").text(data.total);
+                            }
+                            else if (data.added == 'failure'){
+                                alert("Item not available at store or has been removed by the store");
+                                console.log("item add failed, item removed by store");
+                                
+                            }
+                        } 
+                });
+            
+                
+            });
+
+//confirming purchase and saving to order table
+            $("#confirm").click(function(){
+                buy_clicked = true;
+                $.ajax({
+                        url: '/ajax/cart/',
+                        data: {
+                            'status' : 'confirm_order',
+                            'student_id' : '{{student_id}}',
+                        },
+                        dataType: 'json',
+                        success: function (data){
+                            if (data.status == 'order_placed'){
+                                alert("Order placed!");
+                                location.reload();
+                            }
+                        }
+
+                });
+
+            });
+
+
+
+
+        
+        window.onbeforeunload = function(event) {
+            if (buy_clicked == false){
+            event.returnValue = "exit"
+            }
+            };    
+//this ajax only resets cart on reentering to the cart page
+// meets the requirement but don't know why the anomaly
+            $.ajax({
+                        url: '/ajax/cart/',
+                        data: {
+                            'status' : 'leaving_page',
+                            'student_id' : '{{student_id}}',
+                        },
+                        dataType: 'json',
+                        success: function (data){
+                            if (data.status == 'cart_count_reset'){
+                                console.log(data.status)
+                            }
+                        }
+
+            });
+  
+    
+    });
+</script>
+{% endwith %}
+{% endwith %}
+
 
 {% endblock %}

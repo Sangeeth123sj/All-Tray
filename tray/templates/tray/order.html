@@ -2,29 +2,15 @@
 
 {% block title %} Order {% endblock %}
 
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'store_home' %}">Store</a>
+</nav>
+{% endblock %}
+
+
 {% block javascript %}
-<script>
-$("#item_name").change(function () {
-      var order = $(this).val();
 
-$.ajax({
-    url: '/ajax/validate_store_item/',
-    data: {
-        'order': order
-    },
-    dataType: 'json',
-    success: function (data) {
-        if (data.is_taken) {
-            alert("Item already exists in store");
-        }
-    }
-
-});
-
-});
-
-
-</script>
 
 
 {% endblock %}
@@ -47,6 +33,39 @@ $.ajax({
     <input type="hidden" name="store_id" value="{{store_id}}">
     <input type="submit" class="btn btn-success">
 </form>
+
+<div class="row">
+    <div class="col-sm-9">
+
+    </div>
+<div class="col-sm-3">
+    <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
+</div>
+</div>
+
+
+<script>
+    $("#item_name").change(function () {
+          var order = $(this).val();
+    
+    $.ajax({
+        url: '/ajax/validate_store_item/',
+        data: {
+            'order': order
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.is_taken) {
+                alert("Item already exists in store");
+            }
+        }
+    
+    });
+    
+    });
+    
+    
+    </script>
 
 
 {% endblock %}

@@ -1,0 +1,47 @@
+{% extends "tray/base.html" %}
+
+{% block title%} Register card {% endblock %}
+
+{% block content %}
+<h2>Register your card</h2>
+<br/>
+<form action="/register_card/" method="POST">
+{% csrf_token %}
+    <label>Your Name</label>
+    <br/>
+    <input type="text" name="student_name" required>
+    <br/><br/>
+    <label>Branch</label>
+    <br/>
+<select name="branch_name" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" style="background-color: azure;" required>
+    <option input value="Electronics & Communication">Electronics & Communication</option>
+    <option input value="Computer Science">Computer Science</option>
+    <option input value="Civil Engineering">Civil Engineering</option>
+    <option input value="Mechanical Engineering">Mechanical Engineering</option>
+</select>
+<br/><br/>
+<label>Semester</label>
+<br/>
+<input type="text" name="semester" required>
+<br/><br/>
+<label>PIN number</label>
+<br/>
+<input type="number" name="pin" minlength="4" required>
+<br/><br/>
+<label>Scan id card here</label>
+<br/>
+<input type="number" name="card" required>
+<br/> <br/>
+<input type="submit" onclick="success()" value="Submit" class="btn btn-primary">
+<p id="alerter"></p>
+
+</form>
+
+
+<script>
+    function success(){
+        document.getElementById(alerter).innerHTML = "Success!!"
+    }
+</script>
+
+{%  endblock %}

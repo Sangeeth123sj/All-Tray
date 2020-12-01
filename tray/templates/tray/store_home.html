@@ -1,24 +1,42 @@
 {% extends "tray/base.html" %}
 
+
 {% block title %} Store Home {% endblock %}
 
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <ul class="navbar-nav mr-auto">
 
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+    </ul>
+    <li class="nav-item">
+    <a class="nav-item" href="{% url 'logout' %}">Logout</a>
+    </li>
+    <li class="nav-item">
+    <a class="navbar-link" href="{% url 'store_order_list' %}">Order list</a>
+    </li>
+    <li class="nav-item">
+    <a class="navbar-link" href="{% url 'order' %}">Add item</a>
+    </li>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-9">
- 
-        </div>
-        <div class="col-sm-3">
-            <a href="{% url 'logout' %}" class="btn btn-warning">Log Out</a>
-        </div>
-    </div>
-</div>
 
-<h3>{{store_name}}({{status}})</h3>
+<h3>{{store_name}}<span id="status">({{status}})</span></h3>
 <strong>Welcome to your {{store_name}}</strong><br/><br/>
-<button type="button" id="activate" onclick="" class="btn btn-success">Activate Store</button>
+<p>Store status</p>
+<!--My switch from scratch-->
+<button  type="submit" id="l" style="width: fit-content;" class="btn btn-success">Store Open! </button>
+
+
+
+
+
+
+
+
+
 <br/> <br/>
       
 <table  width="40%">
@@ -64,5 +82,66 @@
         </div>
     </div>
 </div>
+
+
+
+<script>
+    //initial store status updation on load
+    $(document).ready(function(){
+        if ('{{status}}' == "Open"){
+            $("#l").attr("class", "btn btn-success");
+            $("#l").text("Store {{status}}!");
+        }
+        else{
+            $("#l").attr("class", "btn btn-danger");
+            $("#l").text("Store {{status}}");
+        console.log("{{status}}");
+        }
+    });
+    //change store status on button click
+    $("#l").click(function(){
+      
+      var q = $(this).attr("class");
+    
+      if (q == "btn btn-success"){
+            console.log(false);
+            var open = "Closed";
+            $(this).attr("class", "btn btn-danger");
+            $(this).text("Store Closed!");
+      }
+      else {
+        console.log(true);
+            $(this).attr("class","btn btn-success");
+            $(this).text("Store Open!");
+            var open = "Open";
+      }
+    
+           //ajaxifying with jquery
+           $.ajax({
+        url: '/ajax/update_store_status/',
+        data: {
+            'open': open
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.is_open == "true") {
+                alert("Store status updated as open");
+                $("#status").text("(Open)");
+            }
+            else if (data.is_open == "false") {
+                alert("Store status updated as closed");
+                $("#status").text("(Closed)");
+            }
+        }
+    
+        }); 
+      
+    
+    });
+     
+    </script>
+
+
+
 
 {% endblock %}
