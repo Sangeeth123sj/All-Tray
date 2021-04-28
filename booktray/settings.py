@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,10 +28,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#authentication backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'booktray.backend.MyBackend',
+]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'tray.backend.MyBackend',
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+    'account',
     'tray.apps.TrayConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -131,6 +142,23 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = ( os.path.join('static'), )
+STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'static'), )
 
 STATIC_ROOT = '/static/'
+
+SESSION_SAVE_EVERY_REQUEST = True
+
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}

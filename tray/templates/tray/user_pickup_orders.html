@@ -1,0 +1,227 @@
+{% extends "tray/base.html" %}
+
+{% block title%} Order list {% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'store_home' %}">Store</a>
+  </nav>
+{% endblock %}
+
+{% block content %}
+
+<h1> {{student.name}}'s Order List</h1>
+
+<br/>
+<!--Testing daterange-->
+{% load item_filters %}
+{% pickup_date_range as the_days %}
+
+{% for day in the_days %}
+   
+    {% order_day_checker day as is_order_day %}
+
+        {% if is_order_day %}
+               
+                    <table width="30%">
+                    <thead>
+                        
+                        <th>
+                            Item
+                        </th>
+                        <th>
+                            Quantity
+                        </th>
+                        <th>
+                            Buyer
+                        </th>
+                        <th>
+                            Deliver
+                        </th>
+                        
+                    </thead>
+                
+                <tbody>
+                    <br/> <p>{{day.date}} </p>
+                    <!--Now-->
+                    {% break_checker day "Now" as is_break %}
+                    {% if is_break %}
+                    <tr>
+                        <td colspan="5" align="center" style="background-color: #4eb7d4;">Orders now</td>
+                    </tr>
+                    {% endif %}  
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
+                
+                    <tr height="50px" id="{{order.id}}">
+                        
+                        <td align="center">
+                            <p id="order_id" hidden>{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" id="name" class="t">
+                            {{order.student.name}}
+                        </td>
+                        <td>
+                            {% if order.status %}
+                            <button class="btn btn-success" id="deliver">Delivered</button>
+                            {% else %}
+                            <button class="btn btn-danger" id="deliver">Delivered</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+
+                    <!--First Break-->
+                    {% break_checker day "First Break" as is_break %}
+                    {% if is_break %}
+                    <tr>
+                        <td colspan="5" align="center" style="background-color: #4eb7d4;">First Break</td>
+                    </tr>
+                    {% endif %}
+
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
+                
+                    <tr height="50px" id="{{order.id}}">
+                        
+                        <td align="center">
+                            <p id="order_id" hidden>{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
+                            {{order.student.name}}
+                        </td>
+                        <td>
+                            {% if order.status %}
+                            <button class="btn btn-success" id="deliver">Delivered</button>
+                            {% else %}
+                            <button class="btn btn-danger" id="deliver">Delivered</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+            <!--Lunch Break-->
+            {% break_checker day "Lunch Break" as is_break %}
+            {% if is_break %}
+            <tr>
+                <td colspan="5" align="center" style="background-color: #4eb7d4;">Lunch Break</td>
+            </tr> 
+            {% endif %}
+
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
+                
+                
+                    <tr height="50px" id="{{order.id}}">
+                        
+                        <td align="center">
+                            <p id="order_id" hidden>{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
+                            {{order.student.name}}
+                        </td>
+                        <td>
+                            {% if order.status %}
+                            <button class="btn btn-success" id="deliver">Delivered</button>
+                            {% else %}
+                            <button class="btn btn-danger" id="deliver">Delivered</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+            <!--Last Break-->
+            {% break_checker day "Last Break" as is_break %}
+            {% if is_break %}
+            <tr>
+                <td colspan="5" align="center" style="background-color: #4eb7d4;">Last Break</td>
+            </tr> 
+            {% endif %}
+
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
+                
+                    <tr height="50px" id="{{order.id}}">
+                        
+                        <td align="center">
+                            <p id="order_id" hidden>{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
+                            {{order.student.name}}
+                        </td>
+                        <td>
+                            {% if order.status %}
+                            <button class="btn btn-success" id="deliver">Delivered</button>
+                            {% else %}
+                            <button class="btn btn-danger" id="deliver">Delivered</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+            {% endfor %}
+
+                
+        {% endif %} 
+                </tbody>
+{% endfor %}
+</table>
+
+
+<br/>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+ 
+        </div>
+        <div class="col-sm-3">
+            <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+$(document).ready(function(){
+    $("tr #deliver").on("click",function(){
+            $(this).attr("class", "btn btn-success");
+            var order_id = $(this).parent().prev().prev().prev().find("#order_id").html().trim();
+            console.log(typeof(order_id));
+       
+        $.ajax({
+                        url: '/ajax/pickup_order/',
+                        data: {
+                            'order_id': order_id     
+                            },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.deliver == "true"){
+                                console.log("Deliver ticked");
+                            }
+                        }
+        });
+    });
+});
+</script>
+
+{% endblock %}

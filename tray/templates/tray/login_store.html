@@ -12,13 +12,70 @@
 
 
 <p>username</p>
-<input type="text" class="form-control" name="username"><br/><br/>
+<input type="text" class="form-control" id="username" name="username"><br/><br/>
 <p>password</p>
-<input type="password" class="form-control" name="password"><br/><br/>
-<input type="submit"  value="Login" class="btn btn-success" type="button">
+<input type="password" class="form-control" id="password" name="password"><br/><br/>
+<p id="incorrect_alert" style="color: rgb(143, 68, 68); font-weight: 1000; width: fit-content;" ></p>
+<input type="submit" id="enter" value="Login" class="btn btn-success" type="button">
 
 </form>
 
 </div>
 
+
+
+<script>
+//login validation
+    $(document).ready(function(){
+        $("#enter").click(function(event){
+                var username = $("#username").val();
+                var password = $("#password").val();
+                event.preventDefault();
+                if ($("#username").val() == "" && $("#password").val() != ""){
+                    document.getElementById("incorrect_alert").innerHTML = "Please fill in your username."
+                    $("#username").css("border-color","red"); 
+                    $("#password").removeAttr("border-color","red");
+                    return false;
+                }
+                if ($("#password").val() == "" && $("#username").val() != ""){
+                    document.getElementById("incorrect_alert").innerHTML = "Please fill in your password"
+                    $("#username").css("border-color","red"); 
+                    return false;
+                }
+                if ($("#username").val() == "" && $("#password").val() == ""){
+                    document.getElementById("incorrect_alert").innerHTML = "Please fill in username & password"
+                    document.getElementById("username").style.borderColor = "red";
+                    document.getElementById("password").style.borderColor = "red";
+                    return false;
+                }
+        
+        else{
+        $.ajax({
+                            url: '/ajax/store_login_validate/',
+                            data: {
+                                'user_name' : username,
+                                'password' : password
+                            },
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.validity == "correct") {
+                                    console.log("Correct!");
+                                    $("form").submit()
+                                }
+                                if (data.validity == "invalid_user") {
+                                    document.getElementById("incorrect_alert").innerHTML = "Invalid username"
+                                    console.log("Invalid username!");
+                                }
+                                else if (data.validity == "wrong_password") {
+                                    document.getElementById("incorrect_alert").innerHTML = "Invalid  password"
+                                    console.log("Invalid password");
+                                }
+                            }
+                    
+            });
+        }
+        });
+    });
+
+</script>
 {% endblock %}

@@ -1,0 +1,122 @@
+{% extends "tray/base.html" %}
+
+
+{% block title %} Edit Store {% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <ul class="navbar-nav mr-auto">
+
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+    </ul>
+    <li class="nav-item">
+    <a class="nav-item" href="{% url 'store_logout' %}">Logout</a>
+    </li>
+    <li class="nav-item">
+    <a class="navbar-link" href="{% url 'store_order_list' %}">Edit Store</a>
+    </li>
+    <li class="nav-item">
+    <a class="navbar-link" href="{% url 'store_add_item' %}">Add item</a>
+    </li>
+</nav>
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<script>
+    function validateForm() {
+                var store_name = document.forms["form"]["store_name"].value;
+                var store_description = document.forms["form"]["store_description"].value;
+                if (store_name == "") {
+                    document.getElementById("store_name").style.borderColor = "red";
+                    return false;
+                }
+                if (store_description == "") {
+                    document.getElementById("store_description").style.borderColor = "red";
+                    return false;
+                }
+            }
+</script>
+
+<h3>Edit Store</h3>
+
+<div class="form-group centered">
+    <form action="/store_edit_details_post/" method="POST" name="form" onsubmit="return validateForm()" >
+    {% csrf_token %}
+    <p>Store name</p>
+    <input type="text" name="store_name" id="store_name" class="form-control" value={{store.store_name}}><br/><br/>
+    <p>Store Description</p>
+    <textarea id="store_description" name="store_description" class="form-control" rows="5">{{store.store_details}}</textarea><br/><br/>
+    <input type="button" class="btn btn-success" value="submit" id="submit_button">
+    </form>
+    </div>
+
+
+
+
+    <script>
+        $(document).ready(function(){
+            //storing field variables to browser before reloading page
+            //filling fields with values on reload
+            window.onload=set_fields(); 
+    
+            function set_fields(){
+                var store_name = sessionStorage.getItem('store_name');
+                if (store_name !== null) $('#store_name').val(store_name);
+                var store_description = sessionStorage.getItem('store_description');
+                if (store_description !== null) $('#store_description').val(store_description);
+            }
+    
+    
+            
+           
+            window.onbeforeunload = function() {
+                sessionStorage.setItem("store_name", $('#store_name').val());
+                sessionStorage.setItem("store_description", $('#store_description').val());
+                // ...
+            }
+    
+            
+    
+            $("#submit_button").click(function (event) {
+                var store_name = $("#store_name").val();
+                var store_description = $("#store_description").val();
+                 $.ajax({
+                    url: '/ajax/store_edit_validate/',
+                    
+                    data: {
+                        'store_name': store_name,
+                        'college_id' : '{{college.id}}',
+                        'store_id' : '{{store.id}}'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.store_name_taken) {
+                            alert("That store name is already taken, try another name");
+                            location.reload();
+                            return false;
+                        }
+                        else{
+                            $("form").submit();
+                        }
+                    }
+                });
+                
+               
+                
+        
+            });
+        });
+        
+        
+        
+    </script>
+    
+
+
+
+
+{% endblock %}

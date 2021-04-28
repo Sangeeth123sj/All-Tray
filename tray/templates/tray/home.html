@@ -2,7 +2,13 @@
 
 {% block navbar %} 
 <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+        <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+    <li class="nav-item">
+        <a class="nav-item" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+    </li>   
+    <li class="nav-item">
+        <a class="nav-item" href="{% url 'student_logout' %}">Logout</a>
+    </li>
 </nav>
 {% endblock %}
 
@@ -12,12 +18,12 @@
 
 
 {% block content %}
+<center>
         <p>Welcome {{student.name}}</p>
-        <p>Your pin: {{student_pin}}</p>
-        <form action="/your_orders/" method="POST">
+        <form action="/your_orders_post/" method="POST">
             {% csrf_token %}
         <input type="hidden" name="student_id" value="{{student.id}}">
-        <input type="submit" class="btn btn-info" value="Your orders"> 
+        <input type="submit" class="btn btn-outline-primary" value="Your orders"> 
         </form>
 
         <form action="" method="POST">
@@ -26,14 +32,32 @@
         </form>
         <br/>
         
-        
-        <form action="/order_page/" method="POST">
+   
+        <form action="/order_page_post/" method="POST">
             {% csrf_token %}
-       
+            
+            <div class="container ">
+                <div class="row">
+                    <div class="col-sm-12" >
             {% for store in stores %}
-                <input type="submit" name="store_name" value="{{store.store_name}}" class="button store-button" type="button">
-                <input type="hidden" name="student_id" value="{{student.id}}">
+           
+                <button type="submit" class="btn btn-outline-dark" id="store_button" name="store_id" value="{{store.id}}" > 
+                    <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
+                    {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
+                    {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>
+                    {{store.store_details}}
+                </button>
+               
+           
+            
+                <!--input type="submit" name="" value="{{store.store_name}}" class="button store-button" type="button"-->
+                
+                <!--input type="hidden" name="store_name" value="{{store.store_name}}"-->
             {% endfor %}
+                </div>
+                </div>
+                </div>
+                <input type="hidden" name="student_id" value="{{student.id}}">
      </form>
-
+    </center>
 {% endblock %}

@@ -3,20 +3,149 @@
 {% block title %} Your Store {% endblock %}
 
 {% block content %}
+
+<script>
+    function validateForm() {
+            var store_name = document.forms["form"]["store_name"].value;
+            var username = document.forms["form"]["username"].value;
+            var email = document.forms["form"]["email"].value;
+            var password = document.forms["form"]["password"].value;
+            var college_id = document.forms["form"]["college_id"].value;
+            if (store_name == "") {
+                alert("Store name must be filled out");
+                document.getElementById("store_name").style.borderColor = "red";
+                return false;
+            }
+            if (username == "") {
+                alert("User name must be filled out");
+                document.getElementById("username").style.borderColor = "red";
+                return false;
+            }
+            if (email == "") {
+                alert("e-mail must be filled out");
+                document.getElementById("email").style.borderColor = "red";
+                return false;
+            }
+            if (password == "") {
+                alert("password must be filled out");
+                document.getElementById("password").style.borderColor = "red";
+                return false;
+            }
+            if (college_id == "") {
+                alert("College must be selected");
+                document.getElementById("college_id").style.borderColor = "red";
+                return false;
+            }
+        }
+</script>
+
+
 <h4> <strong> Register Your Store </strong></h4>
 
-<div class="form-group centered">
-<form action="/register_store_success/" method="POST">
+<div class="form-group centered" >
+<form  action="/register_store_success/" name="form" method="POST" onsubmit="return validateForm()" >
 {% csrf_token %}
 <p>Store name</p>
-<input type="text" name="store_name" class="form-control"><br/><br/>
+<input type="text" id="store_name" name="store_name" class="form-control" required ><br/><br/>
+<p>Store Description</p>
+<textarea id="store_description" name="store_description" class="form-control" rows="5">Add store description to display to buyer.</textarea>
+<br/><br/>
 <p>username</p>
-<input type="text" name="username" class="form-control"><br/><br/>
+<input type="text" name="username" id="username" class="form-control" required><br/><br/>
 <p>email id</p>
-<input type="email" name="email" class="form-control"><br/><br/>
+<input type="email" name="email" id="email" class="form-control" required><br/><br/>
 <p>password</p>
-<input type="password" name="password" class="form-control"><br/><br/>
-<input type="submit" value="Open Store" class="btn btn-success">
+<input type="password" name="password" id="password" class="form-control" required><br/><br/>
+<p>College</p>
+
+<select id="college_id" name="college_id" id="item" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;" required>
+                    
+                    
+    <option value="" selected disabled hidden> 
+        Select an Option 
+    </option> 
+
+{% for college in colleges %}
+<option input value="{{college.id}}" required>{{college.institute_name}}</option>
+{% endfor %}
+</select>
+
+<input type="button" id="submit_button" value="Submit" class="btn btn-success">
 </form>
 </div>
+
+<script>
+    $(document).ready(function(){
+        //storing field variables to browser before reloading page
+
+        //filling fields with values on reload
+        window.onload=set_fields(); 
+
+        function set_fields(){
+            var store_name = sessionStorage.getItem('store_name');
+            if (store_name !== null) $('#store_name').val(store_name);
+            var username = sessionStorage.getItem('username');
+            if (username !== null) $('#username').val(username);
+            var email = sessionStorage.getItem('email');
+            if (email !== null) $('#email').val(email);
+            var password = sessionStorage.getItem('password');
+            if (password !== null) $('#password').val(password);
+            var college_id = sessionStorage.getItem('college_id');
+            if (college_id !== null) $('#college_id').val(college_id);
+        }
+
+
+        
+       
+        window.onbeforeunload = function() {
+            sessionStorage.setItem("store_name", $('#store_name').val());
+            sessionStorage.setItem("username", $('#username').val());
+            sessionStorage.setItem("email", $('#email').val());
+            sessionStorage.setItem("password", $('#password').val());
+            sessionStorage.setItem("college_id", $('#college_id').val());
+            // ...
+        }
+
+        
+
+        $("#submit_button").click(function (event) {
+            var store_name = $("#store_name").val();
+            var college_id = $("#college_id").val();
+            var user_name = $("#username").val();
+             $.ajax({
+                url: '/ajax/store_register_validate/',
+                
+                data: {
+                    'store_name': store_name,
+                    'college_id': college_id,
+                    'user_name' : user_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.store_name_taken) {
+                        alert("Store name already taken, try another name");
+                        location.reload();
+                        return false;
+                    }
+                    else if (data.user_name_taken) {
+                        alert("User name already taken, try another name");
+                        location.reload();
+                        return false;
+                    }
+                    else{
+                        $("form").submit();
+                    }
+                }
+            });
+            
+           
+            
+    
+        });
+    });
+    
+    
+    
+        </script>
+
 {% endblock %}

@@ -1,0 +1,37 @@
+{% extends "tray/base.html" %}
+
+
+{% block title %} Edit Break {% endblock %}
+
+{% block navbar %} 
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+    <li class="nav-item">
+        <a class="nav-item" href="{% url 'college_logout' %}">Logout</a>
+    </li>
+</nav>
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+<h3>Edit Break</h3>
+
+<div class="form-group centered">
+    <form action="/college_break_edit_post/" method="POST" name="form" >
+    {% csrf_token %}
+        <p>First Break</p>
+        <input type="time" name="first_break" id="first_break" class="form-control" required><br/><br/>
+        <p>Lunch break</p>
+        <input type="time" name="lunch_break" id="lunch_break" class="form-control" required><br/><br/>
+        <p>Last break</p>
+        <input type="time" name="last_break" id="last_break" class="form-control" required><br/><br/>
+        <input type="submit" class="form-control btn btn-success" >
+    </form>
+</div>
+
+{% endblock %}

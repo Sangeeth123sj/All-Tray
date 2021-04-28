@@ -31,29 +31,30 @@ SEMESTERS = (
     ('semester 8', 'semester 8'),
 
 
-
 )
 
 class Institute(models.Model):
     institute_name = models.CharField(max_length=200)
     institute_balance = models.IntegerField(default=0)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-
+    
 class Student(models.Model):
     name = models.CharField(max_length=200)
     branch = models.CharField(max_length=200, choices=BRANCHES)
     sem = models.CharField(max_length=200, choices=SEMESTERS)
-    reg_no = models.IntegerField(default=0)
+    reg_no = models.CharField(max_length=200, unique = True)
     balance = models.IntegerField(default=0)
-    pin_no = models.IntegerField()
-
-
+    pin_no = models.CharField(max_length=200, unique = True)
+    college = models.ForeignKey(Institute, on_delete=models.CASCADE )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
 class Store(models.Model):
     store_name = models.CharField(max_length=200)
     store_status = models.BooleanField()
+    store_details = models.CharField(max_length=300, blank = True)
     store_balance = models.IntegerField(default=0)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    
+    college = models.ForeignKey(Institute, on_delete=models.CASCADE )
     def __str__(self):
         return str(self.store_name)+" "+ str(self.store_status)
 
@@ -72,6 +73,7 @@ class Order(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=False)
 
 class CartItem(models.Model):
     item = models.CharField(max_length=200, blank = True)
@@ -86,4 +88,4 @@ class Break(models.Model):
     first_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     lunch_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     last_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
-    
+    college = models.ForeignKey(Institute, on_delete=models.CASCADE)

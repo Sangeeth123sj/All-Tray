@@ -1,260 +1,292 @@
 {% extends 'tray/base.html'%}
 
 {% block content %}
+
 <h1>You orders are:</h1>
-<strong id="no_delete_condition" style="color: red;"></strong>
+<strong id="no_delete_condition" style="color: red; display:none;">"Order can be cancelled only atleast one hour before the break of the order"</strong>
 <br/> <br/>
-<table width="40%">
-    <thead>
-        <th>
-            Time
-        </th>
-        <th>
-            Item
-        </th>
-        <th>
-            Quantity
-        </th>
-        <th>
-            Cost
-        </th>
-        <th>
-            Cancellation
-        </th>
+
+<!--Testing daterange-->
+{% load item_filters %}
+
+{%pickup_date_range as today %}
+{% for day in today %}
+
+{% order_day_checker day as is_order_day %}
+
+{% if is_order_day %}
+       
+            <table width="30%">
+            <thead>
+                
+                <th>
+                    Item
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Cancellation
+                </th>
+                
+            </thead>
         
-    </thead>
-
-{% for order in your_orders_now %}
-
-    <tbody>
-    <tr height="50px" id="{{order.id}}">
-        <td align="center">
-            {{order.pickup_time}}
-        </td>
-
-        <td align="center">
-            {{order.item}}
-        </td>
-        <td align="center">
-            {{order.quantity}}
-        </td>
-        <td align="center">
-            {{order.cost}}
-        </td>
-
-        <td align="center">
-           
-        </td>
-    </tr>
-    </tbody>
-
-    <script>
-        $(document).ready(function(){
-            $("#{{order.id}}").click(function(){
-                console.log("entering ajax");
-                var choice = confirm("Do you want to continue ?");
-                if (choice == true){
-                    $.ajax({
-                        url: '/ajax/validate_order_cancel/',
-                        data: {
-                            'order_id': "{{order.id}}"
-                        },
-                        dataType: 'json',
-                        success: function (data){
-                            if (data.cancelled == 'success'){
-                                $(this).hide();
-                                alert("Item {{order.item1}} cancelled");
-                            } 
-                            else if (data.cancelled == 'failure'){
-                                console.log("failed by last minute");
-                                $("#no_delete_condition").text("Orders can be cancelled only upto atleast 1 hour before the time of pickup");
-                            }
-                            
-                        }
+        <tbody>
+            <br/> <p>{{day.date}} </p>
+            <!--Now-->
+            {% break_checker day "Now" as is_break %}
+            {% if is_break %}
+            <tr>
+                <td colspan="5" align="center" style="background-color: #4eb7d4;">Orders now</td>
+            </tr>
+            {% endif %}  
+    {% for order in orders %}
+        {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
+        
+            <tr height="50px">
+                
+                <td align="center">
+                    <p id="order_id" hidden>{{order.id}}</p>
+                    {{order.item}}
+                </td>
+                <td align="center">
+                    {{order.quantity}}
+                </td>
+                <td align="center" >
+                    <button class="btn btn-warning" id="cancel" name="cancel">Cancel</button>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
 
 
+            <!--First Break-->
+            {% break_checker day "First Break" as is_break %}
+            {% if is_break %}
+            <tr>
+                <td colspan="5" align="center" style="background-color: #4eb7d4;">First Break</td>
+            </tr>
+            {% endif %}
 
-                    });
-                }
-            });
-        });
-    </script>
+    {% for order in orders %}
+        {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
+        
+            <tr height="50px">
+                
+                <td align="center">
+                    <p id="order_id" hidden >{{order.id}}</p>
+                    {{order.item}}
+                </td>
+                <td align="center">
+                    {{order.quantity}}
+                </td>
+                <td align="center" >
+                    <button class="btn btn-warning" id="cancel" >Cancel</button>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+
+    <!--Lunch Break-->
+    {% break_checker day "Lunch Break" as is_break %}
+    {% if is_break %}
+    <tr>
+        <td colspan="5" align="center" style="background-color: #4eb7d4;">Lunch Break</td>
+    </tr> 
+    {% endif %}
+
+    {% for order in orders %}
+        {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
+        
+            <tr height="50px" >
+                
+                <td align="center">
+                    <p id="order_id" hidden >{{order.id}}</p>
+                    {{order.item}}
+                </td>
+                <td align="center">
+                    {{order.quantity}}
+                </td>
+                <td align="center" >
+                    <button class="btn btn-warning" id="cancel" >Cancel</button>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+
+    <!--Last Break-->
+    {% break_checker day "Last Break" as is_break %}
+    {% if is_break %}
+    <tr>
+        <td colspan="5" align="center" style="background-color: #4eb7d4;">Last Break</td>
+    </tr> 
+    {% endif %}
+
+    {% for order in orders %}
+        {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
+        
+            <tr height="50px" >
+                
+                <td align="center">
+                    <p id="order_id" hidden >{{order.id}}</p>
+                    {{order.item}}
+                </td>
+                <td align="center">
+                    {{order.quantity}}
+                </td>
+                <td align="center" >
+                    <button class="btn btn-warning" id="cancel" name="cancel" >Cancel</button>
+                </td>
+            </tr>
+        {% endif %}
+
+    {% endfor %}
+
+        
+{% endif %} 
+        </tbody>
 {% endfor %}
 
+</table>
 
-{% for order in your_orders_first_break %}
 
-    <tbody>
-    <tr height="50px" id="{{order.id}}">
-        <td align="center">
-            {{order.pickup_time}}
-        </td>
 
-        <td align="center">
-            {{order.item}}
-        </td>
-        <td align="center">
-            {{order.quantity}}
-        </td>
-        <td align="center">
-            {{order.cost}}
-        </td>
+{% your_orders_date_range as the_days %}
+{% for day in the_days %}
+   
+    {% order_day_checker day as is_order_day %}
 
-        <td align="center">
-            <button class="btn btn-danger" >Cancel</button>
-        </td>
-    </tr>
-    </tbody>
-
-    <script>
-        $(document).ready(function(){
-            $("#{{order.id}}").click(function(){
-                console.log("entering ajax");
-                var choice = confirm("Do you want to continue ?");
-                if (choice == true){
-                    $.ajax({
-                        url: '/ajax/validate_order_cancel/',
-                        data: {
-                            'order_id': "{{order.id}}"
-                        },
-                        dataType: 'json',
-                        success: function (data){
-                            if (data.cancelled == 'success'){
-                                console.log("reached success");
-                                alert("Item {{order.item1}} cancelled");
-                                $("#{{order.id}}").hide();
-                            } 
-                            else if (data.cancelled == 'failure'){
-                                console.log("failed by last minute");
-                                $("#no_delete_condition").text("Orders can be cancelled only upto atleast 1 hour before the time of pickup");
-                            }
+        {% if is_order_day %}
+               
+                    <table width="30%">
+                    <thead>
+                        
+                        <th>
+                            Item
+                        </th>
+                        <th>
+                            Quantity
+                        </th>
+                        <th>
+                            Cancellation
+                        </th>
+                        
+                    </thead>
+                
+                <tbody>
+                    <br/> <p>{{day.date}} </p>
+                    <!--Now-->
+                    {% break_checker day "Now" as is_break %}
+                    {% if is_break %}
+                    <tr>
+                        <td colspan="5" align="center" style="background-color: #4eb7d4;">Orders now</td>
+                    </tr>
+                    {% endif %}  
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
+                
+                    <tr height="50px">
+                        
+                        <td align="center">
+                            <p id="order_id" hidden>{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
                             
-                        }
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
 
 
+                    <!--First Break-->
+                    {% break_checker day "First Break" as is_break %}
+                    {% if is_break %}
+                    <tr>
+                        <td colspan="5" align="center" style="background-color: #4eb7d4;">First Break</td>
+                    </tr>
+                    {% endif %}
 
-                    });
-                }
-            });
-        });
-    </script>
-{% endfor %}
-
-<tbody>
-{% for order in your_orders_lunch_break %}
-
-    
-    <tr height="50px" id="{{order.id}}">
-        <td align="center">
-            {{order.pickup_time}}
-        </td>
-
-        <td align="center">
-            {{order.item}}
-        </td>
-        <td align="center">
-            {{order.quantity}}
-        </td>
-        <td align="center">
-            {{order.cost}}
-        </td>
-
-        <td align="center">
-            <button class="btn btn-danger" >Cancel</button>
-        </td>
-    </tr>
-    </tbody>
-
-    <script>
-        $(document).ready(function(){
-            $("#{{order.id}}").click(function(){
-                console.log("entering ajax");
-                var choice = confirm("Do you want to continue ?");
-                if (choice == true){
-                    $.ajax({
-                        url: '/ajax/validate_order_cancel/',
-                        data: {
-                            'order_id': "{{order.id}}"
-                        },
-                        dataType: 'json',
-                        success: function (data){
-                            if (data.cancelled == 'success'){
-                                console.log("reached success");
-                                alert("Item {{order.item1}} cancelled");
-                                $("#{{order.id}}").hide();
-                            } 
-                            else if (data.cancelled == 'failure'){
-                                console.log("failed by last minute");
-                                $("#no_delete_condition").text("Orders can be cancelled only upto atleast 1 hour before the time of pickup");
-                            }
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
+                
+                    <tr height="50px">
+                        
+                        <td align="center">
+                            <p id="order_id" hidden >{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
                             
-                        }
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
 
+            <!--Lunch Break-->
+            {% break_checker day "Lunch Break" as is_break %}
+            {% if is_break %}
+            <tr>
+                <td colspan="5" align="center" style="background-color: #4eb7d4;">Lunch Break</td>
+            </tr> 
+            {% endif %}
 
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
+                
+                    <tr height="50px" >
+                        
+                        <td align="center">
+                            <p id="order_id" hidden >{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
+                            
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
 
-                    });
-                }
-            });
-        });
-    </script>
-{% endfor %}
+            <!--Last Break-->
+            {% break_checker day "Last Break" as is_break %}
+            {% if is_break %}
+            <tr>
+                <td colspan="5" align="center" style="background-color: #4eb7d4;">Last Break</td>
+            </tr> 
+            {% endif %}
 
+            {% for order in orders %}
+                {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
+                
+                    <tr height="50px" >
+                        
+                        <td align="center">
+                            <p id="order_id" hidden >{{order.id}}</p>
+                            {{order.item}}
+                        </td>
+                        <td align="center">
+                            {{order.quantity}}
+                        </td>
+                        <td align="center" >
+                            
+                        </td>
+                    </tr>
+                {% endif %}
 
-{% for order in your_orders_last_break %}
+            {% endfor %}
 
-    <tbody>
-    <tr height="50px" id="{{order.id}}">
-        <td align="center">
-            {{order.pickup_time}}
-        </td>
-
-        <td align="center">
-            {{order.item}}
-        </td>
-        <td align="center">
-            {{order.quantity}}
-        </td>
-        <td align="center">
-            {{order.cost}}
-        </td>
-        <td align="center">
-            <button class="btn btn-danger">Cancel</button>
-        </td>
-    </tr>
-    </tbody>
-
-    <script>
-        $(document).ready(function(){
-            $("#{{order.id}}").click(function(){
-                console.log("entering ajax");
-                var choice = confirm("Do you want to continue ?");
-                if (choice == true){
-                    $.ajax({
-                        url: '/ajax/validate_order_cancel/',
-                        data: {
-                            'order_id': "{{order.id}}"
-                        },
-                        dataType: 'json',
-                        success: function (data){
-                            if (data.cancelled == 'success'){
-                                console.log("reached success");
-                                alert("Item {{order.item1}} cancelled");
-                                $("#{{order.id}}").hide(200);
-                            } 
-                            else if (data.cancelled == 'failure'){
-                                console.log("failed by last minute");
-                                $("#no_delete_condition").text("Orders can be cancelled only upto atleast 1 hour before the time of pickup");
-                            }
-
-                        }
-
-
-
-                    });
-                }
-            });
-        });
-    </script>
+                
+        {% endif %} 
+                </tbody>
 {% endfor %}
 
 
@@ -262,5 +294,42 @@
 </table>
 
 
+<script>
+
+
+
+
+$(document).ready(function(){
+
+    //cancels the clicked item from orders
+        $("tr #cancel").on("click", function(){
+            order_id = $(this).parent().prev().prev().find("#order_id").html().trim();
+            item_name = $(this).parent().prev().prev().text().trim();
+            console.log(order_id);
+            var row = $(this).parent().parent();
+            
+            $.ajax({
+                                url: '/ajax/validate_order_cancel/',
+                                data: {
+                                    'order_id' : order_id
+                                },
+                                dataType: 'json',
+                                success: function (data) {
+                                    if (data.cancelled == "success") {
+                                        alert(item_name+" order is cancelled" );
+                                        row.fadeOut(500);
+                                        //row.remove();
+                                        
+                                    }
+                                    else if (data.cancelled == "failure") {
+                                        $("#no_delete_condition").fadeIn(1000).delay(4000).fadeOut(1000);
+                                    }
+                                }
+                        
+                });  
+        });
+    });
+
+</script>
 
 {% endblock %}

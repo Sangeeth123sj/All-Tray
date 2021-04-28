@@ -1,0 +1,159 @@
+{% extends "tray/base.html" %}
+
+{% block title %} Your Store {% endblock %}
+
+{% block content %}
+
+<script>
+    function validateForm() {
+                var college_name = document.forms["form"]["college_name"].value;
+                var username = document.forms["form"]["username"].value;
+                var email = document.forms["form"]["email"].value;
+                var password = document.forms["form"]["password"].value;
+                var first_break = document.forms["form"]["first_break"].value;
+                var lunch_break = document.forms["form"]["lunch_break"].value;
+                var last_break = document.forms["form"]["last_break"].value;
+                if (college_name == "") {
+                    document.getElementById("college_name").style.borderColor = "red";
+                    alert("College name must be filled out");
+                    return false;
+                }
+                if (first_break == "") {
+                    document.getElementById("first_break").style.borderColor = "red";
+                    alert("First break time must be filled out");
+                    return false;
+                }
+                if (lunch_break == "") {
+                    document.getElementById("lunch_break").style.borderColor = "red";
+                    alert("Lunch break time must be filled out");
+                    return false;
+                }
+                if (last_break == "") {
+                    document.getElementById("last_break").style.borderColor = "red";
+                    alert("Last break time must be filled out");
+                    return false;
+                }
+                if (username == "") {
+                    document.getElementById("username").style.borderColor = "red";
+                    alert("User name must be filled out");
+                    return false;
+                }
+                if (email == "") {
+                    document.getElementById("email").style.borderColor = "red";
+                    alert("e-mail must be filled out");
+                    return false;
+                }
+                if (password == "") {
+                    document.getElementById("password").style.borderColor = "red";
+                    alert("Password must be filled out");
+                    return false;
+                }
+            }
+</script>
+
+<h4> <strong> Register Your Institute </strong></h4>
+
+<div class="form-group centered">
+<form action="/register_college_success/" name="form" method="POST" onsubmit="return validateForm()">
+{% csrf_token %}
+<p>Institute name</p>
+<input type="text" name="college_name" id="college_name" class="form-control"><br/><br/>
+<p>First Break</p>
+<input type="time" name="first_break" id="first_break" class="form-control"><br/><br/>
+<p>Lunch break</p>
+<input type="time" name="lunch_break" id="lunch_break" class="form-control"><br/><br/>
+<p>Last break</p>
+<input type="time" name="last_break" id="last_break" class="form-control"><br/><br/>
+<p>username</p>
+<input type="text" name="username" id="username" class="form-control"><br/><br/>
+<p>email id</p>
+<input type="email" name="email" id="email" class="form-control"><br/><br/>
+<p>password</p>
+<input type="password" name="password" id="password" class="form-control"><br/><br/>
+<input type="button" id="submit_button" value="Submit" class="btn btn-success">
+</form>
+</div>
+<script>
+    $(document).ready(function(){
+
+        
+
+        //storing field variables to browser before reloading page
+        //filling fields with values on reload
+        window.onload=set_fields(); 
+
+        function set_fields(){
+            var college_name = sessionStorage.getItem('college_name');
+            if (college_name !== null) $('#college_name').val(college_name);
+            var username = sessionStorage.getItem('username');
+            if (username !== null) $('#username').val(username);
+            var email = sessionStorage.getItem('email');
+            if (email !== null) $('#email').val(email);
+            var password = sessionStorage.getItem('password');
+            if (password !== null) $('#password').val(password);
+            /*var first_break = sessionStorage.getItem('first_break');
+            if (first_break !== null) $('#first_break').val('first_break');
+            var lunch_break = sessionStorage.getItem('lunch_break');
+            if (lunch_break !== null) $('#password').val(lunch_break);
+            var last_break = sessionStorage.getItem('last_break');
+            if (last_break !== null) $('#last_break').val(last_break);
+            */
+        }
+
+
+        
+       
+        window.onbeforeunload = function() {
+            sessionStorage.setItem("college_name", $('#college_name').val());
+            sessionStorage.setItem("username", $('#username').val());
+            sessionStorage.setItem("email", $('#email').val());
+            sessionStorage.setItem("password", $('#password').val());
+            /*sessionStorage.setItem("first_break", $('#first_break').val());
+            sessionStorage.setItem("lunch_break", $('#lunch_break').val());
+            sessionStorage.setItem("last_break", $('#last_break').val());
+            */
+        }
+
+        
+
+        $("#submit_button").click(function (event) {
+            var college_name = $("#college_name").val();
+            var user_name = $("#username").val();
+             $.ajax({
+                url: '/ajax/college_register_validate/',
+                
+                data: {
+                    'college_name': college_name,
+                    'user_name' : user_name
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.college_name_taken) {
+                        alert("College name already taken, try another name");
+                        location.reload();
+                        return false;
+                    }
+                    else if (data.user_name_taken) {
+                        alert("User name already taken, try another name");
+                        location.reload();
+                        return false;
+                    }
+                    else{
+                        $("form").submit();
+                    }
+                }
+            });
+            
+           
+            
+    
+        });
+});
+    
+    
+    
+</script>
+
+
+
+{% endblock %}

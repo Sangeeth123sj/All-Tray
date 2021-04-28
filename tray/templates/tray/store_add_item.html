@@ -1,0 +1,127 @@
+{% extends "tray/base.html" %}
+
+{% block title %} Order {% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'store_home' %}">Store</a>
+</nav>
+{% endblock %}
+
+
+{% block javascript %}
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+<script>
+    function validateForm() {
+                var item_name = document.forms["form"]["item_name"].value;
+                var price = document.forms["form"]["price"].value;
+                var stock = document.forms["form"]["stock"].value;
+                if (item_name == "") {
+                    document.getElementById("add_item_name").style.borderColor = "red";
+                    alert("Item name must be filled out");
+                    return false;
+                }
+                if (price == "") {
+                    document.getElementById("add_price").style.borderColor = "red";
+                    alert("Price must be filled out");
+                    return false;
+                }
+                if (stock == "") {
+                    document.getElementById("add_stock").style.borderColor = "red";
+                    alert("Stock must be filled out");
+                    return false;
+                }
+            }
+</script>
+
+
+
+<strong>Add Item</strong>
+<br/>
+
+<div class="form-group centered">
+<form action="/store_add_item_save/" name="form" method="POST" onsubmit="return validateForm()">
+    {% csrf_token %}
+    <p>item</p>
+    <input type="text" id="add_item_name" name="item_name" class="form-control" required><br/><br/>
+    <p>Price</p>
+    <input type="number" id="add_price" name="price" min="0" class="form-control" required><br/><br/>
+    <p>Stock</p>
+    <input type="number" id="add_stock" name="stock" min="1" class="form-control" required><br/><br/>
+    <input type="hidden" name="store_id" value="{{store_id}}">
+    <input type="button" id="submit_button" value="submit" class="btn btn-success">
+</form>
+</div>
+<div class="row">
+    <div class="col-sm-9">
+
+    </div>
+<div class="col-sm-3">
+    <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
+</div>
+</div>
+
+
+<script>
+$(document).ready(function(){
+
+    //filling fields with values on reload from browser session storage
+    window.onload=set_fields(); 
+
+    function set_fields(){
+        var add_item_name = sessionStorage.getItem('add_item_name');
+        if (add_item_name !== null) $('#add_item_name').val(add_item_name);
+        var add_price = sessionStorage.getItem('add_price');
+        if (add_price !== null) $('#add_price').val(add_price);
+        var add_stock = sessionStorage.getItem('add_stock');
+        if (add_stock !== null) $('#add_stock').val(add_stock);
+    }
+
+
+
+
+    window.onbeforeunload = function() {
+        sessionStorage.setItem("add_item_name", $('#add_item_name').val());
+        sessionStorage.setItem("add_price", $('#add_price').val());
+        sessionStorage.setItem("add_stock", $('#add_stock').val());
+        // ...
+    }
+
+    $("#submit_button").click(function () {
+
+        var item_name = $("#add_item_name").val();
+        //alert("entered the button region "+item_name);
+        $.ajax({
+            url: '/ajax/validate_store_item/',
+            data: {
+                'item_name': item_name
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.is_taken) {
+                    alert("Item already exists in store");
+                    location.reload();
+                }
+                else {
+                    $("form").submit();
+                }
+            }
+        });
+        
+
+    });
+});
+
+
+
+    </script>
+
+
+{% endblock %}

@@ -3,9 +3,10 @@
 {% block title%} Welcome to {{store.store_name}} {% endblock %}
 
 {% block content %}
-
-<p> You are {{student.name}}</p>
+<center>
+<p>Hi {{student.name}}</p>
 <p> Welcome to {{store.store_name}}</p>
+<p>Your balance: {{student.balance}}</p>
 <br/>
 
 
@@ -60,30 +61,32 @@
 <h3><strong>Cart</strong><i class="fas fa-shopping-cart"></i></h3>
 
 
-<table style="background-color: rgb(249, 251, 252); width: 25%;" class="table table-striped" class="table-responsive-sm">
+<table id="cart_table" style="background-color: rgb(249, 251, 252); width: 20%;" class="table table-striped" class="table-responsive-xs" >
 <thead>
     <tr>
     <th>Item</th>
-    <th>Quantity</th>
-    <th>Price/unit</th>
+    <th>Qty</th>
+    <th>Price</th>
     <th>Subtotal</th>
+    <th>Action</th>
     </tr>
 </thead>
-<tbody id="body">
+<tbody id="cart_body" >
 <!--this is the cart table where items are added by jquery-->
 </tbody>
 <tfoot>
     <tr>
         <td colspan="1"><strong>Total:</strong></td>
-        <td colspan="3" id="total" >  </td>
+        <td colspan="3" id="total"></td>
+        <td><button id="delete" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button></td>
     </tr>
 </tfoot>
 </table>
 
-<br/>
 
-<br/>
-<input type="button"  id="confirm" value="Buy" class="btn btn-success">    
+<p>Pay using:</p>
+
+<input type="button"  id="confirm" value="id-card" class="btn btn-primary">    
 
 {% with student_id=student.id  %}
 {% with store_id=store.id %}
@@ -94,14 +97,15 @@
 <script>
 //add items to cart
     $(document).ready(function(){
-        var last_subtotal = 0;
-        var buy_clicked = false;
+    var subtotal = 0;   
+    var total = 0;
+    var buy_clicked = false;
             $("#add").click(function(event){
                 var item = $("#item").val();
                 var quantity = $("#quantity").val();
                 
                 if (quantity == ' ' || quantity == 0 ){
-                    alert ("please select atleast one in quantity");1
+                    alert ("please select atleast one in quantity");
                     return;
                 }
                 var  time = $("#pickup_time").val();
@@ -121,9 +125,18 @@
                             if (data.added == 'success'){
                                 console.log("item add to cart success");
                                 var price = data.item_price;
-                                var subtotal = price * quantity;
-                                $("#body").append("<tr > <td>"+item+"</td> <td>"+quantity+"</td> <td>"+ price +"</td> <td>"+subtotal+"<button>Del</button></td> </tr>");
-                                $("#total").text(data.total);
+                                var cost = price * quantity;
+                                total = cost + subtotal;
+                                subtotal = subtotal + cost;
+                                console.log("total type:"+ typeof (total));
+                                console.log("cost type:"+ typeof (cost));
+                                console.log("subtotal type:"+ typeof (subtotal));
+                                var item_row = '<tr id = '+data.cart_item_id+'> <td>'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
+                                $("#cart_table").find('tbody').append(item_row );
+                                $("#total").text(total);
+                                console.log("total type:"+  total);
+                                console.log(total);
+                                //total = 0;
                             }
                             else if (data.added == 'failure'){
                                 alert("Item not available at store or has been removed by the store");
@@ -133,8 +146,42 @@
                         } 
                 });
             
+
+
                 
             });
+
+            $("#delete").click(function(){
+           
+              $("#cart_body").find('input[name="record"]').each(function(){
+            	if($(this).is(":checked")){
+                    var delete_item_id = $(this).closest('tr').attr('id');
+                    var item_cost = $(this).parent().prev().text();
+                    console.log(delete_item_id+ "item deleting with cost : " +item_cost);
+                    $(this).parents("tr").remove();
+                    console.log("total:"+subtotal);
+                    subtotal = subtotal - item_cost;
+                    console.log("total after deleting item:"+subtotal+"item_cost:"+item_cost );
+                    $("#total").text(subtotal);
+                    $.ajax({
+                        url: '/ajax/cart/',
+                        data: {
+                            'status' : 'delete_from_cart',
+                            'item_id' : delete_item_id
+                        },
+                        dataType: 'json',
+                        success: function (data){
+                            if (data.status == 'item_deleted'){
+                                //alert("Item deleted");
+                            }
+                        }
+
+                });
+
+
+                }
+           });
+       });
 
 //confirming purchase and saving to order table
             $("#confirm").click(function(){
@@ -144,13 +191,25 @@
                         data: {
                             'status' : 'confirm_order',
                             'student_id' : '{{student_id}}',
+                            'store_id' : '{{store.id}}',
+                            'total' : total
                         },
                         dataType: 'json',
                         success: function (data){
                             if (data.status == 'order_placed'){
+                                total = 0;
+                                subtotal = 0;
                                 alert("Order placed!");
                                 location.reload();
                             }
+                            if (data.status == 'no_item_in_cart')
+                            {
+                            alert("No item in cart");
+                            total = 0;
+                            subtotal = 0;
+                            }
+                            else if (data.status == 'low_balance')
+                            alert("Insufficient balance in card try, google pay.")
                         }
 
                 });
@@ -161,9 +220,11 @@
 
 
         
-        window.onbeforeunload = function(event) {
+            window.onbeforeunload = function(event) {
             if (buy_clicked == false){
             event.returnValue = "exit"
+            total = 0;
+            subtotal = 0;
             }
             };    
 //this ajax only resets cart on reentering to the cart page
@@ -189,5 +250,5 @@
 {% endwith %}
 {% endwith %}
 
-
+</center>
 {% endblock %}

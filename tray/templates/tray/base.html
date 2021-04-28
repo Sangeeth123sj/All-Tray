@@ -6,37 +6,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
 <style>
-    table, th, td {
-  border: 1px solid black;
+    table{
+-moz-box-shadow: 0 0 2px 2px #888;
+-webkit-box-shadow: 0 0 2px 2px#888;
+box-shadow: 0 0 2px 2px #888;
   border-collapse: collapse;
+  border-radius:3px;
+  
+}
+    td,th.tr{
+        border: 1px solid black;
     }
+    
 
-    body{
-        background-image: url('{% static "tray/images/tri.png" %}');
+    div.picture{
+        background-image: url('{% static "tray/images/train.jpg" %}');
         background-size: cover;
         background-repeat: no-repeat;
     }
     .heading{
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 24px;
-        color: #f1e8de;
+        font-family: Helvetica, sans-serif;
+        font-size: 54px;
+        color: #464975;
     }
-    .button { 
-        cursor: pointer; 
-        border: 1px solid #454442; 
-        background-color: #E7E9D1; 
-        height: 200px; 
+    #store_button { 
+        background-color:#ebf2f5; 
+        height: 300px; 
         width: 200px; 
-        color:#454442; 
-        font-size: 1.5em; 
         box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
-        filter: grayscale(10%);
-        background-color: rgba(255, 255, 255, .35);
+        border-radius: 6px;
         font-family: 'Courier New', Courier, monospace;
-        font-size: 20px;
+
     }
+
+    #store_button:hover {
+        color: rgb(127, 150, 144);
+    }
+
     .foot {
-        color:blanchedalmond;
+        color: #464975;
+        font-family:cursive;
     }
     div.fixed {
   position: fixed;
@@ -51,9 +60,42 @@
   align-items: center;
   justify-content: center;
     }
+    div.span2{
+      width:34%;
+    }
+  
 
 
-   
+/**
+ * style input elements that have a required
+ * attribute and a hover state
+ */
+input:required:hover {
+  opacity: 1;
+}
+
+
+
+
+
+/* Control the left side */
+div.left {
+  position: relative;
+  left: 80;
+  width:fit-content;
+}
+
+
+/* Control the right side */
+.right {
+
+  position: relative;
+  float: right;
+  width: fit-content;
+  height: 900%;
+  background-color: black;
+}
+
 
 </style>
 
@@ -67,8 +109,8 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 </head>
-<body >
-
+<body style="background-color: #ebf2f5">
+<!-- #ebf2f5-->
 {% block navbar %}
 
 <nav class="navbar navbar-dark bg-dark">
@@ -90,25 +132,32 @@
 
     
 {% endblock %}
-<center>
-      <br/>
-    <div class="heading">
-        <h1><strong>All Tray</strong> </h1>
-        </div>
+{% block heading %}
+
+    <div class="heading" >
+        <center>
+        <strong>All Tray</strong>
+        </center>
+    </div>
     
-    {% block content%} {% endblock %}
+{% endblock %}
+    {% block content%}
+    
+    {% endblock %}
 
     </div>
-</center>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="{% static 'tray/js/app.js' %}"></script>
-{% block javascript %}{% endblock %}
+
+
+
 
 </body>
 {% block footer %}
 <center>
 <div class="foot">
+<br/> <br/>
 <p> Thanks for using All Tray </p>
 </div>
 </center>

@@ -10,97 +10,186 @@
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
     </ul>
     <li class="nav-item">
-    <a class="nav-item" href="{% url 'logout' %}">Logout</a>
+    <a class="nav-item" href="{% url 'store_logout' %}">Logout</a>
+    </li>
+    <li class="nav-item">
+    <a class="navbar-link" href="{% url 'store_edit_details' %}">Edit Store</a>
     </li>
     <li class="nav-item">
     <a class="navbar-link" href="{% url 'store_order_list' %}">Order list</a>
     </li>
-    <li class="nav-item">
-    <a class="navbar-link" href="{% url 'order' %}">Add item</a>
-    </li>
 </nav>
 {% endblock %}
 
+
+
 {% block content %}
 
-<h3>{{store_name}}<span id="status">({{status}})</span></h3>
+<script>
+//prevent navigating back to login
+function preventBack() { 
+        window.history.forward();  
+    } 
+      
+    setTimeout("preventBack()", 0); 
+      
+    window.onunload = function () { null }; 
+//script to reload the item list of store on nav back from add item page 
+//so that just before deleted item would appear again overriding the hide()
+if(performance.navigation.type == 2){
+    location.reload(true);
+ }
+</script>
+
+<h3>{{store.store_name}}<span id="status">({{status}})</span></h3>
 <strong>Welcome to your {{store_name}}</strong><br/><br/>
 <p>Store status</p>
 <!--My switch from scratch-->
-<button  type="submit" id="l" style="width: fit-content;" class="btn btn-success">Store Open! </button>
+<button  type="button" id="store_status_button" style="width: fit-content;" class="btn btn-success">Store Open! </button>
+
+<br/> 
+<p>Store balance: {{store.store_balance}}</p>
 
 
+<div class="btn-group" role="group" aria-label="Basic example">
+    <a href="{% url 'store_add_item' %}" class="btn btn-outline-success">Add Items</a>
+    <a href="{% url 'store_item_pickup' %}" class="btn btn-outline-primary">Item pickup</a>
+    <a href="{% url 'store_edit_details' %}" class="btn btn-outline-success">Edit Store</a>
+  </div>
+<br/>  <br/>  
 
-
-
-
-
-
-
-<br/> <br/>
-      
-<table  width="40%">
+{% if items %}
+<table  id="item_table" width="40%">
 <thead>
     <tr>
         <th>Item </th>
-        <th>Price/unit</th>
+        <th id="tt">Price/unit</th>
         <th>Stock</th>
-        <th>Avialable</th>
+        <th>Show</th>
         <th>Actions</th>
     </tr>
 </thead>
-<tbody>
+<tbody id="order_list_body">
 {% for item in items %}
-<tr height="50px">
+<tr height="50px" id="row">
     <td align="center">
-        {{item.item}}: 
+        <p id="item_id" hidden>{{item.id}}</p>
+        {{item.item}}
     </td>
     <td align="center">
         {{item.price}}
     </td>
     <td align="center">
-        {{item.quantity}}
+        {{item.stock}}
     </td>
     <td align="center">
-        <input type="checkbox" id="available" name="available" value="available">
+        <input type="checkbox" id="available" name="available" {% if item.available %} checked {% endif %} >
     </td>
     <td align="center">
-        <a href="{% url 'order' %}" class="btn btn-info">Edit</a>
-        <a href="{% url 'order' %}" class="btn btn-warning">Delete</a>
+        <form action="/edit_items_post/" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" value={{item.id}}>
+            <input type="hidden" name="store_id" value={{store_id}}>
+            <button type="submit" class="btn btn-info"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+        </form>
+        <button class="btn btn-warning" id="delete" ><i class="fa fa-trash-o" aria-hidden="true"></i></button>
     </td>
 </tr>
+
+
 {% endfor %}
+
+
+
 </tbody>
 </table> <br/>
+
 <div class="container">
     <div class="row">
-        <div class="col-sm-6">
- <a href="{% url 'order' %}" class="btn btn-success">Add Items</a>
+        <div class="col-sm-3">
         </div>
-        <div class="col-sm-6">
-            <a href="{% url 'store_order_list' %}" class="btn btn-primary">Order list</a>
+        <div class="col-sm-2">
+ <a href="{% url 'store_add_item' %}" class="btn btn-outline-success">Add Items</a>
+        </div>
+        <div class="col-sm-2">
+            <a href="{% url 'store_order_list' %}" class="btn btn-outline-primary">Order list</a>
+        </div>
+        <div class="col-sm-2">
+            <a href="{% url 'store_item_pickup' %}" class="btn btn-outline-success">Store item pickup</a>
+        </div>
+        <div class="col-sm-3">
         </div>
     </div>
 </div>
 
-
+{% endif %}
 
 <script>
-    //initial store status updation on load
-    $(document).ready(function(){
-        if ('{{status}}' == "Open"){
-            $("#l").attr("class", "btn btn-success");
-            $("#l").text("Store {{status}}!");
+
+var availability
+var item_name
+
+$(document).ready(function(){
+
+//ticks the availabiltiy of item on clicking and updates same in db
+    $("tr #available").on("click", function(){
+        item_id = $(this).parent().prev().prev().prev().find("#item_id").html().trim();
+        item_name = $(this).parent().prev().prev().prev().text().trim();
+        if ($(this).is(":checked"))
+        {
+            // it is checked
+            availability = 'available';
+            console.log("Item: "+item_id+availability+"{{store_id}} is now available to buyers");
         }
-        else{
-            $("#l").attr("class", "btn btn-danger");
-            $("#l").text("Store {{status}}");
-        console.log("{{status}}");
+        else 
+        {
+            //it is unchecked
+            availability = 'unavailable';
         }
+
+
+        $.ajax({
+                            url: '/ajax/update_item_availability/',
+                            data: {
+                                'status' : 'availability_change',
+                                'availability' : availability,
+                                'item_id' : item_id,
+                                'store_id' : '{{store_id}}'
+                            },
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.available == "true") {
+                                    console.log("Item: "+item_name+availability+"{{store_id}} is now available to buyers");
+                                    //alert("Item is now available to buyers" );
+                                }
+                                else if (data.available == "false") {
+                                    console.log("Item: "+item_name+" is now unavailable to buyers");
+                                    //alert("Item is now unavailable to buyers");
+                                }
+                            }
+                    
+            }); 
     });
+
+
+//store status button update onload of page
+    if ('{{status}}' == "Open"){
+            $("#store_status_button").attr("class", "btn btn-success");
+            $("#store_status_button").text("Store {{status}}!");
+            console.log("{{status}}");
+        }
+
+    else if ( '{{status}}' == "Closed" ){
+          $("#store_status_button").attr("class", "btn btn-danger");
+          $("#store_status_button").text("Store {{status}}");
+          console.log("{{status}}");
+        }
+
+
+
+
     //change store status on button click
-    $("#l").click(function(){
-      
+    $("#store_status_button").click(function(){
       var q = $(this).attr("class");
     
       if (q == "btn btn-success"){
@@ -120,7 +209,8 @@
            $.ajax({
         url: '/ajax/update_store_status/',
         data: {
-            'open': open
+            'open': open,
+            'store_id': '{{store_id}}'
         },
         dataType: 'json',
         success: function (data) {
@@ -138,8 +228,50 @@
       
     
     });
-     
-    </script>
+        
+ 
+//delete item ajaxify
+    $("tr #delete").on("click", function(){
+        var choice = confirm("Are you sure to delete the item permanently from store?");
+        if (choice){
+            item_id = $(this).parent().prev().prev().prev().prev().find("#item_id").html().trim();
+            console.log($(this).parent().prev().prev().prev().prev().find("#item_id").html());
+            $(this).parent().parent().fadeOut(1000);
+            $.ajax({
+                            url: '/ajax/update_item_availability/',
+                            data: {
+                                'status' : 'delete_item',
+                                'item_id' : item_id,
+                                'store_id' : '{{store_id}}'
+                            },
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data.deleted == "true") {
+                                 // ERRRORRRRR..   
+                                    console.log($(this).parent().prev().prev().prev().prev().find("#item_id").html());
+                                    $(this).parent().prev().fadeOut(2000);
+                                   
+                                }
+                                else if (data.deleted == "false") {
+                                    alert("Item: "+item_name+" not in list");
+                                }
+
+                            }
+                        
+            });
+        }
+        else{
+            return;
+        }
+    });
+
+    
+
+
+});
+
+  
+ </script>
 
 
 

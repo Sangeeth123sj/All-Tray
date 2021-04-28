@@ -1,0 +1,80 @@
+{% extends "tray/base.html" %}
+
+
+{% block title %} Edit Pin {% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-dark bg-dark">
+    <ul class="navbar-nav mr-auto">
+
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+    </ul>
+    <li class="nav-item">
+    <a class="nav-item" href="{% url 'store_logout' %}">Logout</a>
+    </li>
+</nav>
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+<h3>Edit Pin</h3>
+
+<div class="form-group centered">
+    <form action="/student_pin_edit_post/" method="POST" name="form">
+    {% csrf_token %}
+    <p>Pin no.</p>
+    <input type="text" name="pin_no" id="pin_no" class="form-control" required><br/><br/>
+    <input type="button" id="submit_button" value="Submit" class="btn btn-success">
+    </form>
+    </div>
+
+
+
+
+    <script>
+        $(document).ready(function(){
+           
+            $("#submit_button").click(function (event) {
+                var pin_no = $("#pin_no").val();
+                console.log(pin_no);
+
+                $.ajax({
+                    url: '/ajax/student_pin_edit_validate/',
+                    
+                    data: {
+                        'pin_no': pin_no,
+                        'student_id': '{{student.id}}'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.pin_taken) {
+                            alert("Pin no already taken try another");
+                            location.reload();
+                            return false;
+                        }
+                        else{
+                            $("form").submit();
+                        }
+                    }
+                });
+                
+               
+                
+        
+            });
+        });
+        
+        
+        
+    </script>
+    
+
+
+
+
+{% endblock %}

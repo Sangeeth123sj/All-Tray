@@ -3,45 +3,195 @@
 {% block title%} Register card {% endblock %}
 
 {% block content %}
+
+<script>
+    function validateForm() {
+            var student_name = document.forms["form"]["student_name"].value;
+            var branch_name = document.forms["form"]["branch_name"].value;
+            var semester = document.forms["form"]["semester"].value;
+            var pin = document.forms["form"]["pin"].value;
+            var card = document.forms["form"]["card"].value;
+            var college_id = document.forms["form"]["college_id"].value;
+            if (student_name == "") {
+                document.getElementById("student_name").style.borderColor = "red";
+                alert("Please enter your name")
+                return false;
+            }
+            if (branch_name == "") {
+                document.getElementById("branch_name").style.borderColor = "red";
+                alert("Please enter your branch")
+                return false;
+            }
+            if (semester == "") {
+                document.getElementById("semester").style.borderColor = "red";
+                alert("Please enter your semester")
+                return false;
+            }
+            if (pin == "") {
+                document.getElementById("pin").style.borderColor = "red";
+                alert("Please enter pin no.")
+                return false;
+            }
+            if (card == "") {
+                document.getElementById("card").style.borderColor = "red";
+                alert("Please swipe your rfid card or enter it's number")
+                return false;
+            }
+            if (college_id == "") {
+                document.getElementById("college_id").style.borderColor = "red";
+                alert("Please swipe your rfid card or enter it's number")
+                return false;
+            }
+
+        }
+</script>
+
 <h2>Register your card</h2>
 <br/>
-<form action="/register_card/" method="POST">
+<div class="form-group centered">
+<form action="/register_card_post/" method="POST" name="form" onsubmit="return validateForm()">
 {% csrf_token %}
     <label>Your Name</label>
     <br/>
-    <input type="text" name="student_name" required>
+    <input type="text" name="student_name" id="student_name" class="form-control" >
+    <br/><br/>
+    <label>e-mail id</label>
+    <br/>
+    <input type="text" name="mail_id" id="mail_id" class="form-control" >
     <br/><br/>
     <label>Branch</label>
     <br/>
-<select name="branch_name" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" style="background-color: azure;" required>
+<select name="branch_name" id="branch_name" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" style="background-color: azure;" class="form-control" >
     <option input value="Electronics & Communication">Electronics & Communication</option>
     <option input value="Computer Science">Computer Science</option>
     <option input value="Civil Engineering">Civil Engineering</option>
     <option input value="Mechanical Engineering">Mechanical Engineering</option>
 </select>
 <br/><br/>
-<label>Semester</label>
+
+<p>Semester:</p>
+<select name="semester" id="semester" class="btn dropdown-toggle" class="form-control"  required style="background-color: azure;">
+<option input value="semester 1">semester 1</option>
+<option input value="semester 2">semester 2</option>
+<option input value="semester 3">semester 3</option>
+<option input value="semester 4">semester 4</option>
+<option input value="semester 5">semester 5</option>
+<option input value="semester 6">semester 6</option>
+<option input value="semester 7">semester 7</option>
+<option input value="semester 8">semester 8</option>
+</select>
+
 <br/>
-<input type="text" name="semester" required>
-<br/><br/>
+
 <label>PIN number</label>
 <br/>
-<input type="number" name="pin" minlength="4" required>
+<input type="number" name="pin" id="pin" minlength="4" class="form-control" >
 <br/><br/>
 <label>Scan id card here</label>
 <br/>
-<input type="number" name="card" required>
+<input type="number" name="card" id="card" class="form-control" >
 <br/> <br/>
-<input type="submit" onclick="success()" value="Submit" class="btn btn-primary">
+<p>College</p>
+
+<select id="college_id" name="college_id" id="college_id" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;" >
+                    
+                    
+    <option value="" selected disabled hidden> 
+        Select an Option 
+    </option> 
+
+{% for college in colleges %}
+<option input value="{{college.id}}" >{{college.institute_name}}</option>
+{% endfor %}
+</select>
+<input type="button" id="submit_button" value="Submit" class="btn btn-primary" class="form-control">
 <p id="alerter"></p>
 
 </form>
-
+</div>
 
 <script>
-    function success(){
-        document.getElementById(alerter).innerHTML = "Success!!"
-    }
+    $(document).ready(function(){
+
+
+        window.onload=set_fields(); 
+
+        function set_fields(){
+            var student_name = sessionStorage.getItem('student_name');
+            if (student_name !== null) $('#student_name').val(student_name);
+            var mail_id = sessionStorage.getItem('mail_id');
+            if (mail_id !== null) $('#mail_id').val(mail_id);
+            var branch_name = sessionStorage.getItem('branch_name');
+            if (branch_name !== null) $('#branch_name').val(branch_name);
+            var semester = sessionStorage.getItem('semester');
+            if (semester !== null) $('#semester').val(semester);
+            var pin = sessionStorage.getItem('pin');
+            if (pin !== null) $('#pin').val(pin);
+            var card = sessionStorage.getItem('card');
+            if (card !== null) $('#card').val(card);
+            var college_id = sessionStorage.getItem('college_id');
+            if (college_id !== null) $('#college_id').val(college_id);
+        }
+
+
+
+
+        window.onbeforeunload = function() {
+            sessionStorage.setItem("student_name", $('#student_name').val());
+            sessionStorage.setItem("mail_id", $('#mail_id').val());
+            sessionStorage.setItem("branch_name", $('#branch_name').val());
+            sessionStorage.setItem("semester", $('#semester').val());
+            sessionStorage.setItem("pin", $('#pin').val());
+            sessionStorage.setItem("card", $('#card').val());
+            sessionStorage.setItem("college_id", $('#college_id').val());
+        }
+
+
+
+
+        $("#submit_button").click(function (event) {
+            var user_name = $("#student_name").val();
+            var pin = $("#pin").val();
+            var card = $("#card").val();
+             $.ajax({
+                url: '/ajax/student_register_validate/',
+                
+                data: {
+                    'user_name' : user_name,
+                    'pin' : pin,
+                    'card' : card
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.user_name_taken) {
+                        alert("User name already taken, try another name");
+                        location.reload();
+                        return false;
+                    }
+                    if (data.pin_taken) {
+                        alert("Pin already taken, try another pin");
+                        location.reload();
+                        return false;
+                    }
+                    if (data.card_taken) {
+                        alert("Card number already taken, try another pin");
+                        location.reload();
+                        return false;
+                    }
+                    else{
+                        $("form").submit();
+                    }
+                }
+            });
+            
+           
+            
+    
+        });
+
+    });
+
 </script>
+
 
 {%  endblock %}

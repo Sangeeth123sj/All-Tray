@@ -11,6 +11,15 @@
 {% endblock %}
 
 {% block content %}
+
+{% with t=True %}
+
+<p>{{t}}</p>
+
+{% with t=False %}
+<p>{{t}}</p>
+{% endwith %}
+{% endwith %}
 <form action="/form_test/" method="POST">
 {% csrf_token %}
     {{form}}
