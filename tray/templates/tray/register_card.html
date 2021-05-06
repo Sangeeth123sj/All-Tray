@@ -45,12 +45,13 @@
 
         }
 </script>
-
+{% load crispy_forms_tags %}
 <h2>Register your card</h2>
 <br/>
 <div class="form-group centered">
 <form action="/register_card_post/" method="POST" name="form" onsubmit="return validateForm()">
 {% csrf_token %}
+{{ form|crispy }}
     <label>Your Name</label>
     <br/>
     <input type="text" name="student_name" id="student_name" class="form-control" >

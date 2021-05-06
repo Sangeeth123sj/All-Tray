@@ -6,7 +6,7 @@
 
                 {% block heading %}
 <div class="row">
-    
+{% load crispy_forms_tags %}
     <div class="col-md-4 left">
                 <div class="heading" >
                     <br/>
@@ -25,6 +25,7 @@
                     
                 <form action="/home_post/" class="form" method="POST" >
                     {% csrf_token %}
+                    {{ form|crispy }}
                 <br/>
                 <Strong>Pin</strong>
                 <br/>

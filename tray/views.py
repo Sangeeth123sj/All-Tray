@@ -482,6 +482,14 @@ def validate_order_cancel(request):
     else: break_time = "Now"
 
     if  break_time == "Now" :
+        student_balance = order.student.balance
+        store_balance = order.store.store_balance
+        student_balance = order.student.balance + order.cost
+        order.student.balance = student_balance
+        store_balance = order.store.store_balance - order.cost
+        order.store.store_balance = store_balance
+        order.student.save()
+        order.store.save()
         order.delete()
         data = {
                 'cancelled' : 'success'
@@ -493,7 +501,12 @@ def validate_order_cancel(request):
         cancel_time = datetime.now()
         time_difference = break_time.hour - cancel_time.hour
         if time_difference >= 0 :
+            student_balance = order.student.balance 
+            student_balance = order.student.balance + order.cost
+            order.student.balance = student_balance
+            order.student.save()
             order.delete()
+
             data = {
                     'cancelled' : 'success'
                 }
