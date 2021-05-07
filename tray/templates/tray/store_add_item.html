@@ -17,6 +17,7 @@
 
 
 {% block content %}
+<center>
 
 <script>
     function validateForm() {
@@ -60,11 +61,12 @@
 </form>
 </div>
 <div class="row">
-    <div class="col-sm-9">
+    
+<div class="col-sm-5">
+    <a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
+</div>
+<div class="col-sm-11">
 
-    </div>
-<div class="col-sm-3">
-    <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
 </div>
 </div>
 
@@ -123,5 +125,5 @@ $(document).ready(function(){
 
     </script>
 
-
+</center>
 {% endblock %}
