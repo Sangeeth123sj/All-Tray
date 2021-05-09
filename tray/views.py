@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 from .models import Student,Item,Store,User,Order, Break, CartItem, Institute
 from django.db.models import Sum
@@ -40,11 +41,11 @@ def register_card_post(request):
         return render (request, 'tray/entry.html')
 
 def entry(request):
-    #if request.user.is_active:
-    #if Student.objects.filter(user__is_active=True):
-     #   print("Already logged in")
-        #return redirect('home')
-    #else:
+    #if Student.objects.filter(user=request.user, user__is_authenticated=True):
+    if request.user.is_authenticated:
+       print("Already logged in")
+       return redirect('home')
+    else:
         return render (request, 'tray/entry.html')
 
 def home_post(request):
@@ -148,7 +149,11 @@ def open_store_success(request):
         return redirect(store_login)
 
 def store_login(request):
-    return render(request, 'tray/login_store.html' )
+    if request.user.is_authenticated:
+       print("Already logged in")
+       return redirect('store_home')
+    else:
+        return render(request, 'tray/login_store.html' )
 
 
 def store_login_processing(request):
@@ -302,7 +307,11 @@ def register_college_success(request):
         return redirect(login_college)
 
 def login_college(request):
-    return render (request, 'tray/login_college.html')
+    if request.user.is_authenticated:
+       print("Already logged in")
+       return redirect('college_home')
+    else:
+        return render (request, 'tray/login_college.html')
 
 def college_login_verify(request):
     username = request.POST['username']

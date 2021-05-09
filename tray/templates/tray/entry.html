@@ -16,9 +16,15 @@
                 {% block content %}
                 
 <script type="text/javascript">
-function preback() {window.history.forward();}
-setTimeout("preback()",0);
-window.onunload=function() {null};
+//function preback() {window.history.forward();}
+//setTimeout("preback()",0);
+//window.onunload=function() {null};
+//window.onbeforeunload = function() { return "Your work will be lost."; };
+
+
+history.go(1);
+
+
 </script>
 
 
