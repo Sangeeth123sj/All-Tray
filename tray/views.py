@@ -40,11 +40,11 @@ def register_card_post(request):
         return render (request, 'tray/entry.html')
 
 def entry(request):
-
-    if request.user.is_active:
-        print("Already logged in")
-        return redirect('home')
-    else:
+    #if request.user.is_active:
+    #if Student.objects.filter(user__is_active=True):
+     #   print("Already logged in")
+        #return redirect('home')
+    #else:
         return render (request, 'tray/entry.html')
 
 def home_post(request):
@@ -157,6 +157,7 @@ def store_login_processing(request):
     user = authenticate(request, username = username, password = password)
 
     if user is not None:
+        logout(request)
         login(request, user)
         store_id = user.store.id
         request.session['store_id'] = store_id
