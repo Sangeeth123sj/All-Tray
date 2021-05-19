@@ -110,14 +110,16 @@ div.left {
 <script src="{% static 'tray/js/app.js' %}"></script>   
 <script src="https://kit.fontawesome.com/803b4ae923.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!--new navbar source-->
 
 </head>
-<body style="background-color: #ebf2f5">
+<body style="background-color: rgba(255,255, 255, 1)">
 <!-- #ebf2f5-->
 {% block navbar %}
 
 <nav class="navbar navbar-dark bg-dark">
-  <ul class="navbar-nav mr-auto" >
+  <!--navbar-dark bg-dark-->
+  <ul class="navbar-nav mr-auto">
   <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
   </ul>
 
@@ -125,7 +127,7 @@ div.left {
   <a class="navbar-link" href="{% url 'open_store' %}">New Store</a>
   </li>
   <li class="nav-item">
-  <a class="navbar-item" href="{% url 'store_login' %}">Store Log In</a>
+  <a class="navbar-item" href="{% url 'store_login' %}">Store LogIn</a>
   </li>
 </nav>
 
