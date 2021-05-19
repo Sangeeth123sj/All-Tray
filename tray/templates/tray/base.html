@@ -31,7 +31,8 @@ box-shadow: 0 0 2px 2px #888;
         color: #464975;
     }
     #store_button { 
-        background-color:#ebf2f5; 
+        background-color: rgba(255,255, 255, 1);
+          /* #ebf2f5; */
         height: 300px; 
         width: 200px; 
         box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
@@ -51,7 +52,7 @@ box-shadow: 0 0 2px 2px #888;
     div.fixed {
   position: fixed;
   bottom: 0;
-  right: -999;
+  right: -800;
   
   border: 3px solid #73AD21;
     }
@@ -116,8 +117,9 @@ div.left {
 <body style="background-color: rgba(255,255, 255, 1)">
 <!-- #ebf2f5-->
 {% block navbar %}
-
-<nav class="navbar navbar-dark bg-dark">
+<div class="fluid-container">
+<nav class="navbar navbar-dark bg-dark ">
+  
   <!--navbar-dark bg-dark-->
   <ul class="navbar-nav mr-auto">
   <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -130,7 +132,7 @@ div.left {
   <a class="navbar-item" href="{% url 'store_login' %}">Store LogIn</a>
   </li>
 </nav>
-
+</div>
 
 
 
