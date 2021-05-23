@@ -37,6 +37,8 @@ class Institute(models.Model):
     institute_name = models.CharField(max_length=200)
     institute_balance = models.IntegerField(default=0)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    def __str__(self):
+        return str(self.institute_name)
     
 class Student(models.Model):
     name = models.CharField(max_length=200)
@@ -47,6 +49,8 @@ class Student(models.Model):
     pin_no = models.CharField(max_length=200, unique = True)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    def __str__(self):
+        return "Student: "+str(self.name)+" | College: "+ str(self.college.institute_name)
     
 class Store(models.Model):
     store_name = models.CharField(max_length=200)
@@ -56,7 +60,7 @@ class Store(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE )
     def __str__(self):
-        return str(self.store_name)+" "+ str(self.store_status)
+        return "Store: "+str(self.store_name)+" | open:"+ str(self.store_status)+" | college: "+ str(self.college.institute_name)
 
 class Item(models.Model):
     item = models.CharField(max_length=200)
@@ -64,6 +68,8 @@ class Item(models.Model):
     price = models.IntegerField(default=0)
     available = models.BooleanField(default=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    def __str__(self):
+        return "Item: "+str(self.item)+" | store:"+ str(self.store.store_name)+" | college: "+ str(self.store.college.institute_name)
 
 class Order(models.Model):
     item = models.CharField(max_length=200, blank = True)
@@ -74,7 +80,8 @@ class Order(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
-
+    def __str__(self):
+        return "Item: "+str(self.item)+" | Pickuptime: "+ str(self.pickup_time)+" | Student: "+str(self.student.name)
 class CartItem(models.Model):
     item = models.CharField(max_length=200, blank = True)
     quantity = models.IntegerField(default=0)
@@ -83,9 +90,13 @@ class CartItem(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "Item: "+str(self.item)+" | store:"+ str(self.store.store_name)+" | college: "+ str(self.store.college.institute_name)
 
 class Break(models.Model):
     first_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     lunch_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     last_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
+    def __str__(self):
+        return "Breaks of: "+str(self.college.institute_name)
