@@ -8,9 +8,10 @@
   </nav>
 {% endblock %}
 
+
 {% block content %}
 
-<h1> {{student.name}}'s Order List</h1>
+<h1 class="centered"> Order List </h1>
 
 <br/>
 <!--Testing daterange-->
@@ -22,8 +23,8 @@
     {% order_day_checker day as is_order_day %}
 
         {% if is_order_day %}
-               
-                    <table width="30%">
+               <center>
+                    <table width="30%" >
                     <thead>
                         
                         <th>
@@ -186,17 +187,14 @@
                 </tbody>
 {% endfor %}
 </table>
-
+</center>
 
 <br/>
 <div class="container">
     <div class="row">
-        <div class="col-sm-9">
- 
-        </div>
-        <div class="col-sm-3">
+       
             <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
-        </div>
+        
     </div>
 </div>
 

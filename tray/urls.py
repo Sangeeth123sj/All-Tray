@@ -1,5 +1,5 @@
 from django.urls import path
-
+from django.contrib import admin
 from . import views
 
 urlpatterns = [
@@ -40,6 +40,9 @@ urlpatterns = [
     path('college_store_order_list/', views.college_store_order_list, name='college_store_order_list'),
     path('college_break_edit/', views.college_break_edit, name='college_break_edit'),
     path('college_break_edit_post/', views.college_break_edit_post, name='college_break_edit_post'),
+    path('college_recharge/', views.college_recharge, name='college_recharge'),
+    path('college_recharge_post/', views.college_recharge_post, name='college_recharge_post'),
+    path('college_recharge_details/', views.college_recharge_details, name='college_recharge_details'),
     path('student_pin_edit/', views.student_pin_edit, name='student_pin_edit'),
     path('student_pin_edit_post/', views.student_pin_edit_post, name='student_pin_edit_post'),
     #ajaxify using jquery_____________________________________________________________________________________________
@@ -58,5 +61,7 @@ urlpatterns = [
     path('ajax/student_register_validate/', views.student_register_validate, name='student_register_validate'),
     path('ajax/store_edit_validate/', views.store_edit_validate, name='store_edit_validate'),
     path('ajax/student_pin_edit_validate/', views.student_pin_edit_validate, name='student_pin_edit_validate'),
-    
+    path('ajax/store_item_pickup_validate/', views.store_item_pickup_validate, name='store_item_pickup_validate'),
+
 ]
+

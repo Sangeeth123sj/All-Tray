@@ -7,86 +7,45 @@
     <title>{% block title %}{% endblock %}</title>
     
 <style>
-    table{
--moz-box-shadow: 0 0 2px 2px #888;
--webkit-box-shadow: 0 0 2px 2px#888;
-box-shadow: 0 0 2px 2px #888;
-  border-collapse: collapse;
-  border-radius:3px;
-  
-}
-    td,th.tr{
-        border: 1px solid black;
-    }
+   
     
     .bg { 
 	/* The image used */
-	background-image: url('{% static "tray/images/homesunset.jpg" %}');
-  background-attachment: fixed;
-  /*url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");*/
+	background-image: url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");
+  
 	/* Full height */
-	
+	height: 150%; 
   
 	/* Center and scale the image nicely */
 	background-position: center;
 	background-repeat: no-repeat;
-	
-  height: 900px;
-  /*padding: 5%;
-  padding-left: 35.45%;*/
+	background-size: cover;
   }
 
   .cent{
     text-align: center;
-    
   }
 
   .white-box {
-    background-color: rgba(194, 213, 235, 0.274);
-    height:800px;
-    padding: 10%;
-    padding-top: 4%;
-    width: 400px;
+    background-color: white;
     color: black;
-    position: relative;
-
-  }
-
+}
   .frostprimary{
-	background-color:  rgba(224, 236, 247, 0.384);
+	background-color:  rgba(97, 127, 211, 0.555);
 	font-weight: bold;
-  padding-bottom: 4%;
-  
+	
 }
 
-    div.picture{
-        background-image: url('{% static "tray/images/woods.jpg" %}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
+    
     .heading{
         font-family: Helvetica, sans-serif;
         font-size: 54px;
         color: #464975;
     }
-    #store_button { 
-        background-color: rgba(255,255, 255, 1);
-          /* #ebf2f5; */
-        height: 300px; 
-        width: 200px; 
-        box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
-        border-radius: 6px;
-        font-family: 'Courier New', Courier, monospace;
-
-    }
-
-    #store_button:hover {
-        color: rgb(127, 150, 144);
-    }
+    
 
     .foot {
-        color: #b9bcec;
+        color: #464975;
         font-family:cursive;
     }
     div.fixed {
@@ -102,6 +61,7 @@ box-shadow: 0 0 2px 2px #888;
   align-items: center;
   justify-content: center;
     }
+    
   
 
 
@@ -112,31 +72,8 @@ box-shadow: 0 0 2px 2px #888;
 input:required:hover {
   opacity: 1;
 }
-
-
-
-
-
-/* Control the left side */
-div.left {
-  position: relative;
-  left: 50;
-  width:fit-content;
-}
-
-
-/* Control the right side */
-.right {
-
-  position: relative;
-  float: right;
-  width: 300%;
-  height: 500%;
-  
-}
-
-
 </style>
+
 <!--icon -->
 <link rel="shortcut icon" type="image/png" href="{% static 'tray/images/favicon.ico/alltray.png' %}" />
 <!---->
@@ -147,24 +84,24 @@ div.left {
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="{% static 'tray/js/app.js' %}"></script>   
 <script src="https://kit.fontawesome.com/803b4ae923.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <!--new navbar source-->
 
 </head>
 <body style="background-color: rgba(255,255, 255, 1)">
-
-
-
+<!-- #ebf2f5-->
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <li class="nav-item active">
-    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
-  </li>
+  <a class="navbar-brand">ALLTRAY</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+      </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'open_store' %}">New Store</a>
       </li>
@@ -178,49 +115,36 @@ div.left {
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
   </div>
-</nav>
-
-
-
-
-
-
-    
+</nav>    
 {% endblock %}
 
-<div class="bg">
-    {% block heading %}
-
-        <div class="heading" >
-            <center>
-            <strong>All Tray</strong>
-            </center>
-        </div>
-        
-    {% endblock %}
-  <div class="frostprimary">
-        {% block content%}
-        
-        {% endblock %}
-
-
-
-
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-
-
-
-    </body>
-  </div>
-    {% block footer %}
-    <center>
-    <div class="foot">
-    <br/> <br/>
-    <p> Thanks for using All Tray </p>
+{% block heading %}
+    <div class="heading" >
+        <center>
+        <strong>All Tray</strong>
+        </center>
     </div>
-    </center>
-        {% endblock %}
- 
+    
+{% endblock %}
+    {% block content%}
+    
+    {% endblock %}
+
+    </div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+
+
+</body>
+{% block footer %}
+<center>
+<div class="foot">
+<br/> <br/>
+<p> Thanks for using All Tray </p>
 </div>
+</center>
+    {% endblock %}
 </html>

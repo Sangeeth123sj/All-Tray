@@ -1,5 +1,16 @@
 {% extends 'tray/base.html'%}
 
+
+{% block navbar %} 
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
+    <li class="nav-item">
+        <a class="nav-item" href="{% url 'college_break_edit' %}">Edit break</a><span>" "</span>
+        <a class="nav-item" href="{% url 'college_logout' %}">Logout</a>
+    </li>
+</nav>
+{% endblock %}
+
 {% block content %}
 <center>
 <h1>{{store.store_name}} orders are:</h1>

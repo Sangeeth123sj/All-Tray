@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from datetime import datetime
 from datetime import timedelta
 from django.contrib.auth.hashers import check_password, make_password
-
+import string,random
 
 
 #student views______________________________________________________________________________
@@ -43,26 +43,39 @@ def register_card_post(request):
 def entry(request):
     #if Student.objects.filter(user=request.user, user__is_authenticated=True):
     if request.user.is_authenticated:
-       print("Already logged in")
-       return redirect('home')
+        student_user = Student.objects.filter(user = request.user).exists()
+        store_user = Store.objects.filter(user = request.user).exists()
+        college_user = Institute.objects.filter(user = request.user).exists()
+        if student_user:
+            print("Already logged in student")
+            return redirect('home')
+        if store_user:
+            print("Already logged in storeeee")
+            return redirect('store_home')
+        if college_user:
+            print("Already logged in college")
+            return redirect('college_home')
+        else:
+            return render (request, 'tray/entry.html')
     else:
         return render (request, 'tray/entry.html')
 
 def home_post(request):
     if request.method == 'POST':
+        username = request.POST['username']
         student_id = request.POST['student_id']
         student_pin = request.POST['student_pin']
+        request.session['username'] = username
         request.session['student_id'] = student_id
         request.session['student_pin'] = student_pin
         return redirect(home)
 
 def home(request):
+    student_username = request.session['username']
     student_id_post = request.session['student_id']
     student_pin_post = request.session['student_pin']
-    if student_pin_post:
-        user = authenticate(request, pin_no = student_pin_post)
-    elif student_id_post:
-        user = authenticate(request, reg_no = student_id_post)
+    user = authenticate(request, username = student_username, pin_no= student_pin_post, reg_no= student_id_post)
+    print("Student "+str(user)+" just logged in")
     
     if user is not None:
         login(request, user)
@@ -74,6 +87,7 @@ def home(request):
         c = "Sorry login failed!"
         return HttpResponse(c)  
 
+
 def your_orders_post(request):
     if request.method == 'POST':
         student_id = request.POST['student_id']
@@ -84,7 +98,8 @@ def your_orders(request):
         student_id = request.session['student_id']
         student_object = Student.objects.get(id = student_id)
         orders = Order.objects.filter(student = student_object)
-        return render(request, 'tray/your_orders.html', {'orders': orders})
+        otp = orders.first().otp
+        return render(request, 'tray/your_orders.html', {'orders': orders, 'otp': otp})
 
 def order_page_post(request):
     if request.method == 'POST':
@@ -150,8 +165,12 @@ def open_store_success(request):
 
 def store_login(request):
     if request.user.is_authenticated:
-       print("Already logged in")
-       return redirect('store_home')
+        store_user = Store.objects.filter(user = request.user).exists()
+        if store_user:
+            print("Already logged in store")
+            return redirect('store_home')
+        else:
+            return render (request, 'tray/login_store.html')
     else:
         return render(request, 'tray/login_store.html' )
 
@@ -263,27 +282,35 @@ def store_item_pickup(request):
     request.session['store_id'] = store_id 
     return render(request, 'tray/store_item_pickup.html')
 
+
+def store_item_pickup_validate(request):
+    otp = request.GET['otp']
+    check_otp = Order.objects.filter(otp = otp).exists()
+    #otp_orders = Order.objects.filter(otp = otp)
+    if check_otp:
+        data = {
+            'incorrect_status' : 'correct_otp',
+        }
+        return JsonResponse(data)
+    else :
+        data = {
+            'incorrect_status' : 'incorrect_otp',
+            'check_otp' : check_otp,
+        }
+        return JsonResponse(data)
+
 def user_pickup_orders_post(request):
     if request.method == 'POST':
-        student_id = request.POST['student_id']
-        student_pin = request.POST['student_pin']
-        request.session['student_id'] = student_id
-        request.session['student_pin'] = student_pin
+        otp = request.POST['student_otp']
+        request.session['otp'] = otp
         return redirect(user_pickup_orders)
 
 def user_pickup_orders(request):
     store_id = request.session['store_id']
-    student_id = request.session['student_id']
-    student_pin = request.session['student_pin']
+    otp = request.session['otp']
     store_object = Store.objects.get(id = store_id)
-    if student_pin:
-        student_pin_hash = make_password(student_pin,'pepper')
-        student = Student.objects.get(pin_no = student_pin_hash)
-    elif student_id:
-        student_id_hash = make_password(student_id,'pepper')
-        student = Student.objects.get(reg_no = student_id_hash)
-    orders = Order.objects.filter(store = store_object, student = student)
-    return render(request,'tray/user_pickup_orders.html', {'orders': orders, 'student': student} )
+    orders = Order.objects.filter(otp = otp)
+    return render(request,'tray/user_pickup_orders.html', {'orders': orders} )
 
 #college views__________________________________________________________________________________
 def register_college(request):
@@ -308,8 +335,12 @@ def register_college_success(request):
 
 def login_college(request):
     if request.user.is_authenticated:
-       print("Already logged in")
-       return redirect('college_home')
+        college_user = Institute.objects.filter(user = request.user).exists()
+        if college_user:
+            print("Already logged in")
+            return redirect('college_home')
+        else:
+            return render (request, 'tray/login_college.html')
     else:
         return render (request, 'tray/login_college.html')
 
@@ -317,8 +348,9 @@ def college_login_verify(request):
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(request, username = username, password = password)
+    user_institute_exist = Institute.objects.filter(user = user).exists()
 
-    if user is not None:
+    if user is not None and user_institute_exist:
         login(request, user)
         institute_id = user.institute.id
         request.session['institute_id'] = institute_id
@@ -368,6 +400,22 @@ def college_break_edit_post(request):
         break_time_object.save()
         return redirect (college_home)
 
+def college_recharge(request):
+    return render(request, 'tray/college_recharge.html')
+
+def college_recharge_post(request):
+    if request.method == 'POST':
+        student_pin = request.POST['student_pin']
+        student_pin_hash = make_password(student_pin,'pepper')
+        student_object = Student.objects.get(pin_no = student_pin_hash)
+        #student_object = Student.objects.get(pin_no=student_pin)
+        student_name =  student_object.name
+        student_balance = student_object.balance
+    return render(request, 'tray/college_recharge_details.html', {'student_balance':student_balance, 'student_name':student_name})
+
+def college_recharge_details(request):
+    return render(request, 'tray/college_recharge_details.html')
+
 def college_logout(request):
     logout(request)
     return redirect(login_college)
@@ -410,6 +458,7 @@ def update_store_status(request):
         data = {
             'is_open' : 'true'
         }
+
         return JsonResponse(data)
 
 
@@ -455,26 +504,37 @@ def update_item_availability(request):
            return JsonResponse(data)
 
 def validate_entry(request):
+    username = request.GET['username']
     pin = request.GET['pin']
     id_card = request.GET['id_card']
-    pin_hash = make_password(pin,'pepper')
-    id_card_hash = make_password(id_card, 'pepper')
-    check_card = bool(Student.objects.filter(reg_no = id_card_hash))
-    check_pin = bool(Student.objects.filter(pin_no = pin_hash))
-    if (check_card == False) and (check_pin == False):
-        data = {
-            'incorrect_pin_or_card' : 'incorrect',
-            'check_card' : check_card,
-            'check_pin' : check_pin
-        }
+    user_exist = User.objects.filter(username = username).exists()
+    if user_exist:
+        user_student_exist = Student.objects.filter(name = username).exists()
+    else: 
+        user_student_exist = False
+
+    if user_student_exist:
+        user = User.objects.get(username = username)
+        check_pin = check_password(pin,user.student.pin_no)
+        check_card = check_password(id_card, user.student.reg_no)
+        if (check_card == False) and (check_pin == False):
+            data = {
+                'incorrect_status' : 'incorrect_pin&card',
+                'check_card' : check_card,
+                'check_pin' : check_pin,
+            }
+        else :
+            data = {
+                'incorrect_status' : 'correct',
+                'check_card' : check_card,
+                'check_pin' : check_pin
+            }
+        return JsonResponse(data)
     else :
         data = {
-            'incorrect_pin_or_card' : 'correct',
-            'check_card' : check_card,
-            'check_pin' : check_pin
-        }
-    return JsonResponse(data)
-
+                'incorrect_status' : 'wrong_username'
+            }
+        return JsonResponse(data)
 
 def validate_order_cancel(request):
     order_id = request.GET['order_id']
@@ -579,28 +639,42 @@ def cart(request):
         student = Student.objects.get(id = student_id)
         cart_items = CartItem.objects.filter(student = student)
         if cart_items.exists() and int(student.balance) > int(total) :
+            #generating otp for the cart of items
+            # generating random strings 
+            # using random.choices()
+            # initializing size of string 
+            N = 4
+            # using random.choices()
+            # generating random strings 
+            res = ''.join(random.choices(string.ascii_lowercase, k = N))
+            otp = str(res)
             for cart_item in cart_items :
                 item = Item.objects.get(item = cart_item.item)
-                #updating stock at store
+                #initializing stock of item variable
                 item_stock = item.stock
+                #saving the order from cart
+                order = Order(item = cart_item.item, quantity = cart_item.quantity, cost = cart_item.cost, pickup_time = cart_item.pickup_time, otp=otp, store = cart_item.store, student = cart_item.student )
+                order.save()
+                #updating stock at store
                 item.stock = int(item_stock) - int(cart_item.quantity)
                 #unticking item availability to customers on reaching low stock at store
                 if item.stock < 5:
                     item.available = False
                 item.save()
+
                 #updating store balance
                 store.store_balance = store.store_balance + int(cart_item.cost)
                 store.save()
                 #updating student balance
                 student.balance = student.balance - int(cart_item.cost)
                 student.save()
-                order = Order(item = cart_item.item, quantity = cart_item.quantity, cost = cart_item.cost, pickup_time = cart_item.pickup_time, store = cart_item.store, student = cart_item.student )
-                order.save()
+                #deleting item from cart
                 cart_item.delete()
             data = {
                     'status' : 'order_placed',
                     'cart_items' : cart_items.exists(),
-                    'total' : total
+                    'total' : total,
+                    'otp': otp,
                 }
             return JsonResponse(data)
         
@@ -641,9 +715,13 @@ def store_login_validate(request):
     user_name = request.GET['user_name']
     password = request.GET['password'] 
     user_exists = User.objects.filter(username=user_name).exists()
-    
     if user_exists:
         user = User.objects.get(username=user_name)
+        user_store_exist = Store.objects.filter(user = user).exists()
+    else:
+        user_store_exist = False
+
+    if user_store_exist:
         password_check = check_password(password, user.password)
         if password_check:
             data = {
@@ -665,9 +743,13 @@ def college_login_validate(request):
     user_name = request.GET['user_name']
     password = request.GET['password'] 
     user_exists = User.objects.filter(username=user_name).exists()
-    
     if user_exists:
         user = User.objects.get(username=user_name)
+        user_institute_exist = Institute.objects.filter(user = user).exists()
+    else: 
+        user_institute_exist = False
+    
+    if user_institute_exist:
         password_check = check_password(password, user.password)
         if password_check:
             data = {
@@ -721,8 +803,8 @@ def student_register_validate(request):
     user_name = request.GET['user_name']
     pin_no = request.GET['pin']
     card_id = request.GET['card']
-    pin_no_hash = make_password(pin_no, 'pepper')
-    card_id_hash = make_password(card_id, 'pepper')
+    pin_no_hash = check_password(pin_no, 'pepper')
+    card_id_hash = check_password(card_id, 'pepper')
     data = {
         'user_name_taken' : User.objects.filter(username = user_name).exists(),
         'pin_taken' : Student.objects.filter(pin_no = pin_no_hash).exists(),

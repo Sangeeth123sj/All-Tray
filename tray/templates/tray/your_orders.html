@@ -1,7 +1,7 @@
 {% extends 'tray/base.html'%}
 
 {% block content %}
-<center>
+<center class="frostprimary">
 <h1>You orders are:</h1>
 <strong id="no_delete_condition" style="color: red; display:none;">"Order can be cancelled only atleast one hour before the break of the order"</strong>
 <br/> <br/>
@@ -24,6 +24,9 @@
                 </th>
                 <th>
                     Quantity
+                </th>
+                <th>
+                    OTP
                 </th>
                 <th>
                     Cancellation
@@ -51,6 +54,9 @@
                 </td>
                 <td align="center">
                     {{order.quantity}}
+                </td>
+                <td align="center">
+                    {{order.otp}}
                 </td>
                 <td align="center" >
                     <button class="btn btn-warning" id="cancel" name="cancel">Cancel</button>
@@ -80,6 +86,9 @@
                 <td align="center">
                     {{order.quantity}}
                 </td>
+                <td align="center">
+                    {{order.otp}}
+                </td>
                 <td align="center" >
                     <button class="btn btn-warning" id="cancel" >Cancel</button>
                 </td>
@@ -107,6 +116,9 @@
                 <td align="center">
                     {{order.quantity}}
                 </td>
+                <td align="center">
+                    {{order.otp}}
+                </td>
                 <td align="center" >
                     <button class="btn btn-warning" id="cancel" >Cancel</button>
                 </td>
@@ -133,6 +145,9 @@
                 </td>
                 <td align="center">
                     {{order.quantity}}
+                </td>
+                <td align="center">
+                    {{order.otp}}
                 </td>
                 <td align="center" >
                     <button class="btn btn-warning" id="cancel" name="cancel" >Cancel</button>
@@ -303,7 +318,7 @@ $(document).ready(function(){
 
     //cancels the clicked item from orders
         $("tr #cancel").on("click", function(){
-            order_id = $(this).parent().prev().prev().find("#order_id").html().trim();
+            order_id = $(this).parent().prev().prev().prev().find("#order_id").html().trim();
             item_name = $(this).parent().prev().prev().text().trim();
             console.log(order_id);
             var row = $(this).parent().parent();

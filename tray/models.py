@@ -3,7 +3,7 @@ from django.db.models import Model
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from datetime import datetime
-
+import string, random
 # Create your models here.
 
 BREAKS = (  
@@ -80,8 +80,10 @@ class Order(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
+    otp = models.CharField(max_length=4)
     def __str__(self):
         return "Item: "+str(self.item)+" | Pickuptime: "+ str(self.pickup_time)+" | Student: "+str(self.student.name)
+            
 class CartItem(models.Model):
     item = models.CharField(max_length=200, blank = True)
     quantity = models.IntegerField(default=0)

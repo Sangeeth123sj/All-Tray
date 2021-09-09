@@ -16,8 +16,9 @@
 
 {% block title%} Tray  {% endblock %}
 
-
 {% block content %}
+
+<div class="bg">
 <center>
         <p>Welcome {{student.name}}</p>
         <form action="/your_orders_post/" method="POST">
@@ -59,5 +60,7 @@
                 </div>
                 <input type="hidden" name="student_id" value="{{student.id}}">
      </form>
+
     </center>
+</div>
 {% endblock %}

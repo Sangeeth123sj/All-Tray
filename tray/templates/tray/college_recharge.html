@@ -1,0 +1,98 @@
+{% extends "tray/base.html" %}
+
+
+{% block title %} Recharge a card {% endblock %}
+
+{% block content %}
+
+<center>
+    <br/><br/><br/>
+    <h3><strong>Swipe customer's id card or enter pin to recharge customer account</strong></h3>
+    <br/> <br/>
+    <form action="/college_recharge_post/" class="form" method="POST">
+        {% csrf_token %}
+    <label>Pin</label>
+    <br/>
+    <!--class 'fixed' to hide rfid card number input field-->
+    <div class="fixed">
+        <input type="number" id="id_card" name="student_id" autofocus >
+    </div> 
+    <input type="number" id="pin" name="student_pin"> 
+    <br/> <br/>
+    <p id="incorrect_alert" style="color: rgb(143, 68, 68); font-weight: 1000; width: fit-content;" ></p>
+    <input type="button" id="enter" class="btn btn-primary" value="Enter">
+    </form>
+    
+    <script>
+    //checking if pin or id card entered
+        $(document).ready(function(){
+            $("#enter").click(function(event){
+                var t = $("#id_card").val();
+                console.log(t+"id card value");
+                console.log($("#pin").val());
+        if ($("#id_card").val() == "" && $("#pin").val() == ""){
+                document.getElementById("incorrect_alert").innerHTML = "Either enter the pin or refresh the page <br/> and swipe id card to enter"
+                $('#incorrect_alert').fadeToggle(2000);
+                event.preventDefault();
+            }
+    
+        else{       
+                    console.log("test on enter button");
+                    var pin = $("#pin").val();
+                    var id_card = $("#id_card").val();
+                    
+        //sending form fields in ajax for checking if registered pin or card
+                $.ajax({
+                    url: '/ajax/validate_entry/',
+                    data: {
+                        'pin': pin,
+                        'id_card': id_card
+                    },
+                    dataType: 'json',
+                    success: function (data){
+                        if (data.incorrect_pin_or_card == "incorrect"){
+                            //document.getElementById("incorrect_alert").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
+                            alert("Sorry incorrect pin or unregistered card, please register if not registered and try again");
+                            window.location.href = " ";
+                        }
+                        else{
+                            $("form").submit();
+                        }
+    
+    
+                            }
+                          
+                });
+            }
+    
+        });
+        });
+            
+    
+    </script>
+    
+    <div class="row">
+        
+        <div class="col-sm-5">
+            <a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
+        </div>
+        <div class="col-sm-11">
+        
+        </div>
+        </div>
+    
+    </center>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

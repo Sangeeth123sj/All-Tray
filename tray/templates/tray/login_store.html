@@ -15,9 +15,8 @@
 <input type="text" class="form-control" id="username" name="username"><br/><br/>
 <p>password</p>
 <input type="password" class="form-control" id="password" name="password"><br/><br/>
-<p id="incorrect_alert" style="color: rgb(143, 68, 68); font-weight: 1000; width: fit-content;" ></p>
+<p id="incorrect_alert" style="color: rgb(240, 124, 124); font-weight: 1000; width: fit-content;" ></p>
 <input type="submit" id="enter" value="Login" class="btn btn-success" type="button">
-
 </form>
 
 </div>
@@ -39,7 +38,7 @@
                 }
                 if ($("#password").val() == "" && $("#username").val() != ""){
                     document.getElementById("incorrect_alert").innerHTML = "Please fill in your password"
-                    $("#username").css("border-color","red"); 
+                    $("#password").css("border-color","red"); 
                     return false;
                 }
                 if ($("#username").val() == "" && $("#password").val() == ""){

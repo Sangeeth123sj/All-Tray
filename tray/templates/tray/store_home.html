@@ -25,6 +25,7 @@
 
 {% block content %}
 <center>
+    <div class="frostprimary">
 <script>
 //prevent navigating back to login
 function preventBack() { 
@@ -51,10 +52,10 @@ if(performance.navigation.type == 2){
 <p>Store balance: {{store.store_balance}}</p>
 
 
-<div class="btn-group" role="group" aria-label="Basic example">
-    <a href="{% url 'store_add_item' %}" class="btn btn-outline-success">Add Items</a>
-    <a href="{% url 'store_item_pickup' %}" class="btn btn-outline-primary">Item pickup</a>
-    <a href="{% url 'store_edit_details' %}" class="btn btn-outline-success">Edit Store</a>
+<div class="btn-group" role="group" >
+    <a href="{% url 'store_add_item' %}" class="btn btn-success">Add Items</a>
+    <a href="{% url 'store_item_pickup' %}" class="btn btn-primary">Item pickup</a>
+    <a href="{% url 'store_edit_details' %}" class="btn btn-success">Edit Store</a>
   </div>
 <br/>  <br/>  
 
@@ -104,23 +105,12 @@ if(performance.navigation.type == 2){
 </tbody>
 </table> <br/>
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-3">
+
+        <div class="btn-group" role="group" >   
+            <a href="{% url 'store_add_item' %}" class="btn btn-success">Add Items</a>
+            <a href="{% url 'store_order_list' %}" class="btn btn-primary">Order list</a>
+            <a href="{% url 'store_item_pickup' %}" class="btn btn-success">Store item pickup</a>
         </div>
-        <div class="col-sm-2">
- <a href="{% url 'store_add_item' %}" class="btn btn-outline-success">Add Items</a>
-        </div>
-        <div class="col-sm-2">
-            <a href="{% url 'store_order_list' %}" class="btn btn-outline-primary">Order list</a>
-        </div>
-        <div class="col-sm-2">
-            <a href="{% url 'store_item_pickup' %}" class="btn btn-outline-success">Store item pickup</a>
-        </div>
-        <div class="col-sm-3">
-        </div>
-    </div>
-</div>
 
 {% endif %}
 
@@ -225,6 +215,9 @@ $(document).ready(function(){
         }
     
         }); 
+
+    
+
       
     
     });

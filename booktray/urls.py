@@ -20,3 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tray.urls')),
 ]
+admin.site.site_title = "Alltray admin"
+admin.site.site_header = "Alltray Admin"
+admin.site.index_title = "welcome to Alltray admin"
