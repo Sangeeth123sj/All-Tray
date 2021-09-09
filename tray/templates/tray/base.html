@@ -31,7 +31,24 @@ box-shadow: 0 0 2px 2px #888;
 	background-position: center;
 	background-repeat: no-repeat;
 	
-  height: 900px;
+  height: 900;
+  /*padding: 5%;
+  padding-left: 35.45%;*/
+  }
+
+  .bg_infinite { 
+	/* The image used */
+	background-image: url('{% static "tray/images/homesunset.jpg" %}');
+  background-attachment: fixed;
+  /*url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");*/
+	/* Full height */
+	
+  
+	/* Center and scale the image nicely */
+	background-position: center;
+	background-repeat: no-repeat;
+	
+  height: cover;
   /*padding: 5%;
   padding-left: 35.45%;*/
   }
@@ -214,12 +231,9 @@ div.left {
     </body>
   </div>
     {% block footer %}
-    <center>
-    <div class="foot">
-    <br/> <br/>
-    <p> Thanks for using All Tray </p>
-    </div>
-    </center>
+    
+    
+   
         {% endblock %}
  
 </div>
