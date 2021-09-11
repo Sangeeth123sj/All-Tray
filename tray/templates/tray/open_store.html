@@ -124,33 +124,34 @@
                 alert("Please enter a valid email");
                 event.preventDefault();
             }
-
-             $.ajax({
-                url: '/ajax/store_register_validate/',
+            else{
+                $.ajax({
+                    url: '/ajax/store_register_validate/',
+                    
+                    data: {
+                        'store_name': store_name,
+                        'college_id': college_id,
+                        'user_name' : user_name
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.store_name_taken) {
+                            alert("Store name already taken, try another name");
+                            location.reload();
+                            return false;
+                        }
+                        else if (data.user_name_taken) {
+                            alert("User name already taken, try another name");
+                            location.reload();
+                            return false;
+                        }
+                        else{
+                            $("form").submit();
+                        }
+                    }
+                });
+            }
                 
-                data: {
-                    'store_name': store_name,
-                    'college_id': college_id,
-                    'user_name' : user_name
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if (data.store_name_taken) {
-                        alert("Store name already taken, try another name");
-                        location.reload();
-                        return false;
-                    }
-                    else if (data.user_name_taken) {
-                        alert("User name already taken, try another name");
-                        location.reload();
-                        return false;
-                    }
-                    else{
-                        $("form").submit();
-                    }
-                }
-            });
-            
            
             
     

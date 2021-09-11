@@ -133,35 +133,36 @@
                 alert("Please enter a valid email");
                 event.preventDefault();
             }
-             $.ajax({
-                url: '/ajax/college_register_validate/',
-                
-                data: {
-                    'college_name': college_name,
-                    'user_name' : user_name
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if (data.college_name_taken) {
-                        alert("College name already taken, try another name");
-                        location.reload();
-                        return false;
-                    }
-                    else if (data.user_name_taken) {
-                        alert("User name already taken, try another name");
-                        location.reload();
-                        return false;
-                    }
-                    else{
-                        $("form").submit();
-                    }
-                }
-            });
-            
-           
-            
-    
+            else{
+                $.ajax({
+                    url: '/ajax/college_register_validate/',
+                    
+                    data: {
+                        'college_name': college_name,
+                        'user_name' : user_name
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.college_name_taken) {
+                            alert("College name already taken, try another name");
+                            location.reload();
+                            return false;
+                        }
+                        else if (data.user_name_taken) {
+                            alert("User name already taken, try another name");
+                            location.reload();
+                            return false;
+                        }
+                        else{
+                            $("form").submit();
+                        }
+                    }        
+        
+                });
+
+            }
         });
+       
 });
     
     
