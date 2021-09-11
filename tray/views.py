@@ -98,7 +98,11 @@ def your_orders(request):
         student_id = request.session['student_id']
         student_object = Student.objects.get(id = student_id)
         orders = Order.objects.filter(student = student_object)
-        otp = orders.first().otp
+        order_exist = Order.objects.filter(student = student_object).exists()
+        if order_exist:
+            otp = orders.first().otp
+        else:
+            otp = ""
         return render(request, 'tray/your_orders.html', {'orders': orders, 'otp': otp})
 
 def order_page_post(request):

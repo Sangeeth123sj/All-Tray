@@ -104,7 +104,7 @@
                 var item = $("#item").val();
                 var quantity = $("#quantity").val();
                 
-                if (quantity == ' ' || quantity == 0 ){
+                if (quantity == ' ' || quantity < 1  ){
                     alert ("please select atleast one in quantity");
                     return;
                 }
