@@ -21,12 +21,12 @@
                         <form action="/home_post/" class="form" method="POST" >
                             {% csrf_token %}
                             {{ form|crispy }}
-                        <!--class 'fixed' to hide rfid card number input field-->
+                        <!--class 'fixed' to hide rfid card number input field>
                         <div class="fixed">
                             <div class="form-group">
                             <input type="number" id="id_card" name="student_id" autofocus >
                             </div>
-                        </div>
+                        </div-->
                         
 
                         <div class="form-group">
@@ -37,27 +37,30 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="container">
-                        <Strong>Pin</strong>
-                        <br/>
-                        <input type="password" id="pin" name="student_pin" class="form-control"> 
+                            <Strong>Password</strong>
+                            <br/>
+                            <input type="password" id="password" name="password" class="form-control"> 
                         </div>
-                        <br>
-                    <div class="container">
+                        <br/><br/>
+                    <!--div class="container">
                         <i>Swipe id card / enter pin</i>
-                        <br/>
+                        <br/-->
                         <p id="incorrect_alert_1" style="color: rgb(131, 54, 54); font-weight: 1000; width: fit-content; display:none;" ></p>
                         <p id="incorrect_alert_2" style="color: rgb(80, 32, 32); font-weight: 1000; width: fit-content; display:none;" ></p>
 
-                        <div>
-                        <input type="button" id="enter" class="btn btn-primary btn-block " value="Enter">
-                        </div>
+                        
+                            <input type="button" id="enter" class="btn btn-primary btn-block " value="Enter">
+                       
                         <br/><br/>
                         <p style="font-style:unset;">Not yet started with All Tray?<br/>
                         Start now!</p>
                     </div>
-                        <a href="{% url 'register_card' %}" class="btn btn-success">Register card</a>
+                    <div class="centered">
+                        <a href="{% url 'register_card' %}" class="btn btn-success">Register</a>
                         <br/>
+                    </div>
                         {%block footer%} {% endblock %}
                         </form>
                     </center>  
@@ -80,12 +83,12 @@ $(document).ready(function(){
         //window.onload=set_fields();
 
         function set_fields(){
-            var pin = sessionStorage.getItem('pin');
-            if (pin !== null) $('#pin').val(pin);
+            var password = sessionStorage.getItem('password');
+            if (password !== null) $('#password').val(password);
         }
 
         window.onbeforeunload = function() {
-            sessionStorage.setItem("pin", $('#pin').val());
+            sessionStorage.setItem("password", $('#password').val());
         }
 
 
@@ -95,51 +98,50 @@ $(document).ready(function(){
         if ( $("#username").val() == "" ) {
                 document.getElementById("incorrect_alert_1").innerHTML = "Please enter username."
                 $("#username").css("border-color","red"); 
-                //$("#incorrect_alert_1").fadeIn(1000).delay(4000).fadeOut(1000);
                 event.preventDefault();
             }
 
-        if ($("#id_card").val() == "" && $("#pin").val() == ""){
-                $("#pin").css("border-color","red");
-                document.getElementById("incorrect_alert_2").innerHTML = "Please enter pin or refresh and swipe card first then enter username."
-                $("#incorrect_alert_2").fadeIn(1000).delay(4000).fadeOut(1000);
+        else if ($("#password").val() == ""){
+                $("#password").css("border-color","red");
+                document.getElementById("incorrect_alert_1").innerHTML = "Please enter password."
+                $("#incorrect_alert_1").fadeIn(1000).delay(4000).fadeOut(1000);
                 event.preventDefault();
             }
         
-        else if ( ($("#username").val() == "" && $("#id_card").val() != "" )||( $("#username").val() =="" && $("#pin").val() != "") ) {       
+        /*else if ( ($("#username").val() == "" && $("#id_card").val() != "" )||( $("#username").val() =="" && $("#pin").val() != "") ) {       
                     document.getElementById("incorrect_alert_1").innerHTML = "Please enter username or refresh and swipe card first then enter username."
                     $("#incorrect_alert_1").fadeIn(1000).delay(4000).fadeOut(1000);
                     event.preventDefault();
                     console.log(username);
                     console.log(pin);
                     console.log(id_card);
-                }
+                }*/
 
         else{
             console.log("test on enter button");
                     var username =  $("#username").val();
-                    var pin = $("#pin").val();
-                    var id_card = $("#id_card").val();
+                    var password = $("#password").val();
+                    //var id_card = $("#id_card").val();
                     console.log(username);
         //sending form fields in ajax for checking if registered pin or card
                 $.ajax({
                     url: '/ajax/validate_entry/',
                     data: {
                         'username': username,
-                        'pin': pin,
-                        'id_card': id_card,
+                        'password': password,
+                        //'id_card': id_card,
                     },
                     dataType: 'json',
                     success: function (data){
                             if (data.incorrect_status == "wrong_username"){
-                                document.getElementById("incorrect_alert_1").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
+                                document.getElementById("incorrect_alert_2").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
                                 alert("Sorry non-existent user  please register if not registered and try again");
                                 $("#pin").css("border-color","red");
                                 location.reload();
                             }
-                            if (data.incorrect_status == "incorrect_pin&card"){
-                                document.getElementById("incorrect_alert_1").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
-                                alert("Sorry incorrect pin/card  please register if not registered and try again");
+                            if (data.incorrect_status == "incorrect_password"){
+                                document.getElementById("incorrect_alert_2").innerHTML = "Sorry incorrect password, please register if not registered and try again"
+                                alert("Sorry incorrect password  please register if not registered and try again");
                                 $("#pin").css("border-color","red");
                                 location.reload();
                             }

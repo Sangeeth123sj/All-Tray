@@ -41,12 +41,12 @@ class Institute(models.Model):
         return str(self.institute_name)
     
 class Student(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique = True)
     branch = models.CharField(max_length=200, choices=BRANCHES)
     sem = models.CharField(max_length=200, choices=SEMESTERS)
-    reg_no = models.CharField(max_length=200, unique = True)
+    reg_no = models.CharField(max_length=200)
     balance = models.IntegerField(default=0)
-    pin_no = models.CharField(max_length=200, unique = True)
+    pin_no = models.CharField(max_length=200)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     def __str__(self):

@@ -8,21 +8,72 @@
 <center>
     <br/><br/><br/>
     <h3><strong>Student: {{student_name}}</strong></h3>
-    <h3><strong>Balance: {{student_balance}}</strong></h3>
+    <h3><strong>Balance: <p id="balance">{{student_balance}}</p></strong></h3>
     <br/> <br/>
-    <form action="/college_recharge_post/" class="form" method="POST">
+    <form action="/college_recharge_final/" class="form" method="POST">
         {% csrf_token %}
     <label>Enter Recharge amount</label>
     <br/>
-    <!--class 'fixed' to hide rfid card number input field-->
-    <div class="fixed">
-        <input type="number" id="id_card" name="student_id" autofocus >
-    </div> 
-    <input type="number" id="pin" name="student_pin"> 
+    <!--class 'fixed' to hide rfid card number input field--> 
+    <input type="number" id="recharge_amount" name="recharge_amount"> 
     <br/> <br/>
-    <p id="incorrect_alert" style="color: rgb(143, 68, 68); font-weight: 1000; width: fit-content;" ></p>
-    <input type="button" id="enter" class="btn btn-primary" value="Enter">
+    <p id="incorrect_alert" style="color: rgb(243, 168, 168); font-weight: 1000; width: fit-content;" ></p>
+    <input type="button" id="enter" name="enter" class="btn btn-primary" value="Enter">
     </form>
 </center>
 
+
+<script>
+    //checking if pin or id card entered
+        $(document).ready(function(){
+            console.log("test on enter button");
+
+            $("#enter").click(function(event){
+                console.log("test on enter button");
+
+                if ($("#recharge_amount").val() < 1  | $("#recharge_amount").val() == "") {
+                        document.getElementById("incorrect_alert").innerHTML = "Please enter a valid amount."
+                        $('#incorrect_alert').fadeToggle(4000);
+                        event.preventDefault();
+                    }
+                else{  
+                    console.log("test on enter button in else");
+                    recharge_amount = $("#recharge_amount").val()
+        //sending form fields in ajax for rechargingand showing status
+                $.ajax({
+                    url: '/ajax/college_recharge_final/',
+                    data: {
+                        'username': '{{student_name}}',
+                        'amount': recharge_amount,
+                    },
+                    dataType: 'json',
+                    success: function (data){
+                        if (data.recharge_status == "success"){
+                            current_balance = data.present_balance;
+                            username = data.username;
+                            alert("Recharge of Rs "+recharge_amount+" has been successful!\nCurrent balance of "+username+" is \n  "+current_balance);
+                            $("#balance").text(current_balance);
+                            location.reload();
+                        }
+                        
+    
+                    }
+                          
+                });
+            }
+    
+        });
+        });
+            
+    
+                    
+
+
+            
+</script>
+
+
+
+
 {% endblock %}
+

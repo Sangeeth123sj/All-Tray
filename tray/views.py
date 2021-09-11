@@ -26,22 +26,22 @@ def register_card_post(request):
         student_name = request.POST['student_name']
         branch = request.POST['branch_name']
         semester = request.POST['semester']
-        reg_no = request.POST['card']
-        reg_no_hash = make_password(reg_no, 'pepper')
-        pin_no = request.POST['pin']
-        pin_no_hash = make_password(pin_no, 'pepper')
+        #reg_no = request.POST['card']
+        #reg_no_hash = make_password(reg_no, 'pepper')
+        password = request.POST['password']
+        #pin_no_hash = make_password(pin_no)
         college_id = request.POST['college_id']
         email = request.POST['mail_id']
         college_object = Institute.objects.get(id = college_id)
-        user = User.objects.create_user(student_name,email,pin_no)
+        user = User.objects.create_user(student_name,email,password)
         user.save
-        student = Student(name = student_name, branch = branch, sem = semester, reg_no = reg_no_hash, pin_no = pin_no_hash, college = college_object, user = user)
+        #pin_no = pin_no removed at student save next line
+        student = Student(name = student_name, branch = branch, sem = semester,college = college_object, user = user)
         student.save()
-        messages.success(request, 'Profile details updated.')
+        messages.success(request, 'Profile created.')
         return render (request, 'tray/entry.html')
 
 def entry(request):
-    #if Student.objects.filter(user=request.user, user__is_authenticated=True):
     if request.user.is_authenticated:
         student_user = Student.objects.filter(user = request.user).exists()
         store_user = Store.objects.filter(user = request.user).exists()
@@ -50,7 +50,7 @@ def entry(request):
             print("Already logged in student")
             return redirect('home')
         if store_user:
-            print("Already logged in storeeee")
+            print("Already logged in store")
             return redirect('store_home')
         if college_user:
             print("Already logged in college")
@@ -63,18 +63,18 @@ def entry(request):
 def home_post(request):
     if request.method == 'POST':
         username = request.POST['username']
-        student_id = request.POST['student_id']
-        student_pin = request.POST['student_pin']
+        password = request.POST['password']
+        #student_pin = request.POST['student_pin']
         request.session['username'] = username
-        request.session['student_id'] = student_id
-        request.session['student_pin'] = student_pin
+        request.session['password'] = password
+        #request.session['student_pin'] = student_pin
         return redirect(home)
 
 def home(request):
     student_username = request.session['username']
-    student_id_post = request.session['student_id']
-    student_pin_post = request.session['student_pin']
-    user = authenticate(request, username = student_username, pin_no= student_pin_post, reg_no= student_id_post)
+    student_password = request.session['password']
+    #student_pin_post = request.session['student_pin']
+    user = authenticate(request, username = student_username, password = student_password)
     print("Student "+str(user)+" just logged in")
     
     if user is not None:
@@ -130,10 +130,11 @@ def student_pin_edit_post(request):
     student_id = request.session['student_id']
     if request.method == 'POST':
         print(student_id)
-        pin_no = request.POST['pin_no']
+        password = request.POST['password']
         student = Student.objects.get(id = student_id)
-        student.pin_no = make_password (pin_no, 'pepper')
-        student.save()
+        u = student.user
+        u.set_password(password)
+        u.save()
         logout(request)
         return redirect(entry)
 
@@ -405,9 +406,9 @@ def college_recharge(request):
 
 def college_recharge_post(request):
     if request.method == 'POST':
-        student_pin = request.POST['student_pin']
-        student_pin_hash = make_password(student_pin,'pepper')
-        student_object = Student.objects.get(pin_no = student_pin_hash)
+        username = request.POST['username']
+        #student_pin_hash = make_password(student_pin,'pepper')
+        student_object = Student.objects.get(name = username)
         #student_object = Student.objects.get(pin_no=student_pin)
         student_name =  student_object.name
         student_balance = student_object.balance
@@ -415,6 +416,41 @@ def college_recharge_post(request):
 
 def college_recharge_details(request):
     return render(request, 'tray/college_recharge_details.html')
+
+def validate_recharge(request):
+    username = request.GET['username']
+    college_id = request.session['college_id']
+    student_valid = Student.objects.filter(name = username, college = college_id).exists()
+    #student_object = Student.objects.get(name = user_name)
+    if student_valid:
+        data = {
+            'username_status': "correct"
+        } 
+        return JsonResponse(data)
+
+
+    else:
+        data = {
+            'username_status': "incorrect"
+        }  
+        return JsonResponse(data)
+    
+
+
+def college_recharge_final(request):
+    username = request.GET['username']
+    amount = request.GET['amount']
+    student_object = Student.objects.get(name = username)
+    current_balance = student_object.balance
+    student_object.balance = current_balance + int(amount)
+    student_object.save()
+    data = {
+        'recharge_status': "success",
+        'present_balance': student_object.balance,
+        'username': student_object.name,
+    }
+    return JsonResponse(data)
+
 
 def college_logout(request):
     logout(request)
@@ -505,8 +541,8 @@ def update_item_availability(request):
 
 def validate_entry(request):
     username = request.GET['username']
-    pin = request.GET['pin']
-    id_card = request.GET['id_card']
+    password = request.GET['password']
+    #id_card = request.GET['id_card']
     user_exist = User.objects.filter(username = username).exists()
     if user_exist:
         user_student_exist = Student.objects.filter(name = username).exists()
@@ -515,19 +551,15 @@ def validate_entry(request):
 
     if user_student_exist:
         user = User.objects.get(username = username)
-        check_pin = check_password(pin,user.student.pin_no)
-        check_card = check_password(id_card, user.student.reg_no)
-        if (check_card == False) and (check_pin == False):
+        password_checker_bool = check_password(password,user.password)
+        #check_card = check_password(id_card, user.student.reg_no)
+        if (password_checker_bool== False):
             data = {
-                'incorrect_status' : 'incorrect_pin&card',
-                'check_card' : check_card,
-                'check_pin' : check_pin,
+                'incorrect_status' : 'incorrect_password',
             }
         else :
             data = {
                 'incorrect_status' : 'correct',
-                'check_card' : check_card,
-                'check_pin' : check_pin
             }
         return JsonResponse(data)
     else :
@@ -801,23 +833,23 @@ def college_register_validate(request):
 
 def student_register_validate(request):
     user_name = request.GET['user_name']
-    pin_no = request.GET['pin']
-    card_id = request.GET['card']
-    pin_no_hash = check_password(pin_no, 'pepper')
-    card_id_hash = check_password(card_id, 'pepper')
+    password = request.GET['password']
+    #card_id = request.GET['card']
+    #pin_no_hash = check_password(pin_no, 'pepper')
+    #card_id_hash = check_password(card_id, 'pepper')
     data = {
         'user_name_taken' : User.objects.filter(username = user_name).exists(),
-        'pin_taken' : Student.objects.filter(pin_no = pin_no_hash).exists(),
-        'card_taken' : Student.objects.filter(reg_no = card_id_hash).exists(),
+        #'pin_taken' : Student.objects.filter(pin_no = pin_no).exists(),
+        #'card_taken' : Student.objects.filter(reg_no = card_id).exists(),
 
     }
     return JsonResponse(data)
 
 def student_pin_edit_validate(request):
-    pin_no = request.GET['pin_no']
+    password = request.GET['password']
     student_id = request.GET['student_id']
     pin_no_hash = make_password(pin_no, 'pepper')
     data = {
-        'pin_taken' : Student.objects.exclude(id = student_id).filter(pin_no = pin_no_hash).exists(),
+        'pin_taken' : Student.objects.exclude(id = student_id).filter(pin_no = pin_no).exists(),
          }
     return JsonResponse(data)

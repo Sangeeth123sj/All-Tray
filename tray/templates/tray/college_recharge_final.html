@@ -1,0 +1,43 @@
+{% extends "tray/base.html" %}
+
+
+{% block title %} Recharge a card {% endblock %}
+
+{% block content %}
+
+<center>
+    <br/><br/><br/>
+    <h3><strong>Student: {{student_name}}</strong></h3>
+    <h3><strong>Balance: {{student_balance}}</strong></h3>
+    <br/> <br/>
+    <form action="/college_recharge_final/" class="form" method="POST">
+        {% csrf_token %}
+    <label>Enter Recharge amount</label>
+    <br/>
+    <!--class 'fixed' to hide rfid card number input field--> 
+    <input type="number" id="recharge_amount" name="recharge_amount"> 
+    <br/> <br/>
+    <p id="incorrect_alert" style="color: rgb(143, 68, 68); font-weight: 1000; width: fit-content;" ></p>
+    <input type="button" id="enter" name="enter" class="btn btn-primary" value="Enter">
+    </form>
+</center>
+
+
+{% endblock %}
+
+<script>
+    //checking if pin or id card entered
+        $(document).ready(function(){
+            $("#enter").click(function(event){
+                if ($("#recharge_amount").val() < 1  | $("#recharge_amount").val() == null) {
+                        document.getElementById("incorrect_alert").innerHTML = "Please enter a valid amount."
+                        $('#incorrect_alert').fadeToggle(2000);
+                        event.preventDefault();
+                    }
+                else{
+                    $("form").submit();
+                    }
+            });
+
+        });
+</script>

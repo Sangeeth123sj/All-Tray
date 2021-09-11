@@ -62,6 +62,9 @@ urlpatterns = [
     path('ajax/store_edit_validate/', views.store_edit_validate, name='store_edit_validate'),
     path('ajax/student_pin_edit_validate/', views.student_pin_edit_validate, name='student_pin_edit_validate'),
     path('ajax/store_item_pickup_validate/', views.store_item_pickup_validate, name='store_item_pickup_validate'),
+    path('ajax/validate_recharge/', views.validate_recharge, name='validate_recharge'),
+    path('ajax/college_recharge_final/', views.college_recharge_final, name='college_recharge_final'),
+
 
 ]
 

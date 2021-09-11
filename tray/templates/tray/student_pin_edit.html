@@ -22,14 +22,14 @@
 
 
 
-<h3>Edit Pin</h3>
+<h3>Edit Password</h3>
 
 <div class="form-group centered">
     <form action="/student_pin_edit_post/" method="POST" name="form">
     {% csrf_token %}
-    <p>Pin no.</p>
-    <input type="text" name="pin_no" id="pin_no" class="form-control" required><br/><br/>
-    <input type="button" id="submit_button" value="Submit" class="btn btn-success">
+    <p>Password</p>
+    <input type="text" name="password" id="password" class="form-control" required><br/><br/>
+    <input type="submit" id="submit_button" value="Submit" class="btn btn-success">
     </form>
     </div>
 
@@ -37,22 +37,22 @@
 
 
     <script>
-        $(document).ready(function(){
+    /*    $(document).ready(function(){
            
             $("#submit_button").click(function (event) {
-                var pin_no = $("#pin_no").val();
-                console.log(pin_no);
+                var password = $("#password").val();
+                console.log(password);
 
                 $.ajax({
                     url: '/ajax/student_pin_edit_validate/',
                     
                     data: {
-                        'pin_no': pin_no,
+                        'pasword': password,
                         'student_id': '{{student.id}}'
                     },
                     dataType: 'json',
                     success: function (data) {
-                        if (data.pin_taken) {
+                        if (data.) {
                             alert("Pin no already taken try another");
                             location.reload();
                             return false;
@@ -70,7 +70,7 @@
         });
         
         
-        
+    */   
     </script>
     
 

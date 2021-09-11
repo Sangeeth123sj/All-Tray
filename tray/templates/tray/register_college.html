@@ -114,11 +114,25 @@
             */
         }
 
+        function checkemail(email) 
+        {
+            var re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        }
+
         
 
         $("#submit_button").click(function (event) {
             var college_name = $("#college_name").val();
             var user_name = $("#username").val();
+            var email = $("#email").val();
+            //console.log(email);
+            var flag = checkemail(email);
+            console.log(flag);
+            if (flag == false){
+                alert("Please enter a valid email");
+                event.preventDefault();
+            }
              $.ajax({
                 url: '/ajax/college_register_validate/',
                 

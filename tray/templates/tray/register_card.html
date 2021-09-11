@@ -9,8 +9,8 @@
             var student_name = document.forms["form"]["student_name"].value;
             var branch_name = document.forms["form"]["branch_name"].value;
             var semester = document.forms["form"]["semester"].value;
-            var pin = document.forms["form"]["pin"].value;
-            var card = document.forms["form"]["card"].value;
+            var password = document.forms["form"]["password"].value;
+            var mail_id = document.forms["form"]["mail_id"].value;
             var college_id = document.forms["form"]["college_id"].value;
             if (student_name == "") {
                 document.getElementById("student_name").style.borderColor = "red";
@@ -27,19 +27,19 @@
                 alert("Please enter your semester")
                 return false;
             }
-            if (pin == "") {
-                document.getElementById("pin").style.borderColor = "red";
-                alert("Please enter pin no.")
+            if (password == "") {
+                document.getElementById("password").style.borderColor = "red";
+                alert("Please enter password.")
                 return false;
             }
-            if (card == "") {
-                document.getElementById("card").style.borderColor = "red";
-                alert("Please swipe your rfid card or enter it's number")
+            if (mail_id == "") {
+                document.getElementById("mail_id").style.borderColor = "red";
+                alert("Please enter mail")
                 return false;
             }
             if (college_id == "") {
                 document.getElementById("college_id").style.borderColor = "red";
-                alert("Please swipe your rfid card or enter it's number")
+                alert("Please select college")
                 return false;
             }
 
@@ -56,9 +56,9 @@
     <br/>
     <input type="text" name="student_name" id="student_name" class="form-control" >
     <br/><br/>
-    <label>e-mail id</label>
+    <label for="email">e-mail id</label>
     <br/>
-    <input type="text" name="mail_id" id="mail_id" class="form-control" >
+    <input type="email" name="mail_id" id="mail_id" class="form-control" >
     <br/><br/>
     <label>Branch</label>
     <br/>
@@ -82,16 +82,12 @@
 <option input value="semester 8">semester 8</option>
 </select>
 
-<br/>
-
-<label>PIN number</label>
-<br/>
-<input type="number" name="pin" id="pin" minlength="4" class="form-control" >
 <br/><br/>
-<label>Scan id card here</label>
+
+<label>Password</label>
 <br/>
-<input type="number" name="card" id="card" class="form-control" >
-<br/> <br/>
+<input type="password" name="password" id="password" minlength="4" class="form-control" >
+<br/><br/>
 <p>College</p>
 
 <select id="college_id" name="college_id" id="college_id" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;" >
@@ -114,7 +110,6 @@
 <script>
     $(document).ready(function(){
 
-
         window.onload=set_fields(); 
 
         function set_fields(){
@@ -126,64 +121,74 @@
             if (branch_name !== null) $('#branch_name').val(branch_name);
             var semester = sessionStorage.getItem('semester');
             if (semester !== null) $('#semester').val(semester);
-            var pin = sessionStorage.getItem('pin');
-            if (pin !== null) $('#pin').val(pin);
-            var card = sessionStorage.getItem('card');
-            if (card !== null) $('#card').val(card);
+            var password = sessionStorage.getItem('password');
+            if (password !== null) $('#password').val(password);
+            //var card = sessionStorage.getItem('card');
+            //if (card !== null) $('#card').val(card);
             var college_id = sessionStorage.getItem('college_id');
             if (college_id !== null) $('#college_id').val(college_id);
         }
-
-
-
 
         window.onbeforeunload = function() {
             sessionStorage.setItem("student_name", $('#student_name').val());
             sessionStorage.setItem("mail_id", $('#mail_id').val());
             sessionStorage.setItem("branch_name", $('#branch_name').val());
             sessionStorage.setItem("semester", $('#semester').val());
-            sessionStorage.setItem("pin", $('#pin').val());
-            sessionStorage.setItem("card", $('#card').val());
+            sessionStorage.setItem("password", $('#password').val());
+            //sessionStorage.setItem("card", $('#card').val());
             sessionStorage.setItem("college_id", $('#college_id').val());
         }
 
-
-
-
-        $("#submit_button").click(function (event) {
-            var user_name = $("#student_name").val();
-            var pin = $("#pin").val();
-            var card = $("#card").val();
-             $.ajax({
-                url: '/ajax/student_register_validate/',
-                
-                data: {
-                    'user_name' : user_name,
-                    'pin' : pin,
-                    'card' : card
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if (data.user_name_taken) {
-                        alert("User name already taken, try another name");
-                        location.reload();
-                        return false;
-                    }
-                    if (data.pin_taken) {
-                        alert("Pin already taken, try another pin");
-                        location.reload();
-                        return false;
-                    }
-                    if (data.card_taken) {
-                        alert("Card number already taken, try another pin");
-                        location.reload();
-                        return false;
-                    }
-                    else{
-                        $("form").submit();
-                    }
+        $('#password').keyup(function (){ 
+                password_string = String(password);
+                console.log(password_string.trim().length);
+                console.log(typeof(password_string));
+                console.log(password_string.length);
+                console.log(String(student_name).length);
+                if (String(password).length < 6) { 
+                    $('#alerter').text("password too short") 
                 }
-            });
+            });  
+        
+        function checkemail(email) 
+            {
+                var re = /\S+@\S+\.\S+/;
+                return re.test(email);
+            }
+        
+        $("#submit_button").click(function (event) {
+
+            var user_name = $("#student_name").val();
+            var password = $("#password").val();
+            var email = $("#mail_id").val();
+            console.log(email);
+            var flag = checkemail(email);
+            console.log(flag);
+            if (flag == false){
+                alert("Please enter a valid email");
+                event.preventDefault();
+            }
+            else{
+                $.ajax({
+                    url: '/ajax/student_register_validate/',
+                    
+                    data: {
+                        'user_name' : user_name,
+                        'password' : password,
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.user_name_taken) {
+                            alert("User name already taken, try another name");
+                            location.reload();
+                            return false;
+                        }
+                        else{
+                            $("form").submit();
+                        }
+                    }
+                });
+            }
             
            
             
@@ -191,6 +196,7 @@
         });
 
     });
+
 
 </script>
 
