@@ -626,12 +626,18 @@ def validate_order_cancel(request):
 
 def cart(request):
     #block that adds items to cart
+    student = False
+    store = False
     if request.GET['status'] == 'add_to_cart':
+        #can cache student and store object
+        #no need to query them on each add_to_cart
+        if student == False and store == False:
+            student_id = request.GET['student_id']
+            student = Student.objects.get(id = student_id)
+            store_id = request.GET['store_id']
+            store = Store.objects.get(id = store_id)
+        
         item_name = request.GET['item_name']
-        student_id = request.GET['student_id']
-        student = Student.objects.get(id = student_id)
-        store_id = request.GET['store_id']
-        store = Store.objects.get(id = store_id)
         time = request.GET['time']
         quantity = request.GET['quantity']
         

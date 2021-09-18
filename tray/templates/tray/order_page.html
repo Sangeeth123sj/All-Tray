@@ -55,7 +55,8 @@
 
 <br/>
 
-<button class="btn btn-success" type="button" id="add">Add to cart </button>
+<button class="btn btn-success" type="button" id="add">Add to cart <div class="fa-3x">
+  <i class="fas fa-spinner fa-spin"></i></div> </button>
 <br/> <br/>
 
 <h3><strong>Cart</strong><i class="fas fa-shopping-cart"></i></h3>
@@ -128,14 +129,14 @@
                                 var cost = price * quantity;
                                 total = cost + subtotal;
                                 subtotal = subtotal + cost;
-                                console.log("total type:"+ typeof (total));
-                                console.log("cost type:"+ typeof (cost));
-                                console.log("subtotal type:"+ typeof (subtotal));
+                                //console.log("total type:"+ typeof (total));
+                                //console.log("cost type:"+ typeof (cost));
+                                //console.log("subtotal type:"+ typeof (subtotal));
                                 var item_row = '<tr id = '+data.cart_item_id+'> <td>'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
                                 $("#cart_table").find('tbody').append(item_row );
                                 $("#total").text(total);
-                                console.log("total type:"+  total);
-                                console.log(total);
+                                //console.log("total type:"+  total);
+                                //console.log(total);
                                 //total = 0;
                             }
                             else if (data.added == 'failure'){
@@ -223,27 +224,28 @@
         
             window.onbeforeunload = function(event) {
             if (buy_clicked == false){
-            event.returnValue = "exit"
-            total = 0;
-            subtotal = 0;
-            }
-            };    
+                event.returnValue = "exit"
+                total = 0;
+                subtotal = 0;
+                }
+               
 //this ajax only resets cart on reentering to the cart page
 // meets the requirement but don't know why the anomaly
-            $.ajax({
-                        url: '/ajax/cart/',
-                        data: {
-                            'status' : 'leaving_page',
-                            'student_id' : '{{student_id}}',
-                        },
-                        dataType: 'json',
-                        success: function (data){
-                            if (data.status == 'cart_count_reset'){
-                                console.log(data.status)
+                $.ajax({
+                            url: '/ajax/cart/',
+                            data: {
+                                'status' : 'leaving_page',
+                                'student_id' : '{{student_id}}',
+                            },
+                            dataType: 'json',
+                            success: function (data){
+                                if (data.status == 'cart_count_reset'){
+                                    console.log(data.status)
+                                }
                             }
-                        }
 
-            });
+                });
+            }; 
   
     
     });
