@@ -1,12 +1,9 @@
 from django.shortcuts import render, redirect
-from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 from .models import Student,Item,Store,User,Order, Break, CartItem, Institute
 from django.db.models import Sum
 from django.contrib.auth.models import User, Permission
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
@@ -26,16 +23,12 @@ def register_card_post(request):
         student_name = request.POST['student_name']
         branch = request.POST['branch_name']
         semester = request.POST['semester']
-        #reg_no = request.POST['card']
-        #reg_no_hash = make_password(reg_no, 'pepper')
         password = request.POST['password']
-        #pin_no_hash = make_password(pin_no)
         college_id = request.POST['college_id']
         email = request.POST['mail_id']
         college_object = Institute.objects.get(id = college_id)
         user = User.objects.create_user(student_name,email,password)
         user.save
-        #pin_no = pin_no removed at student save next line
         student = Student(name = student_name, branch = branch, sem = semester,college = college_object, user = user)
         student.save()
         messages.success(request, 'Profile created.')
@@ -64,16 +57,13 @@ def home_post(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        #student_pin = request.POST['student_pin']
         request.session['username'] = username
         request.session['password'] = password
-        #request.session['student_pin'] = student_pin
         return redirect(home)
 
 def home(request):
     student_username = request.session['username']
     student_password = request.session['password']
-    #student_pin_post = request.session['student_pin']
     user = authenticate(request, username = student_username, password = student_password)
     print("Student "+str(user)+" just logged in")
     
@@ -291,7 +281,6 @@ def store_item_pickup(request):
 def store_item_pickup_validate(request):
     otp = request.GET['otp']
     check_otp = Order.objects.filter(otp = otp).exists()
-    #otp_orders = Order.objects.filter(otp = otp)
     if check_otp:
         data = {
             'incorrect_status' : 'correct_otp',
@@ -411,9 +400,7 @@ def college_recharge(request):
 def college_recharge_post(request):
     if request.method == 'POST':
         username = request.POST['username']
-        #student_pin_hash = make_password(student_pin,'pepper')
         student_object = Student.objects.get(name = username)
-        #student_object = Student.objects.get(pin_no=student_pin)
         student_name =  student_object.name
         student_balance = student_object.balance
     return render(request, 'tray/college_recharge_details.html', {'student_balance':student_balance, 'student_name':student_name})
@@ -425,7 +412,6 @@ def validate_recharge(request):
     username = request.GET['username']
     college_id = request.session['college_id']
     student_valid = Student.objects.filter(name = username, college = college_id).exists()
-    #student_object = Student.objects.get(name = user_name)
     if student_valid:
         data = {
             'username_status': "correct"
@@ -546,7 +532,6 @@ def update_item_availability(request):
 def validate_entry(request):
     username = request.GET['username']
     password = request.GET['password']
-    #id_card = request.GET['id_card']
     user_exist = User.objects.filter(username = username).exists()
     if user_exist:
         user_student_exist = Student.objects.filter(name = username).exists()
@@ -556,7 +541,6 @@ def validate_entry(request):
     if user_student_exist:
         user = User.objects.get(username = username)
         password_checker_bool = check_password(password,user.password)
-        #check_card = check_password(id_card, user.student.reg_no)
         if (password_checker_bool== False):
             data = {
                 'incorrect_status' : 'incorrect_password',
@@ -575,9 +559,9 @@ def validate_entry(request):
 def validate_order_cancel(request):
     order_id = request.GET['order_id']
     order = Order.objects.get(id = order_id)
-    #'break_time_find' is variable which gives break name in string format from the respective order. eg. 'First Break'
+#'break_time_find' is variable which gives break name in string format from the respective order. eg. 'First Break'
     break_time_find = order.pickup_time
-    #this isn't hard code 'id = 1' there is only one break object for now will change and add relation
+#this isn't hard code 'id = 1' there is only one break object for now will change and add relation
     break_object = Break.objects.get(college = order.student.college)
     if break_time_find == "First Break":
         break_time = break_object.first_break
@@ -586,7 +570,12 @@ def validate_order_cancel(request):
     elif  break_time_find == "Last Break":
         break_time = break_object.last_break
     else: break_time = "Now"
-
+    if order.status == True:
+        data = {
+                'cancelled' : 'already_delivered'
+        }
+        return JsonResponse(data)
+    
     if  break_time == "Now" :
         student_balance = order.student.balance
         store_balance = order.store.store_balance
@@ -844,14 +833,8 @@ def college_register_validate(request):
 def student_register_validate(request):
     user_name = request.GET['user_name']
     password = request.GET['password']
-    #card_id = request.GET['card']
-    #pin_no_hash = check_password(pin_no, 'pepper')
-    #card_id_hash = check_password(card_id, 'pepper')
     data = {
         'user_name_taken' : User.objects.filter(username = user_name).exists(),
-        #'pin_taken' : Student.objects.filter(pin_no = pin_no).exists(),
-        #'card_taken' : Student.objects.filter(reg_no = card_id).exists(),
-
     }
     return JsonResponse(data)
 

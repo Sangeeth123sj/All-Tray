@@ -3,7 +3,7 @@
 {% block content %}
 <center class="frostprimary">
 <h1>You orders are:</h1>
-<strong id="no_delete_condition" style="color: red; display:none;">"Order can be cancelled only atleast one hour before the break of the order"</strong>
+<p id="no_delete_condition" style="color:red ; display:none;">"Order can be cancelled only atleast one hour before the break of the order"</p>
 <br/> <br/>
 
 <!--Testing daterange-->
@@ -333,11 +333,12 @@ $(document).ready(function(){
                                     if (data.cancelled == "success") {
                                         alert(item_name+" order is cancelled" );
                                         row.fadeOut(500);
-                                        //row.remove();
-                                        
                                     }
                                     else if (data.cancelled == "failure") {
                                         $("#no_delete_condition").fadeIn(1000).delay(4000).fadeOut(1000);
+                                    }
+                                    else if (data.cancelled == "already_delivered"){
+                                        alert("Item already delivered, can't be cancelled");
                                     }
                                 }
                         
