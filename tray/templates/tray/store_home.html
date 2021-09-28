@@ -4,20 +4,28 @@
 {% block title %} Store Home {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-dark bg-dark">
-    <ul class="navbar-nav mr-auto">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-    <a class="navbar-brand" href="{% url 'store_home' %}">Home</a>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_edit_details' %}">Edit Store</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_order_list' %}">Order list</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_logout' %}">Logout</a>
+      </li>
     </ul>
-    <li class="nav-item">
-    <a class="nav-item" href="{% url 'store_logout' %}">Logout</a>
-    </li>
-    <li class="nav-item">
-    <a class="navbar-link" href="{% url 'store_edit_details' %}">Edit Store</a>
-    </li>
-    <li class="nav-item">
-    <a class="navbar-link" href="{% url 'store_order_list' %}">Order list</a>
-    </li>
+    
+  </div>
 </nav>
 {% endblock %}
 

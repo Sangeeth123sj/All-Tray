@@ -1,5 +1,30 @@
 {% extends "tray/base.html" %}
 
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
+      </li>
+      
+    </ul>
+    
+  </div>
+</nav>
+{% endblock %}
+
+
 {% block title%} Welcome to {{store.store_name}} {% endblock %}
 
 {% block content %}
@@ -102,6 +127,7 @@
     var subtotal = 0;   
     var total = 0;
     var buy_clicked = false;
+    var order_list = [];
             $("#add").click(function(event){
                 var item = $("#item").val();
                 var quantity = $("#quantity").val();
@@ -111,6 +137,23 @@
                     return;
                 }
                 var  time = $("#pickup_time").val();
+                
+                order_obj = {
+                    "item":item,
+                    "quantity":quantity,
+                    "time":time,
+                }
+                order_list_push();
+
+
+                function order_list_push()
+                {
+                    order_list.push(order_obj);
+                    for(let i in order_list){
+                        console.log("item:"+i+" "+order_list[i].item+" quantity:"+order_list[i].quantity+" time:"+order_list[i].time)
+                }
+                }
+
                 
                 $.ajax({
                         url: '/ajax/cart/',
@@ -155,11 +198,28 @@
 
             $("#delete").click(function(){
            
-              $("#cart_body").find('input[name="record"]').each(function(){
+                $("#cart_body").find('input[name="record"]').each(function(){
             	if($(this).is(":checked")){
                     var delete_item_id = $(this).closest('tr').attr('id');
                     var item_cost = $(this).parent().prev().text();
-                    console.log(delete_item_id+ "item deleting with cost : " +item_cost);
+                    var item_name = $(this).parent().prev().prev().prev().prev().text();
+                    console.log(delete_item_id+ "testeritem: "+item_name+" deleting with cost : " +item_cost);
+                    //removing the item from order list array
+                    delete_from_order_list();
+
+                    function delete_from_order_list()
+                    {
+                        console.log("entered delete function, item name:"+item_name);
+                        //item to be removed be prepared as this object on delete click
+                        //remobj = {item:"samosa", quantity:"2", time:"Now" }
+                        find_index = order_list.findIndex(a => (a.item === item_name && a.quantity === a.quantity));
+                        console.log("index check"+find_index);
+                        if (find_index !== -1){
+                            order_list.splice(find_index,1);
+                            console.log("removed");
+                        }
+                    }
+                    //removing from cart table
                     $(this).parents("tr").remove();
                     console.log("total:"+subtotal);
                     subtotal = subtotal - item_cost;

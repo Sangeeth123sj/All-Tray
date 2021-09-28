@@ -1,14 +1,30 @@
 {% extends "tray/base.html" %}
 
 {% block navbar %} 
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
-    <li class="nav-item">
-        <a class="navbar-item" href="{% url 'college_recharge' %}">Recharge .</a>
-        <a class="nav-item" href="{% url 'college_break_edit' %}">Edit break</a><span>" "</span>
-        <a class="nav-item" href="{% url 'college_logout' %}">Logout</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <li class="nav-item active">
+        <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
     </li>
-</nav>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_recharge' %}">Recharge</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_break_edit' %}">Edit break</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_logout' %}">Logout</a>
+        </li>
+        
+        </ul>
+        
+    </div>
+    </nav> 
 {% endblock %}
 
 
@@ -17,42 +33,42 @@
 
 
 {% block content %}
-<center>
-<script type="text/javascript"> 
-    //prevent navigating back to login
-        function preventBack() { 
-            window.history.forward();  
-        } 
-          
-        setTimeout("preventBack()", 0); 
-          
-        window.onunload = function () { null }; 
-</script> 
-        <p>Welcome {{college.institute_name}}</p>
+    <center>
+    <script type="text/javascript"> 
+        //prevent navigating back to login
+            function preventBack() { 
+                window.history.forward();  
+            } 
+            
+            setTimeout("preventBack()", 0); 
+            
+            window.onunload = function () { null }; 
+    </script> 
+            <p>Welcome {{college.institute_name}}</p>
 
+            <br/>
+            
+            
+            <form action="/college_store_order_list_post/" method="POST">
+                {% csrf_token %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                {% for store in stores %}
+                    <button type="submit" id="store_button" class="btn btn-outline-dark" name="store_id" value="{{store.id}}"> 
+                        <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
+                        {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
+                        {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>
+                        {{store.store_details}}
+                    </button>
+                    <!--input type="submit" name="" value="{{store.store_name}}" class="button store-button" type="button"-->
+                    <!--input type="hidden" name="store_name" value="{{store.store_name}}"-->
+                {% endfor %}
+            </div>
+            </div>
+            </div>
+        </form>
         <br/>
-        
-        
-        <form action="/college_store_order_list_post/" method="POST">
-            {% csrf_token %}
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-12">
-            {% for store in stores %}
-                <button type="submit" id="store_button" class="btn btn-outline-dark" name="store_id" value="{{store.id}}"> 
-                    <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
-                    {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
-                    {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>
-                    {{store.store_details}}
-                </button>
-                <!--input type="submit" name="" value="{{store.store_name}}" class="button store-button" type="button"-->
-                <!--input type="hidden" name="store_name" value="{{store.store_name}}"-->
-            {% endfor %}
-        </div>
-        </div>
-        </div>
-     </form>
-     <br/>
-     <a href="{% url 'college_recharge' %}" class="btn btn-success">Recharge a card</a>
-</center>
+        <a href="{% url 'college_recharge' %}" class="btn btn-success">Recharge a card</a>
+    </center>
 {% endblock %}

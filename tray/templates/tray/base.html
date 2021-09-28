@@ -21,8 +21,9 @@ box-shadow: 0 0 2px 2px #888;
     
     .bg { 
 	/* The image used */
-	background-image: url('{% static "tray/images/homesunset.jpg" %}');
+	background-image: url('{% static "tray/images/roadmin.jpg" %}');
   background-attachment: fixed;
+
   /*url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");*/
 	/* Full height */
 	
@@ -47,10 +48,7 @@ box-shadow: 0 0 2px 2px #888;
 	/* Center and scale the image nicely */
 	background-position: center;
 	background-repeat: no-repeat;
-	
   height: cover;
-  /*padding: 5%;
-  padding-left: 35.45%;*/
   }
 
   .cent{
@@ -190,22 +188,13 @@ div.left {
       </li>
       
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
-  </div>
-</nav>
-
-
-
-
-
-
     
+  </div>
+</nav> 
 {% endblock %}
-
+{% block background %}
 <div class="bg">
+{% endblock %}
     {% block heading %}
 
         <div class="heading" >
@@ -220,7 +209,9 @@ div.left {
         
         {% endblock %}
 
+  </div>
 
+</div>
 
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -229,12 +220,5 @@ div.left {
 
 
     </body>
-  </div>
-    {% block footer %}
-    
-    
-   
-        {% endblock %}
- 
-</div>
+  
 </html>

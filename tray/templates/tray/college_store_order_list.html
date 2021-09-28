@@ -2,13 +2,34 @@
 
 
 {% block navbar %} 
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
-    <li class="nav-item">
-        <a class="nav-item" href="{% url 'college_break_edit' %}">Edit break</a><span>" "</span>
-        <a class="nav-item" href="{% url 'college_logout' %}">Logout</a>
+ <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <li class="nav-item active">
+        <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
     </li>
-</nav>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_recharge' %}">Recharge</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_break_edit' %}">Edit break</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_logout' %}">Logout</a>
+        </li>
+        
+        </ul>
+        
+    </div>
+    </nav>
+{% endblock %}
+
+{% block background %}
+<div class="bg_infinite">
 {% endblock %}
 
 {% block content %}
