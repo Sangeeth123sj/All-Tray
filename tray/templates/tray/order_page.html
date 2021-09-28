@@ -131,7 +131,7 @@
             $("#add").click(function(event){
                 var item = $("#item").val();
                 var quantity = $("#quantity").val();
-                
+                //check_exist_in_cart(item);
                 if (quantity == ' ' || quantity < 1  ){
                     alert ("please select atleast one in quantity");
                     return;
@@ -154,6 +154,8 @@
                 }
                 }
 
+                //function check_exist_in_cart(item)
+                //{}
                 
                 $.ajax({
                         url: '/ajax/cart/',
