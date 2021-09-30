@@ -276,14 +276,15 @@
                                 total = 0;
                                 subtotal = 0;
                                 otp = data.otp;
-                                //swal("Order placed!","otp to pickup order is:"+"      "+ otp +"\n\notp can be found in Your Orders\nThanks for Shopping with Alltray!", "success");
-                                swal({
-                                    title: 'Order placed!',
-                                    text: "otp to pickup order is:"+"      "+ otp +"\n\notp can be found in Your Orders\nThanks for Shopping with Alltray!",
-                                    type: 'success'
-                                    }).then(function() {
+                                //Swal.fire('Saved!', '', 'success');
+                                Swal.fire(
+                                    'Order placed!',
+                                    '<p>OTP to pickup order is: <strong>'+ otp +
+                                    '</strong> <br/>OTP can be found in Your Orders. <br/>Thanks for Shopping with Alltray!<p>',
+                                    'success'
+                                    ).then(function() {
                                         location.reload();
-                                })
+                                    });
 
                                 //swal("Good job!", "You clicked the button!", "success"); 
                                 

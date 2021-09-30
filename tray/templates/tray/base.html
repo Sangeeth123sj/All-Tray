@@ -150,6 +150,19 @@ div.left {
   
 }
 
+//input required shake
+.error {
+    position: relative;
+    animation: shake .1s linear;
+    animation-iteration-count: 3;
+}
+
+@keyframes shake {
+    0% { left: -5px; }
+    100% { right: -5px; }
+}
+
+
 
 </style>
 <!--icon -->
@@ -163,8 +176,10 @@ div.left {
 <script src="{% static 'tray/js/app.js' %}"></script>   
 <script src="https://kit.fontawesome.com/803b4ae923.js" crossorigin="anonymous"></script>
 <!--js sweetalerts-->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>  
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css'></link>  
+<!--script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>  
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css'></link>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.5/dist/sweetalert2.all.min.js" integrity="sha256-sq9BgeqJAlCLfjfAO+2diFGt5O8aIYNrds+yhlpFnvg=" crossorigin="anonymous"></script>
 
 </head>
 <body style="background-color: rgba(255,255, 255, 1)">
