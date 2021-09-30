@@ -97,7 +97,10 @@ $(document).ready(function(){
                 
         if ( $("#username").val() == "" ) {
                 document.getElementById("incorrect_alert_1").innerHTML = "Please enter username."
-                $("#username").css("border-color","red"); 
+                $("#username").css("border-color","red");
+                //swal("Here's a message!", " Have a nice day!");  
+                //swal("Oops!", "Something went wrong, you should choose again!", "error");  
+                //swal("Good job!", "You clicked the button!", "success");  
                 event.preventDefault();
             }
 

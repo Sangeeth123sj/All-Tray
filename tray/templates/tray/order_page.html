@@ -137,7 +137,20 @@
                     return;
                 }
                 var  time = $("#pickup_time").val();
-                
+                console.log("entering exist check");
+                //checking if item already in cart and incrementing the item
+                $("#cart_body").find(id="item").each(function(){
+                    console.log("existing"+$(this).text());
+                    if($(this).text == item)
+                    {
+                        console.log("entered exist in cart check");
+                        console.log("existing"+$(this).text);
+                        quantity_in_cart = $(this).parent().prev().prev().prev().text();
+                        incremented_quantity = quantity_in_cart + quantity;
+                        $(this).parent().prev().prev().prev().text(incremented_quantity);
+                    }
+                });
+                //adding order to list
                 order_obj = {
                     "item":item,
                     "quantity":quantity,
@@ -199,7 +212,6 @@
             });
 
             $("#delete").click(function(){
-           
                 $("#cart_body").find('input[name="record"]').each(function(){
             	if($(this).is(":checked")){
                     var delete_item_id = $(this).closest('tr').attr('id');
@@ -264,8 +276,17 @@
                                 total = 0;
                                 subtotal = 0;
                                 otp = data.otp;
-                                alert("Order placed!\notp to pickup order is:"+"      "+ otp +"\n\notp can be found in Your Orders\nThanks for Shopping with Alltray!");
-                                location.reload();
+                                //swal("Order placed!","otp to pickup order is:"+"      "+ otp +"\n\notp can be found in Your Orders\nThanks for Shopping with Alltray!", "success");
+                                swal({
+                                    title: 'Order placed!',
+                                    text: "otp to pickup order is:"+"      "+ otp +"\n\notp can be found in Your Orders\nThanks for Shopping with Alltray!",
+                                    type: 'success'
+                                    }).then(function() {
+                                        location.reload();
+                                })
+
+                                //swal("Good job!", "You clicked the button!", "success"); 
+                                
                             }
                             if (data.status == 'no_item_in_cart')
                             {
