@@ -1,12 +1,12 @@
 {% extends "tray/base.html" %}
-
+{% load static %}
 {% block title%} {% endblock %}
 
 
 
                 {% block heading %}
 {% load crispy_forms_tags %}
-
+{% load static %}
 
         
                         <div class="heading" style="text-align: center;" >
@@ -155,11 +155,23 @@ $(document).ready(function(){
                             if (data.incorrect_status == "incorrect_password"){
                                 //document.getElementById("incorrect_alert_2").innerHTML = "Sorry incorrect password, please register if not registered and try again"
                                 //$("#pin").css("border-color","red");
-                                Swal.fire(
+                                /*Swal.fire(
                                     'Oops',
                                     '<p>Sorry incorrect password.<br/>Try again.<p>',
-                                    'warning'
-                                    ).then(function() {
+                                    imageUrl: 'https://unsplash.it/400/200',
+                                    imageWidth: 400,
+                                    imageHeight: 200,
+                                    imageAlt: 'Custom image',
+                                    )*/
+                                    
+                                    Swal.fire({
+                                        title: 'grr!',
+                                        text: 'Sorry incorrect password ;)',
+                                        imageUrl: href="{% static 'tray/images/chihua.png' %}",
+                                        imageWidth: 400,
+                                        imageHeight: 200,
+                                        imageAlt: 'Custom image',
+                                        }).then(function() {
                                         location.reload();
                                     });
 
