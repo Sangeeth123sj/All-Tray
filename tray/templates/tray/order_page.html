@@ -102,8 +102,9 @@
 </tbody>
 <tfoot>
     <tr>
-        <td colspan="1"><strong>Total:</strong></td>
-        <td colspan="3" id="total"></td>
+        <!--td colspan="1"><strong>Total:</strong></td-->
+        <td colspan="2" id="total">Total:</td>
+        <td colspan="2" id="tray_revenue"></td>
         <td><button id="delete" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button></td>
     </tr>
 </tfoot>
@@ -113,10 +114,10 @@
 <p>Pay using:</p>
 
 <input type="button"  id="confirm" value="pay with alltray balance" class="btn btn-primary"> 
-<br/> <br/>   
-<button class="btn btn-info">pay online</button>
+
 {% with student_id=student.id  %}
 {% with store_id=store.id %}
+
 
 
 
@@ -128,6 +129,33 @@
     var total = 0;
     var buy_clicked = false;
     var order_list = [];
+
+//function to calculate commission on adding item
+    function alltray_revenue(total){
+
+        if (total>0 && total<=10){
+            commission = 0.01 * total;
+        }
+        else if (total>10 && total<=50){
+            commission = 0.5;
+        }
+        else if (total>50 && total<=100){
+            commission = 1;
+        }
+        else if (total>100 && total<=400){
+            commission = 0.01 * total;
+        }
+        else if (total>=400){
+            commission = 4;
+        }
+        else{
+            commission = 0;
+        }
+
+        return commission;
+    };
+
+
             $("#add").click(function(event){
                 var item = $("#item").val();
                 var quantity = $("#quantity").val();
@@ -138,7 +166,7 @@
                 }
                 var  time = $("#pickup_time").val();
                 console.log("entering exist check");
-                //checking if item already in cart and incrementing the item
+                //checking if item already in cart and incrementing the item (not still working!)
                 $("#cart_body").find(id="item").each(function(){
                     console.log("existing"+$(this).text());
                     if($(this).text == item)
@@ -157,7 +185,6 @@
                     "time":time,
                 }
                 order_list_push();
-
 
                 function order_list_push()
                 {
@@ -188,15 +215,11 @@
                                 var cost = price * quantity;
                                 total = cost + subtotal;
                                 subtotal = subtotal + cost;
-                                //console.log("total type:"+ typeof (total));
-                                //console.log("cost type:"+ typeof (cost));
-                                //console.log("subtotal type:"+ typeof (subtotal));
                                 var item_row = '<tr id = '+data.cart_item_id+'> <td>'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
                                 $("#cart_table").find('tbody').append(item_row );
-                                $("#total").text(total);
-                                //console.log("total type:"+  total);
-                                //console.log(total);
-                                //total = 0;
+                                tray_revenue = "tray revenue: "+alltray_revenue(total);
+                                $("#tray_revenue").text(tray_revenue);
+                                $("#total").text("Total: "+total);
                             }
                             else if (data.added == 'failure'){
                                 alert("Item not available at store or has been removed by the store");
@@ -238,7 +261,9 @@
                     console.log("total:"+subtotal);
                     subtotal = subtotal - item_cost;
                     console.log("total after deleting item:"+subtotal+"item_cost:"+item_cost );
-                    $("#total").text(subtotal);
+                    $("#total").text("Total: "+subtotal);
+                    tray_revenue = "tray revenue: "+alltray_revenue(subtotal);
+                    $("#tray_revenue").text(tray_revenue);
                     $.ajax({
                         url: '/ajax/cart/',
                         data: {

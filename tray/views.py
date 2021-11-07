@@ -10,6 +10,16 @@ from datetime import datetime
 from datetime import timedelta
 from django.contrib.auth.hashers import check_password, make_password
 import string,random
+import requests
+import json
+from fpdf import FPDF
+
+# import checksum generation utility
+# You can get this utility from https://developer.paytm.com/docs/checksum/
+import paytmchecksum
+
+
+
 
 
 #student views______________________________________________________________________________
@@ -197,6 +207,28 @@ def store_home(request):
     else:
         c = "Closed"
     return render(request, 'tray/store_home.html',{'store': store, 'store_name':store_name, 'store_id':store_id, 'status':c, 'items':items})
+
+def store_billing(request):
+    store_id = request.session['store_id']
+    print("entering billing store id  = "+str(store_id))
+    store = Store.objects.get(id = store_id)
+    store_name = store.store_name
+    items = store.item_set.all()
+    context = {'store':store,'store_name':store_name, 'items': items}
+    return render (request, 'tray/store_billing.html', context )
+
+def billing_item_price(request):
+    item_name = request.GET['item_name']
+    store_id = request.GET['store_id']
+    #store = Store.objects.get(id = store_id)
+    item = Item.objects.get(item = item_name, store = store_id)
+    item_price = item.price
+    data = {
+        'item_price' : item_price,
+    }
+    return JsonResponse(data)
+
+
 
 def store_edit_details(request):
     store_id = request.session['store_id']
@@ -731,8 +763,11 @@ def cart(request):
             }
         return JsonResponse(data)
 
+def paytm(request):
+    return render(request,'paytm_checkout.html')
 
 def pickup_order(request):
+    
     order_id = request.GET['order_id']
     order = Order.objects.get(id = order_id)
     order.status = True

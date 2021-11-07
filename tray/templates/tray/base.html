@@ -5,7 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
-    
+    <!--font links-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fruktur&display=swap" rel="stylesheet">
+
+
 <style>
     table{
 -moz-box-shadow: 0 0 2px 2px #888;
@@ -18,10 +23,14 @@ box-shadow: 0 0 2px 2px #888;
     td,th.tr{
         border: 1px solid black;
     }
+
+* {
+font-family: Cambria, Georgia, serif;
+}
     
     .bg { 
 	/* The image used */
-	background-image: url('{% static "tray/images/roadmin.jpg" %}');
+	background-image: url('{% static "tray/images/bg.jpg" %}');
   background-attachment: fixed;
 
   /*url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");*/
@@ -68,11 +77,48 @@ box-shadow: 0 0 2px 2px #888;
   }
 
   .frostprimary{
-	background-color:  rgba(224, 236, 247, 0.384);
-	font-weight: bold;
-  padding-bottom: 4%;
+	background-color:rgba(243, 245, 247, 0.788);
+  border-radius:5%;
+	width: fit-content;
+  padding-bottom: 2%;
+  padding-top: 2%;
+  padding-right: clamp(2px, 5%, 50px);
+  padding-left: clamp(2px, 5%, 50px);
+  margin: auto;
   
 }
+
+
+         .btn-grad {background-image: linear-gradient(to right, #77A1D3 0%, #79CBCA  51%, #77A1D3  100%)}
+         .btn-grad {
+            margin: 5px;
+            text-align: center;
+            
+            transition: 0.5s;
+            background-size: 200% auto;
+                  
+            
+            border-radius: 10px;
+            width:fit-content;
+            padding-right: 4%;
+            padding-left: 1%;
+          }
+
+          .btn-grad:hover {
+            background-position: right center; /* change the direction of the change here */
+            
+            text-decoration: none;
+          }
+         
+
+  .billing_balance{
+    background: linear-gradient(90deg, #efd5ff 0%, #515ada 100%);
+    border-radius:4%;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    padding-right: 8%;
+    width: fit-content;
+  }
 
     div.picture{
         background-image: url('{% static "tray/images/woods.jpg" %}');
@@ -217,6 +263,7 @@ div.left {
       <center>
       <strong>All Tray</strong>
       </center>
+      <br/>
     </div>
   {% endblock %}
   {% block frost %}

@@ -20,6 +20,7 @@ urlpatterns = [
     path('register_store/', views.open_store, name = 'open_store'),
     path('register_store_success/', views.open_store_success, name = 'open_store_success'),
     path('store_home/', views.store_home, name = 'store_home'),
+    path('store_billing/', views.store_billing, name = 'billing'),
     path('login/', views.store_login, name = 'store_login'),
     path('login_verify/', views.store_login_processing, name = 'store_login_processing' ),
     path('store_logout/', views.store_logout, name='store_logout'),
@@ -45,6 +46,8 @@ urlpatterns = [
     path('college_recharge_details/', views.college_recharge_details, name='college_recharge_details'),
     path('student_pin_edit/', views.student_pin_edit, name='student_pin_edit'),
     path('student_pin_edit_post/', views.student_pin_edit_post, name='student_pin_edit_post'),
+    path('paytm/', views.paytm, name='paytm'),
+
     #ajaxify using jquery_____________________________________________________________________________________________
     path('ajax/validate_store_item/', views.validate_store_item, name='validate_store_item'),
     path('ajax/validate_store_edit_item/', views.validate_store_edit_item, name='validate_store_edit_item'),
@@ -64,7 +67,8 @@ urlpatterns = [
     path('ajax/store_item_pickup_validate/', views.store_item_pickup_validate, name='store_item_pickup_validate'),
     path('ajax/validate_recharge/', views.validate_recharge, name='validate_recharge'),
     path('ajax/college_recharge_final/', views.college_recharge_final, name='college_recharge_final'),
-
+    path('ajax/billing/item_price/', views.billing_item_price, name='item_price'),
+    
 
 ]
 
