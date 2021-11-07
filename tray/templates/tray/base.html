@@ -40,8 +40,7 @@ font-family: Cambria, Georgia, serif;
 	/* Center and scale the image nicely */
 	background-position: center;
 	background-repeat: no-repeat;
-	
-  height: 900;
+  background-size: cover;
   /*padding: 5%;
   padding-left: 35.45%;*/
   }
@@ -82,10 +81,20 @@ font-family: Cambria, Georgia, serif;
 	width: fit-content;
   padding-bottom: 2%;
   padding-top: 2%;
-  padding-right: clamp(2px, 5%, 50px);
-  padding-left: clamp(2px, 5%, 50px);
+  padding-right: min(50px, 1%);
+  padding-left: min(50px, 1%);
   margin: auto;
-  
+}
+
+.frostprimary_narrow{
+	background-color:rgba(243, 245, 247, 0.788);
+  border-radius:5%;
+	width: fit-content;
+  padding-bottom: 1%;
+  padding-top: 1%;
+  padding-right: clamp(2px, 2%, 50px);
+  padding-left: clamp(2px, 2%, 50px);
+  margin: auto;
 }
 
 
