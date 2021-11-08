@@ -4,12 +4,29 @@
 {% block title %} Edit Break {% endblock %}
 
 {% block navbar %} 
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
-    <li class="nav-item">
-        <a class="nav-item" href="{% url 'college_logout' %}">Logout</a>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <li class="nav-item active">
+        <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
     </li>
-</nav>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_recharge' %}">Recharge</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_logout' %}">Logout</a>
+        </li>
+        
+        </ul>
+        
+    </div>
+    </nav> 
+
 {% endblock %}
 
 
@@ -19,16 +36,16 @@
 
 
 
-<h3>Edit Break</h3>
-
+<h2>Edit Break</h2>
+<br/>
 <div class="form-group centered">
     <form action="/college_break_edit_post/" method="POST" name="form" >
     {% csrf_token %}
-        <p>First Break</p>
+        <h4>First Break</h4>
         <input type="time" name="first_break" id="first_break" class="form-control" required><br/><br/>
-        <p>Lunch break</p>
+        <h4>Lunch break</h4>
         <input type="time" name="lunch_break" id="lunch_break" class="form-control" required><br/><br/>
-        <p>Last break</p>
+        <h4>Last break</h4>
         <input type="time" name="last_break" id="last_break" class="form-control" required><br/><br/>
         <input type="submit" class="form-control btn btn-success" >
     </form>

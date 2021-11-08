@@ -4,19 +4,20 @@
 
 {% block content %}
 <center>
-<h4> <strong> Login to Your Institute </strong></h4>
+<h3> Login to Your Institute</h3>
+<br/>
 <div class="form-group centered">
 
 <form action="/college_login_verify/" method="POST">
 {% csrf_token %}
 
 
-<p>username</p>
+<h4>username</h4>
 <input type="text" class="form-control" id="username" name="username"><br/><br/>
-<p>password</p>
+<h4>password</h4>
 <input type="password" class="form-control" id="password" name="password"><br/><br/>
 <p id="incorrect_alert" style="color: rgb(250, 107, 107); font-weight: 1000; width: fit-content;" ></p>
-<input type="submit" id="enter" value="Login" class="btn btn-success" type="button">
+<input type="submit" id="enter" value="Login" class="login-button" type="button">
 
 </form>
 

@@ -4,20 +4,28 @@
 {% block title %} Edit Store {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-dark bg-dark">
-    <ul class="navbar-nav mr-auto">
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'billing' %}">Billing</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_order_list' %}">Order list</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_logout' %}">Logout</a>
+      </li>
     </ul>
-    <li class="nav-item">
-    <a class="nav-item" href="{% url 'store_logout' %}">Logout</a>
-    </li>
-    <li class="nav-item">
-    <a class="navbar-link" href="{% url 'store_order_list' %}">Edit Store</a>
-    </li>
-    <li class="nav-item">
-    <a class="navbar-link" href="{% url 'store_add_item' %}">Add item</a>
-    </li>
+    
+  </div>
 </nav>
 {% endblock %}
 
@@ -41,14 +49,14 @@
             }
 </script>
 
-<h3>Edit Store</h3>
-
+<h2>Edit Store</h2>
+<br/>
 <div class="form-group centered">
     <form action="/store_edit_details_post/" method="POST" name="form" onsubmit="return validateForm()" >
     {% csrf_token %}
-    <p>Store name</p>
+    <h4>Store name</h4>
     <input type="text" name="store_name" id="store_name" class="form-control" value={{store.store_name}}><br/><br/>
-    <p>Store Description</p>
+    <h4>Store Description</h4>
     <textarea id="store_description" name="store_description" class="form-control" rows="5">{{store.store_details}}</textarea><br/><br/>
     <input type="button" class="btn btn-success" value="submit" id="submit_button">
     </form>
@@ -114,14 +122,7 @@
         
         
     </script>
-    
-    <div class="row">
-    
-        <div class="col-sm-5">
-            <a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
-        </div>
-        <div class="col-sm-11">
-        
+    <a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
         </div>
         </div>
 

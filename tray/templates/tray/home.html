@@ -14,7 +14,13 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
+        <a class="nav-link" href="{% url 'your_orders' %}">Your Orders</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">Recharge</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
@@ -38,11 +44,12 @@
 
 
 <center>
-        <p>Welcome {{student.name}}</p>
+        <h3>Welcome {{student.name}}</h3>
+        <br/><br/>
         <form action="/your_orders_post/" method="POST">
             {% csrf_token %}
         <input type="hidden" name="student_id" value="{{student.id}}">
-        <input type="submit" class="btn btn-outline-primary" value="Your orders"> 
+        <input type="submit" class="blue-button" value="Your orders"> 
         </form>
 
         <form action="" method="POST">
