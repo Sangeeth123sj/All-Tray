@@ -30,9 +30,8 @@ font-family: Cambria, Georgia, serif;
     
     .bg { 
 	/* The image used */
-	background-image: url('{% static "tray/images/bg.jpg" %}');
+	
   background-attachment: fixed;
-
   /*url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");*/
 	/* Full height */
 	
@@ -43,6 +42,13 @@ font-family: Cambria, Georgia, serif;
   background-size: cover;
   /*padding: 5%;
   padding-left: 35.45%;*/
+  }
+
+  body {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url('{% static "tray/images/bg.jpg" %}');
+    padding-bottom: 10%;
   }
 
   .bg_infinite { 
@@ -86,14 +92,14 @@ font-family: Cambria, Georgia, serif;
   margin: auto;
 }
 
-.frostprimary_narrow{
+.frostprimary_test{
 	background-color:rgba(243, 245, 247, 0.788);
   border-radius:5%;
 	width: fit-content;
   padding-bottom: 1%;
   padding-top: 1%;
-  padding-right: clamp(2px, 2%, 50px);
-  padding-left: clamp(2px, 2%, 50px);
+  padding-right: clamp(1px, 1%, 50px);
+  padding-left: clamp(1px, 1%, 50px);
   margin: auto;
 }
 
@@ -205,17 +211,6 @@ div.left {
   
 }
 
-//input required shake
-.error {
-    position: relative;
-    animation: shake .1s linear;
-    animation-iteration-count: 3;
-}
-
-@keyframes shake {
-    0% { left: -5px; }
-    100% { right: -5px; }
-}
 
 
 
@@ -265,7 +260,7 @@ div.left {
 </nav> 
 {% endblock %}
 {% block background %}
-<div class="bg">
+
 {% endblock %}
   {% block heading %}
     <div class="heading" >
@@ -281,10 +276,10 @@ div.left {
         {% block content%}
         
         {% endblock %}
-
+  <br/><br/>
   </div>
 
-</div>
+
 
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -292,6 +287,6 @@ div.left {
 
 
 
-    </body>
+</body>
   
 </html>
