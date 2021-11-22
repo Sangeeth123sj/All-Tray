@@ -1,9 +1,12 @@
 from django.db import models
 from django.db.models import Model
 from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
 from django.utils.timezone import now
 from datetime import datetime
 import string, random
+
+
 # Create your models here.
 
 BREAKS = (  
@@ -57,6 +60,7 @@ class Store(models.Model):
     store_status = models.BooleanField()
     store_details = models.CharField(max_length=300, blank = True)
     store_balance = models.IntegerField(default=0)
+    invoice_code = models.CharField(max_length=2, blank = True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE )
     def __str__(self):
@@ -102,3 +106,18 @@ class Break(models.Model):
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
     def __str__(self):
         return "Breaks of: "+str(self.college.institute_name)
+
+#invoice storage location   
+#fs = FileSystemStorage()   
+
+class Bill(models.Model):
+    item = models.CharField(max_length=200, blank = True)
+    quantity = models.IntegerField(default=0)
+    price = models.IntegerField(default=0)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    invoice_no = models.SlugField(max_length = 10)
+    invoice = models.FileField(upload_to='django_field_pdf', max_length=254, )
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=False)
+    def __str__(self):
+        return "Item: "+str(self.item)+" | Store: "+str(self.store.store_name)

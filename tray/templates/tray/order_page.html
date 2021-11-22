@@ -25,13 +25,14 @@
 {% endblock %}
 
 
-{% block title%} Welcome to {{store.store_name}} {% endblock %}
+{% block title%} {{store.store_name}} {% endblock %}
 
 {% block content %}
 <center>
-<p>Hi {{student.name}}</p>
-<p> Welcome to {{store.store_name}}</p>
-<p>Your balance: {{student.balance}}</p>
+<h4>Hi {{student.name}}</h4>
+<h4> Welcome to {{store.store_name}}</h4>
+<br/>
+<h4>Your balance: {{student.balance}}</h4>
 <br/>
 
 
@@ -66,7 +67,7 @@
 </table>
 <br/>
 
-<p>Time of pickup:</p>
+<h4>Time of pickup:</h4>
 <select name="time" id="pickup_time" class="btn dropdown-toggle" required style="background-color: azure;">
 <option input value="Now">Now</option>
 <option input value="First Break">First Break</option>
@@ -241,20 +242,7 @@
                     var item_name = $(this).parent().prev().prev().prev().prev().text();
                     console.log(delete_item_id+ "testeritem: "+item_name+" deleting with cost : " +item_cost);
                     //removing the item from order list array
-                    delete_from_order_list();
-
-                    function delete_from_order_list()
-                    {
-                        console.log("entered delete function, item name:"+item_name);
-                        //item to be removed be prepared as this object on delete click
-                        //remobj = {item:"samosa", quantity:"2", time:"Now" }
-                        find_index = order_list.findIndex(a => (a.item === item_name && a.quantity === a.quantity));
-                        console.log("index check"+find_index);
-                        if (find_index !== -1){
-                            order_list.splice(find_index,1);
-                            console.log("removed");
-                        }
-                    }
+                    delete_from_order_list(item_name, item_cost);
                     //removing from cart table
                     $(this).parents("tr").remove();
                     console.log("total:"+subtotal);
@@ -276,13 +264,25 @@
                             }
                         }
 
-                });
+                    });
 
 
                 }
-           });
+            });
        });
 
+function delete_from_order_list(item_name, item_cost)
+                    {
+                        console.log("entered delete function, item name:"+item_name);
+                        //item to be removed be prepared as this object on delete click
+                        //remobj = {item:"samosa", quantity:"2", time:"Now" }
+                        find_index = order_list.findIndex(a => (a.item === item_name && a.quantity === a.quantity));
+                        console.log("index check"+find_index);
+                        if (find_index !== -1){
+                            order_list.splice(find_index,1);
+                            console.log("removed");
+                        }
+                    }
 //confirming purchase and saving to order table
             $("#confirm").click(function(){
                 buy_clicked = true;

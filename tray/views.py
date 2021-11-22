@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Student,Item,Store,User,Order, Break, CartItem, Institute
+from .models import Student,Item,Store,User,Order, Break, CartItem, Institute, Bill
 from django.db.models import Sum
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate, login, logout
@@ -12,7 +12,11 @@ from django.contrib.auth.hashers import check_password, make_password
 import string,random
 import requests
 import json
-from fpdf import FPDF
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .modules.invoice import *
+from django.http import FileResponse
+from django.core.files.base import  File
 
 # import checksum generation utility
 # You can get this utility from https://developer.paytm.com/docs/checksum/
@@ -228,7 +232,58 @@ def billing_item_price(request):
     }
     return JsonResponse(data)
 
+def invoice_number_gen(store):
+    last_bill = Bill.objects.all().order_by('id').last()
+    if last_bill:
+        last_invoice_no = last_bill.invoice_no
+        #invoice number format is 'customer_name_short + number' eg: CS003 
+        last_invoice_initials = last_invoice_no[:2]    
+        last_invoice_digits =  last_invoice_no[2:]     
+        new_invoice_digits = int(last_invoice_digits) + 1
+        new_invoice_no =  last_invoice_initials+ str(new_invoice_digits)
+    else:
+        new_invoice_no = store.invoice_code + str(1)
+    return (new_invoice_no) 
 
+def billing_invoice(request):
+    store_id = request.session['store_id']
+    store = Store.objects.get(id = store_id)
+    store_name = store.store_name
+    load = json.loads(request.GET['order_list_json'])
+    total = request.GET['total']
+    
+    #generating incremented invoice no
+    new_invoice_no = invoice_number_gen(store)
+    
+    #load is the list of orders
+    #creating innvoice pdf
+    create_invoice( store_name, new_invoice_no, load, total)
+    #preparing invoice file for Bill db
+    f = open('media/pdf/'+new_invoice_no, 'rb')
+    file = File(f)
+    #creating bill orders on db
+    objects = []
+    new_object = []
+    #assigning invoice number and other details
+    for i in load:
+        new_object = Bill(item=i['item'], price=i['price'], quantity=i['quantity'], invoice_no=new_invoice_no,invoice=file , store=store)
+        objects.append(new_object)
+    Bill.objects.bulk_create(objects)
+    
+    print(store_name)
+    print(load[0]["item"])
+    request.session['invoice_name'] =  new_invoice_no
+    
+    data={
+        
+    }
+    return JsonResponse(data)
+
+def invoice_print(response):
+    invoice_name = response.session['invoice_name']
+    pdf = open('media/pdf/'+invoice_name, 'rb')
+    response = FileResponse(pdf, content_type='application/pdf')
+    return response
 
 def store_edit_details(request):
     store_id = request.session['store_id']

@@ -1,6 +1,9 @@
 from django.urls import path
 from django.contrib import admin
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('register_card/', views.register_card, name='register_card'),
@@ -47,6 +50,8 @@ urlpatterns = [
     path('student_pin_edit/', views.student_pin_edit, name='student_pin_edit'),
     path('student_pin_edit_post/', views.student_pin_edit_post, name='student_pin_edit_post'),
     path('paytm/', views.paytm, name='paytm'),
+    path('invoice_print/',views.invoice_print, name='invoice_print'),
+
 
     #ajaxify using jquery_____________________________________________________________________________________________
     path('ajax/validate_store_item/', views.validate_store_item, name='validate_store_item'),
@@ -68,7 +73,9 @@ urlpatterns = [
     path('ajax/validate_recharge/', views.validate_recharge, name='validate_recharge'),
     path('ajax/college_recharge_final/', views.college_recharge_final, name='college_recharge_final'),
     path('ajax/billing/item_price/', views.billing_item_price, name='item_price'),
-    
+    path('ajax/billing/invoice/', views.billing_invoice, name = 'billing_invoice'),
+] 
+#+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-]
-
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
