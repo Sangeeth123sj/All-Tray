@@ -115,7 +115,7 @@
 
 <h4>Payment Confirmation:</h4>
 
-<input type="submit"  id="confirm" value="CONFIRM" class="btn btn-primary"> 
+<input type="button"  id="confirm" value="Confirm" class="btn btn-primary"> 
 
 {% with student_id=student.id  %}
 {% with store_id=store.id %}
@@ -196,7 +196,7 @@
                         console.log("quantity: "+quantity);
                         var new_item = true; 
                         //check_exist_in_cart(item);
-                        if (quantity == NaN || quantity < 1  ){
+                        if (isNaN(quantity) || quantity < 1  ){
                             alert ("please select atleast one in quantity");
                             return;
                         }
@@ -347,34 +347,53 @@
 
             //confirming purchase and saving to order table
             $("#confirm").click(function(){
-                        buy_clicked = true;
-                        /*store_detail_object = {
-                            'store': '{{store.id}}',
-                        };
-                        order_list.unshift(store_detail_object);*/
-                        order_list_json = JSON.stringify(order_list);
-                        console.log(order_list_json);
+                        if (order_list.length !== 0){
+                                    console.log("entered If");
+                                    buy_clicked = true;
+                                    /*store_detail_object = {
+                                        'store': '{{store.id}}',
+                                    };
+                                    order_list.unshift(store_detail_object);*/
+                                    order_list_json = JSON.stringify(order_list);
+                                    console.log(order_list_json);
+                                    //device check
+                                    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+                                        // true for mobile device
+                                        console.log("mobile device");
+                                        var device = 'mobile'
+                                    }
+                                    else{
+                                        // false for not mobile device
+                                        console.log("not mobile device");
+                                        var device = 'desktop'
+                                    }
 
-
-                        $.ajax({
-                            url: '/ajax/billing/invoice/',
-                            data:{
-                                'order_list_json':order_list_json,
-                                'total': total,
-                            },
-                            dataType: 'json',
-                            success: function (data){
-                                $("form").submit();
-                            }
-                        });
-                        /*Swal.fire(
-                            'Order confirmed',
-                            '<p>invoice has been downloaded to your browser as pdf. <br/>Thanks for Shopping with Alltray!<p>',
-                            'success'
-                            ).then(function() {
-                                location.reload();
-                            });*/
+                                    $.ajax({
+                                        url: '/ajax/billing/invoice/',
+                                        data:{
+                                            'order_list_json':order_list_json,
+                                            'total': total,
+                                            'device': device,
+                                        },
+                                        dataType: 'json',
+                                        success: function (data){
+                                            Swal.fire(
+                                                'Bill confirmed',
+                                                '<p>Invoice has been saved you can print it now <br/>(printing option not available on smartphone)<br/>Thanks for Shopping with Alltray!<p>',
+                                                'success'
+                                            ).then(function() {
+                                                $("form").submit();
+                                            });
+                                        }
+                                    });
+                                    
+                        }   
+                        if (order_list.length === 0){
+                            alert("no item in bill");
+                        }             
+                                
             });
+
 
 
 

@@ -251,7 +251,8 @@ def billing_invoice(request):
     store_name = store.store_name
     load = json.loads(request.GET['order_list_json'])
     total = request.GET['total']
-    
+    device = request.GET['device']
+    request.session['device'] = device
     #generating incremented invoice no
     new_invoice_no = invoice_number_gen(store)
     
@@ -271,7 +272,7 @@ def billing_invoice(request):
     Bill.objects.bulk_create(objects)
     
     print(store_name)
-    print(load[0]["item"])
+    #print(load[0]["item"])
     request.session['invoice_name'] =  new_invoice_no
     
     data={
@@ -280,9 +281,14 @@ def billing_invoice(request):
     return JsonResponse(data)
 
 def invoice_print(response):
+    device = response.session['device']
     invoice_name = response.session['invoice_name']
     pdf = open('media/pdf/'+invoice_name, 'rb')
-    response = FileResponse(pdf, content_type='application/pdf')
+    #device specific print or download
+    if device == 'desktop':
+        response = FileResponse(pdf, content_type='application/pdf')
+    elif device == 'mobile':
+        response = FileResponse(pdf)
     return response
 
 def store_edit_details(request):
