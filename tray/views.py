@@ -287,8 +287,11 @@ def invoice_print(response):
     #device specific print or download
     if device == 'desktop':
         response = FileResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline'
+        
     elif device == 'mobile':
         response = FileResponse(pdf)
+        response['Content-Disposition'] = 'attachment; filename= "' + invoice_name + '"'
     return response
 
 def store_edit_details(request):
