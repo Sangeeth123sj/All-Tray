@@ -721,23 +721,21 @@ def cart(request):
             student = Student.objects.get(id = student_id)
             store_id = request.GET['store_id']
             store = Store.objects.get(id = store_id)
-        
         item_name = request.GET['item_name']
-        time = request.GET['time']
+        #time = request.GET['time']
         quantity = request.GET['quantity']
         
         if Item.objects.filter(item = item_name).exists() :
             item = Item.objects.get(item = item_name)
             price = item.price
-            cost = int(price) * int(quantity)
-            cart_item = CartItem(item = item_name, quantity = quantity, cost = cost, pickup_time = time, store = store, student = student )
-            cart_item.save()
-            item.save()
+            #cost = int(price) * int(quantity)
+            #cart_item = CartItem(item = item_name, quantity = quantity, cost = cost, pickup_time = time, store = store, student = student )
+            #cart_item.save()
+            #item.save()
             data = {
                 'added': 'success',
                 'item_price' : price,
-                'cart_item_id' : cart_item.id,
-                'time' : time,
+                #'time' : time,
             }
             return JsonResponse(data)
         else:
@@ -747,11 +745,6 @@ def cart(request):
             return JsonResponse(data)
 
     if request.GET['status'] == 'leaving_page':
-        student_id = request.GET['student_id']
-        student = Student.objects.get(id = student_id)
-        cart_items = CartItem.objects.filter(student = student)
-        for item in cart_items :
-            item.delete()
         data = {
                 'status' : 'cart_count_reset'
             }
@@ -759,13 +752,15 @@ def cart(request):
 
 
     if request.GET['status'] == 'confirm_order':
+        time = request.GET['time']
         store_id = request.GET['store_id']
         store = Store.objects.get(id = store_id)
         student_id = request.GET['student_id']
         total = request.GET['total']
+        revenue = request.GET['revenue']
         student = Student.objects.get(id = student_id)
-        cart_items = CartItem.objects.filter(student = student)
-        if cart_items.exists() and int(student.balance) > int(total) :
+        #cart_items = CartItem.objects.filter(student = student)
+        if  int(student.balance) > int(total) :
             #generating otp for the cart of items
             # generating random strings 
             # using random.choices()
@@ -775,48 +770,76 @@ def cart(request):
             # generating random strings 
             res = ''.join(random.choices(string.ascii_lowercase, k = N))
             otp = str(res)
-            for cart_item in cart_items :
-                item = Item.objects.get(item = cart_item.item)
+            #taking orders as json
+            load = json.loads(request.GET['order_list_json'])
+            #passing json load to bulk create on orders db
+            #creating bill orders on db
+            objects = []
+            new_object = []
+            purchase_id = purchase_id_generator(store)
+            for i in load:
+                new_object = Order(item = i['item'],cost=i['price'], quantity = i['quantity'], pickup_time = time, otp=otp, store = store, student = student , revenue = revenue, purchase_id = purchase_id)
+                #new_object = Bill(item=i['item'], price=i['price'], quantity=i['quantity'], invoice_no=new_invoice_no,invoice=file , store=store)
+                objects.append(new_object)
+                item = Item.objects.get(item = i['item'])
                 #initializing stock of item variable
                 item_stock = item.stock
-                #saving the order from cart
-                order = Order(item = cart_item.item, quantity = cart_item.quantity, cost = cart_item.cost, pickup_time = cart_item.pickup_time, otp=otp, store = cart_item.store, student = cart_item.student )
-                order.save()
                 #updating stock at store
-                item.stock = int(item_stock) - int(cart_item.quantity)
+                item.stock = int(item_stock) - int(i['quantity'])
+                item.save()
                 #unticking item availability to customers on reaching low stock at store
                 if item.stock < 5:
                     item.available = False
-                item.save()
-
+                    item.save()
                 #updating store balance
-                store.store_balance = store.store_balance + int(cart_item.cost)
+                cost = i['quantity'] * i['price']
+                store.store_balance = store.store_balance + cost
                 store.save()
                 #updating student balance
-                student.balance = student.balance - int(cart_item.cost)
+                student.balance = student.balance - cost
                 student.save()
-                #deleting item from cart
-                cart_item.delete()
+            #saving orders to db
+            Order.objects.bulk_create(objects)
+
+                    #for cart_item in cart_items :
+                    #    item = Item.objects.get(item = cart_item.item)
+                    #    #initializing stock of item variable
+                    #    item_stock = item.stock
+                    #    #saving the order from cart
+                    #    order = Order(item = cart_item.item, quantity = cart_item.quantity, cost = cart_item.cost, pickup_time = cart_item.pickup_time, otp=otp, store = cart_item.store, student = cart_item.student )
+                    #    order.save()
+                        #updating stock at store
+                    #    item.stock = int(item_stock) - int(cart_item.quantity)
+                        #unticking item availability to customers on reaching low stock at store
+                    #    if item.stock < 5:
+                    #        item.available = False
+                    #    item.save()
+                    #updating store balance
+                    #store.store_balance = store.store_balance + int(cart_item.cost)
+                    #store.save()
+                    #updating student balance
+                    #student.balance = student.balance - int(cart_item.cost)
+                    #student.save()
+                    #deleting item from cart
+                    #cart_item.delete()
+                
+
+            
             data = {
                     'status' : 'order_placed',
-                    'cart_items' : cart_items.exists(),
+                    'cart_items' : False,
                     'total' : total,
                     'otp': otp,
                 }
             return JsonResponse(data)
-        
-        elif cart_items.exists() and int(student.balance) < int(total) :
+
+        elif int(student.balance) < int(total) :
             data = {
                 'status' : 'low_balance'
             }
             return JsonResponse(data)
 
-        elif cart_items.exists() == False:
-            data = {
-                    'status' : 'no_item_in_cart',
-                    'cart_items' : cart_items.exists()
-                }
-            return JsonResponse(data)
+        
 
     if request.GET['status'] == 'delete_from_cart':
         item_id = request.GET['item_id']
@@ -827,11 +850,17 @@ def cart(request):
             }
         return JsonResponse(data)
 
+def purchase_id_generator(store):
+            last_bill = Order.objects.filter(store = store).order_by('id').last()
+            purchase_id = last_bill.purchase_id
+            new_purchase_id = purchase_id + 1
+            return new_purchase_id
+        
+        
 def paytm(request):
     return render(request,'paytm_checkout.html')
 
 def pickup_order(request):
-    
     order_id = request.GET['order_id']
     order = Order.objects.get(id = order_id)
     order.status = True

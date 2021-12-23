@@ -85,6 +85,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
     otp = models.CharField(max_length=4)
+    purchase_id = models.IntegerField(default=0)
+    revenue = models.IntegerField(default=0)
     def __str__(self):
         return "Item: "+str(self.item)+" | Pickuptime: "+ str(self.pickup_time)+" | Student: "+str(self.student.name)
             

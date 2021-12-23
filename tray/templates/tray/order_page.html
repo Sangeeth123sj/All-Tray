@@ -124,8 +124,7 @@
 
 <script>
 //add items to cart
-    $(document).ready(function(){
-    var subtotal = 0;   
+    $(document).ready(function(){  
     var total = 0;
     var buy_clicked = false;
     var order_list = [];
@@ -158,44 +157,58 @@
 
             $("#add").click(function(event){
                 var item = $("#item").val();
-                var quantity = $("#quantity").val();
+                var quantity = parseInt( $("#quantity").val() );
+                var new_item = true;
                 //check_exist_in_cart(item);
-                if (quantity == ' ' || quantity < 1  ){
+                if (isNaN(quantity) || quantity < 1  ){
                     alert ("please select atleast one in quantity");
                     return;
                 }
-                var  time = $("#pickup_time").val();
+                
                 console.log("entering exist check");
                 //checking if item already in cart and incrementing the item (not still working!)
-                $("#cart_body").find(id="item").each(function(){
-                    console.log("existing"+$(this).text());
-                    if($(this).text == item)
-                    {
-                        console.log("entered exist in cart check");
-                        console.log("existing"+$(this).text);
-                        quantity_in_cart = $(this).parent().prev().prev().prev().text();
-                        incremented_quantity = quantity_in_cart + quantity;
-                        $(this).parent().prev().prev().prev().text(incremented_quantity);
-                    }
-                });
-                //adding order to list
-                order_obj = {
-                    "item":item,
-                    "quantity":quantity,
-                    "time":time,
-                }
-                order_list_push();
+                check_exist_in_cart(item, quantity);
+                console.log("new item status "+new_item);  
 
-                function order_list_push()
-                {
-                    order_list.push(order_obj);
-                    for(let i in order_list){
-                        console.log("item:"+i+" "+order_list[i].item+" quantity:"+order_list[i].quantity+" time:"+order_list[i].time)
-                }
-                }
+                function check_exist_in_cart(item, quantity){
+                    console.log("entered exist check function");
+                    $("#cart_body").find(id="#item").each(function(){
+                            console.log("checking through each"+$(this).text());
+                            cart_item = $(this).text()
+                            if(cart_item == item)
+                            {
+                                console.log("already existing: "+cart_item);
+                                new_item = false;
+                                quantity_in_cart = parseInt($(this).next().text());
+                                console.log("quantity initialy in cart: "+ quantity_in_cart);
+                                console.log("type of quantity initialy in cart: "+ typeof  quantity_in_cart);
+                                console.log("type of quantity to add: "+typeof quantity);
+                                quantity_in_cart += quantity;
+                                console.log("quantity incremented: "+ quantity_in_cart);
+                                $(this).next().text(quantity_in_cart);
+                                let price = $(this).next().next().text();
+                                let cost = price * quantity_in_cart;
+                                $(this).next().next().next().text(cost);
+                                update_total();
+                                order_list_update(item,quantity,price,cost);
+                                var revenue = parseInt(alltray_revenue(total));
+                                var tray_revenue_display = "tray revenue: "+revenue;
+                                $("#tray_revenue").text(tray_revenue_display);
+                            }
+                        
+                        
+                    });
+                }                        
+
+                    
+
 
                 //function check_exist_in_cart(item)
-                //{}
+                
+        if (new_item)
+        {
+
+                console.log("new item true");
                 
                 $.ajax({
                         url: '/ajax/cart/',
@@ -204,7 +217,6 @@
                             'item_name': item,
                             'student_id' : '{{student_id}}',
                             'store_id' : '{{store_id}}',
-                            'time' : time,
                             'quantity' : quantity
                         },
                         dataType: 'json',
@@ -212,14 +224,26 @@
                             if (data.added == 'success'){
                                 console.log("item add to cart success");
                                 var price = data.item_price;
+                                console.log("price is: "+price);
+                                console.log("price type: "+ typeof price);
                                 var cost = price * quantity;
-                                total = cost + subtotal;
-                                subtotal = subtotal + cost;
-                                var item_row = '<tr id = '+data.cart_item_id+'> <td>'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
+                                var item_row = '<tr id = '+data.cart_item_id+'> <td id="item">'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
                                 $("#cart_table").find('tbody').append(item_row );
-                                tray_revenue = "tray revenue: "+alltray_revenue(total);
-                                $("#tray_revenue").text(tray_revenue);
+                                update_total();
+                                var revenue = parseInt(alltray_revenue(total));
+                                var tray_revenue_display = "tray revenue: "+revenue;
+                                $("#tray_revenue").text(tray_revenue_display);
                                 $("#total").text("Total: "+total);
+
+                                //adding order to list
+     
+                                order_obj = {
+                                    "item":item,
+                                    "quantity":quantity,
+                                    "price":price,
+                                }
+                                order_list_push();
+                            
                             }
                             else if (data.added == 'failure'){
                                 alert("Item not available at store or has been removed by the store");
@@ -229,10 +253,50 @@
                         } 
                 });
             
+        
 
+        }
+        
+        function order_list_push()
+        {
+            order_list.push(order_obj);
+            for(let i in order_list){
+                console.log("item:"+i+" "+order_list[i].item+" quantity:"+order_list[i].quantity+ "price:"+order_list[i].price );
+            }
+        }
+
+        function order_list_update(item,quantity, price, cost){
+            index_of_update_item = order_list.findIndex(a => (a.item === item && a.quantity === a.quantity));
+            update_item = order_list[index_of_update_item];
+            update_item.quantity +=  parseInt(quantity);
+            update_item.cost = cost;
+            console.log("updated item in order_list: "+ update_item.item+" quantity: " + update_item.quantity+" price:"+update_item.price+" cost"+ update_item.cost);
+        }  
+                
+                });
+            
 
                 
-            });
+                
+
+            function update_total(){
+                total = 0;
+                var table = document.getElementById('cart_body');
+                var rowLength = table.rows.length;
+                console.log("row length: "+rowLength);
+                for(let c=0; c<rowLength; c+=1){
+                    var row = table.rows[c];
+                    //cost cell on each row
+                    let cost = row.cells[3].innerHTML;
+                    console.log("on cell: "+c+" cost is"+cost);
+                    total += parseInt(cost);
+                    console.log("UPDATED total_________________________________"+total);
+                    $("#total").text("Total: "+total);
+                }
+                c = 0;
+            }
+
+
 
             $("#delete").click(function(){
                 $("#cart_body").find('input[name="record"]').each(function(){
@@ -245,12 +309,13 @@
                     delete_from_order_list(item_name, item_cost);
                     //removing from cart table
                     $(this).parents("tr").remove();
-                    console.log("total:"+subtotal);
-                    subtotal = subtotal - item_cost;
-                    console.log("total after deleting item:"+subtotal+"item_cost:"+item_cost );
-                    $("#total").text("Total: "+subtotal);
-                    tray_revenue = "tray revenue: "+alltray_revenue(subtotal);
-                    $("#tray_revenue").text(tray_revenue);
+                    console.log("total:"+total);
+                    update_total();
+                    console.log("total after deleting item:"+total+"item_cost:"+item_cost );
+                    $("#total").text("Total: "+total);
+                    var revenue = parseInt(alltray_revenue(total));
+                    tray_revenue_display = "tray revenue: "+revenue;
+                    $("#tray_revenue").text(tray_revenue_display);
                     $.ajax({
                         url: '/ajax/cart/',
                         data: {
@@ -285,14 +350,27 @@ function delete_from_order_list(item_name, item_cost)
                     }
 //confirming purchase and saving to order table
             $("#confirm").click(function(){
+                //notifying if no item in cart
+                if (order_list.length<1){
+                    alert("No items in cart");
+                    return;
+                }
                 buy_clicked = true;
+                var time = $("#pickup_time").val();
+                order_list_json = JSON.stringify(order_list);
+                console.log(order_list_json);
+                var revenue = parseInt(alltray_revenue(total));
+                console.log("revenue: "+revenue);
                 $.ajax({
                         url: '/ajax/cart/',
                         data: {
                             'status' : 'confirm_order',
                             'student_id' : '{{student_id}}',
                             'store_id' : '{{store.id}}',
-                            'total' : total
+                            'total' : total,
+                            'order_list_json' : order_list_json,
+                            'time' : time,
+                            'revenue' : revenue,
                         },
                         dataType: 'json',
                         success: function (data){
@@ -300,7 +378,6 @@ function delete_from_order_list(item_name, item_cost)
                                 total = 0;
                                 subtotal = 0;
                                 otp = data.otp;
-                                //Swal.fire('Saved!', '', 'success');
                                 Swal.fire(
                                     'Order placed!',
                                     '<p>OTP to pickup order is: <strong>'+ otp +
@@ -340,11 +417,13 @@ function delete_from_order_list(item_name, item_cost)
                
 //this ajax only resets cart on reentering to the cart page
 // meets the requirement but don't know why the anomaly
+                /*order_list_json = JSON.stringify(order_list);
                 $.ajax({
                             url: '/ajax/cart/',
                             data: {
                                 'status' : 'leaving_page',
                                 'student_id' : '{{student_id}}',
+                                //'order_list_json':order_list_json,
                             },
                             dataType: 'json',
                             success: function (data){
@@ -353,7 +432,7 @@ function delete_from_order_list(item_name, item_cost)
                                 }
                             }
 
-                });
+                }); */
             }; 
   
     
