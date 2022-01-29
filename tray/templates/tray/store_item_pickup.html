@@ -2,6 +2,37 @@
 
 {% block title%} Welcome to All Tray {% endblock %}
 
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'billing' %}">Billing</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_order_list' %}">Order list</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_bills' %}">Store bills</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'store_logout' %}">Logout</a>
+      </li>
+    </ul>
+    
+  </div>
+</nav>
+{% endblock %}
+
+
 {% block content %}
 <center>
 <br/><br/><br/>

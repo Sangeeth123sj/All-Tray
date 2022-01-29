@@ -1,6 +1,6 @@
-{% extends "tray/base.html" %}
+{% extends 'tray/base.html' %}
 
-{% block title%} Order list {% endblock %}
+{% block title%} Store bills {% endblock %}
 
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -17,9 +17,6 @@
         <a class="nav-link" href="{% url 'billing' %}">Billing</a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" href="{% url 'store_bills' %}">Store bills</a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" href="{% url 'store_edit_details' %}">Edit Store</a>
       </li>
       <li class="nav-item">
@@ -31,12 +28,10 @@
 </nav>
 {% endblock %}
 
-
-
 {% block content %}
-<center>
+<h1>{{store.store_name}} Bills</h1>
 
-<h1> Order list</h1>
+
 <br/>
 <table>
     <thead>
@@ -100,7 +95,7 @@
                         <td colspan="6" align="center" style="background-color: #4eb7d4;">Orders now</td>
                     </tr>
                     {% endif %}  
-            {% for order in orders %}
+            {% for order in store_bills %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
                 
                     <tr height="50px" id="{{order.id}}">
@@ -140,7 +135,7 @@
                     </tr>
                     {% endif %}
 
-            {% for order in orders %}
+            {% for order in store_bills %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
    
                     <tr height="50px" id="{{order.id}}">
@@ -179,7 +174,7 @@
             </tr> 
             {% endif %}
 
-            {% for order in orders %}
+            {% for order in store_bills %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
                 
                     <tr height="50px" id="{{order.id}}">
@@ -217,7 +212,7 @@
             </tr> 
             {% endif %}
 
-            {% for order in orders %}
+            {% for order in store_bills %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
                 
                     <tr height="50px" id="{{order.id}}">
@@ -263,66 +258,4 @@
 
 </center>
 
-<script>
-$(document).ready(function(){
-
-    var table = document.getElementById('table');
-    var rowLength = table.rows.length;
-    console.log("rowlength: "+rowLength);
-    var prev_cell = null;
-        for(let c=0; c<rowLength; c+=1){
-            var row = table.rows[c];
-            var cellLength = row.cells.length;
-            console.log("no of cells in row: "+ cellLength);
-            /*if (cellLength =1){
-                c++;
-                row = table.rows[c];
-                
-            }*/
-            const cell = row.cells[0];
-            console.log(cell.innerText);
-            if (prev_cell === null || cell.innerText !== prev_cell.innerText){
-                prev_cell = cell;
-            }
-            else {
-                prev_cell.rowSpan++;
-                cell.remove();
-            }
-        }
-
-    });
-    
-    /*
-    var table = document.getElementById('test');
-
-    let headerCell = null;
-    
-    for (let row of table.rows) {
-      const firstCell = row.cells[4];
-      console.log(firstCell.innerText);
-      if (headerCell === null || firstCell.innerText !== headerCell.innerText) {
-        headerCell = firstCell;
-      } else {
-        headerCell.rowSpan++;
-        firstCell.remove();
-      }
-    }
-    
-/*    let headerCell = null;
-    for (let row of table.rows) {
-    var firstCell = row.cells[2];
-    
-    if (headerCell === null || firstCell.innerText !== headerCell.innerText) {
-        headerCell = firstCell;
-    } else {
-        headerCell.rowSpan++;
-        firstCell.remove();
-    }
-    }
-*/
-
-</script>
-
-
 {% endblock %}
-

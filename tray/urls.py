@@ -35,6 +35,7 @@ urlpatterns = [
     path('store_item_pickup/', views.store_item_pickup, name='store_item_pickup'),
     path('user_pickup_orders_post/', views.user_pickup_orders_post, name='user_pickup_orders_post'),
     path('user_pickup_orders/', views.user_pickup_orders, name='user_pickup_orders'),
+    path('store_bills/', views.store_bills, name='store_bills'),
     path('register_college/', views.register_college, name='register_college'),
     path('register_college_success/', views.register_college_success, name='register_college_success'),
     path('login_college/', views.login_college, name='login_college'),

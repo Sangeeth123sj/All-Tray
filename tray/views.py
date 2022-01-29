@@ -365,7 +365,12 @@ def store_order_list(request):
     sorted_orders = orders.order_by('student', 'pickup_time')
     current_month = datetime.today().strftime("%h")
     current_month_number = datetime.today().month
-    month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
+    #month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
+    month_orders = orders.filter(created_at__month = current_month_number )
+    month_total = 0
+    for order in month_orders:
+        total = order.cost * order.quantity
+        month_total = month_total + total 
     return render(request, 'tray/store_order_list.html',{'orders': sorted_orders, 'current_month': current_month, 'month_total': month_total}) 
 
 def store_item_pickup(request):
@@ -402,6 +407,12 @@ def user_pickup_orders(request):
     orders = Order.objects.filter(otp = otp)
     return render(request,'tray/user_pickup_orders.html', {'orders': orders} )
 
+def store_bills(request):
+    store_id = request.session['store_id']
+    store_object = Store.objects.get(id = store_id)
+    store_bills = Bill.objects.filter(store = store_object)
+    #sorted_orders = orders.order_by('student', 'pickup_time')
+    return render(request,'tray/store_bills.html',{'store':store_object,'store_bills':store_bills})
 #college views__________________________________________________________________________________
 def register_college(request):
     return render(request, 'tray/register_college.html')
@@ -470,7 +481,12 @@ def college_store_order_list(request):
     sorted_orders = orders.order_by('student', 'pickup_time')
     current_month = datetime.today().strftime("%h")
     current_month_number = datetime.today().month
-    month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
+    #month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
+    month_orders = orders.filter(created_at__month = current_month_number )
+    month_total = 0
+    for order in month_orders:
+        total = order.cost * order.quantity
+        month_total = month_total + total 
     return render(request, 'tray/college_store_order_list.html', {'orders': sorted_orders,'store': store_object, 'current_month': current_month, 'month_total': month_total })
 
 def college_break_edit(request):
