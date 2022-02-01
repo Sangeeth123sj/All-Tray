@@ -44,17 +44,17 @@
 
 
 
-<strong>Add Item</strong>
+<h3>Add Item</h3>
 <br/>
 
 <div class="form-group centered">
 <form action="/store_add_item_save/" name="form" method="POST" onsubmit="return validateForm()">
     {% csrf_token %}
-    <p>item</p>
+    <h4>item</h4>
     <input type="text" id="add_item_name" name="item_name" class="form-control" required><br/><br/>
-    <p>Price</p>
+    <h4>Price</h4>
     <input type="number" id="add_price" name="price" min="0" class="form-control" required><br/><br/>
-    <p>Stock</p>
+    <h4>Stock</h4>
     <input type="number" id="add_stock" name="stock" min="1" class="form-control" required><br/><br/>
     <input type="hidden" name="store_id" value="{{store_id}}">
     <input type="button" id="submit_button" value="submit" class="btn btn-success">

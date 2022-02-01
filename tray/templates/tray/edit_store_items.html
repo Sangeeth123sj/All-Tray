@@ -17,7 +17,7 @@
 
 
 {% block content %}
-
+<center>
 <script>
     function validateForm() {
                 var item_name = document.forms["form"]["item_name"].value;
@@ -41,17 +41,17 @@
             }
 </script>
 
-<strong>Edit Item</strong>
+<h3>Edit Item</h3>
 <br/>
 
 <div class="form-group centered">
 <form action="/edit_item_save/" name="form" method="POST" onsubmit="return validateForm()">
     {% csrf_token %}
-    <p>item</p>
+    <h4>item</h4>
     <input type="text" id="item_name" name="item_name" value= '{{item.item}}' class="form-control" required><br/><br/>
-    <p>Price</p>
+    <h4>Price</h4>
     <input type="number" id="price" name="price" min="0" value="{{item.price}}" class="form-control" required><br/><br/>
-    <p>Stock</p>
+    <h4>Stock</h4>
     <input type="number" id="stock" name="stock" min="1" value="{{item.stock}}" class="form-control" required><br/><br/>
     <input type="hidden" name="store_id" value='{{store_id}}' >
     <input type="hidden" name="item_id" value='{{item.id}}'>
@@ -59,14 +59,9 @@
 
 </form>
 </div>
-<div class="row">
-    <div class="col-sm-9">
 
-    </div>
-<div class="col-sm-3">
     <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
-</div>
-</div>
+
 
 
 <script>
@@ -121,5 +116,5 @@
         });
     });
 </script>
-
+</center>
 {% endblock %}

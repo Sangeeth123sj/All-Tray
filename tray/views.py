@@ -413,6 +413,10 @@ def store_bills(request):
     store_bills = Bill.objects.filter(store = store_object)
     #sorted_orders = orders.order_by('student', 'pickup_time')
     return render(request,'tray/store_bills.html',{'store':store_object,'store_bills':store_bills})
+
+def qr_code(request):
+    return render(request, 'tray/qr_code.html')
+
 #college views__________________________________________________________________________________
 def register_college(request):
     return render(request, 'tray/register_college.html')

@@ -52,7 +52,7 @@ urlpatterns = [
     path('student_pin_edit_post/', views.student_pin_edit_post, name='student_pin_edit_post'),
     path('paytm/', views.paytm, name='paytm'),
     path('invoice_print/',views.invoice_print, name='invoice_print'),
-
+    path('qr_code/',views.qr_code, name='qr_code'),
 
     #ajaxify using jquery_____________________________________________________________________________________________
     path('ajax/validate_store_item/', views.validate_store_item, name='validate_store_item'),

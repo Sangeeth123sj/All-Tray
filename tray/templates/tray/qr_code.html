@@ -1,0 +1,12 @@
+{% extends 'tray/base.html' %}
+{% block title %} QR code {% endblock %}
+
+
+
+{% block content %}
+{% load static %}
+<center>
+<h3>QR code </h3>
+<img src='{% static "tray/images/qr.png" %}' ></img>
+
+{% endblock %}

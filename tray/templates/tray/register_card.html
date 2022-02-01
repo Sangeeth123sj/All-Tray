@@ -46,21 +46,21 @@
         }
 </script>
 {% load crispy_forms_tags %}
-<h2>Register your card</h2>
+<h3>Register as student</h3>
 <br/>
 <div class="form-group centered">
 <form action="/register_card_post/" method="POST" name="form" onsubmit="return validateForm()">
 {% csrf_token %}
 {{ form|crispy }}
-    <label>Your Name</label>
+    <h4>Your Name</h4>
     <br/>
     <input type="text" name="student_name" id="student_name" class="form-control" >
     <br/><br/>
-    <label for="email">e-mail id</label>
+    <h4>e-mail id</h4>
     <br/>
     <input type="email" name="mail_id" id="mail_id" class="form-control" >
     <br/><br/>
-    <label>Branch</label>
+    <h4>Branch</h4>
     <br/>
 <select name="branch_name" id="branch_name" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" style="background-color: azure;" class="form-control" >
     <option input value="Electronics & Communication">Electronics & Communication</option>
@@ -70,7 +70,7 @@
 </select>
 <br/><br/>
 
-<p>Semester:</p>
+<h4>Semester:</h4>
 <select name="semester" id="semester" class="btn dropdown-toggle" class="form-control"  required style="background-color: azure;">
 <option input value="semester 1">semester 1</option>
 <option input value="semester 2">semester 2</option>
@@ -84,11 +84,11 @@
 
 <br/><br/>
 
-<label>Password</label>
+<h4>Password</h4>
 <br/>
 <input type="password" name="password" id="password" minlength="4" class="form-control" >
 <br/><br/>
-<p>College</p>
+<h4>College</h4>
 
 <select id="college_id" name="college_id" id="college_id" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;" >
                     

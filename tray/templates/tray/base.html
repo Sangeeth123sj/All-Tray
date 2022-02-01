@@ -96,33 +96,34 @@
 /* CSS blue button */
 .blue-button {
   background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
-  border-radius: .5rem;
-  box-sizing: border-box;
+  background-color: initial;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 2px 4px;
   color: #FFFFFF;
-  display: flex;
-  font-size: 16px;
-  justify-content: center;
-  padding: 1rem 1.75rem;
-  text-decoration: none;
-  width: 200px;
-  border: 0;
   cursor: pointer;
+  display: inline-block;
+  font-family: Inter,-apple-system,system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
+  height: 44px;
+  line-height: 44px;
+  outline: 0;
+  overflow: hidden;
+  padding: 0 2px;
+  pointer-events: auto;
+  position: relative;
+  text-align: center;
+  touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
+  vertical-align: top;
+  white-space: nowrap;
+  width: 200px;
+  z-index: 9;
+  border: 0;
 }
 
 .blue-button:hover {
   background-image: linear-gradient(-180deg, #1D95C9 0%, #17759C 100%);
 }
-
-@media (min-width: 768px) {
-  .blue-button {
-    padding: 1rem 2rem;
-  }
-}
-
-
 
     table{
 -moz-box-shadow: 0 0 2px 2px #888;
@@ -195,13 +196,19 @@ font-family: Cambria, Georgia, serif;
 
   .frostprimary{
 	background-color:rgba(243, 245, 247, 0.788);
-  border-radius:5%;
+  border-radius:3%;
 	width: fit-content;
   padding-bottom:min(50px, 5%);
   padding-top: min(50px, 5%);
   padding-right: min(50px, 1%);
   padding-left: min(50px, 1%);
   margin: auto;
+}
+
+@media (min-width: 980px) {
+  .frostprimary {
+    min-width: 500px;
+  }
 }
 
 .frostprimary_test{
