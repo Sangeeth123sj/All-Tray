@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Model
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.core.files.storage import FileSystemStorage
 from django.utils.timezone import now
 from datetime import datetime

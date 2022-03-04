@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Student,Item,Store,User,Order, Break, CartItem, Institute, Bill
 from django.db.models import Sum
-from django.contrib.auth.models import User, Permission
+#from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
@@ -78,7 +80,7 @@ def home_post(request):
 def home(request):
     student_username = request.session['username']
     student_password = request.session['password']
-    user = authenticate(request, username = student_username, password = student_password)
+    user = authenticate(request, email = student_username, password = student_password)
     print("Student "+str(user)+" just logged in")
     
     if user is not None:
@@ -648,14 +650,14 @@ def update_item_availability(request):
 def validate_entry(request):
     username = request.GET['username']
     password = request.GET['password']
-    user_exist = User.objects.filter(username = username).exists()
+    user_exist = User.objects.filter(email = username).exists()
     if user_exist:
-        user_student_exist = Student.objects.filter(name = username).exists()
+        user_student_exist = User.objects.filter(email = username).exists()
     else: 
         user_student_exist = False
 
     if user_student_exist:
-        user = User.objects.get(username = username)
+        user = User.objects.get(email = username)
         password_checker_bool = check_password(password,user.password)
         if (password_checker_bool== False):
             data = {
@@ -872,7 +874,10 @@ def cart(request):
 
 def purchase_id_generator(store):
             last_bill = Order.objects.filter(store = store).order_by('id').last()
-            purchase_id = last_bill.purchase_id
+            if last_bill:
+                purchase_id = last_bill.purchase_id
+            else:
+                purchase_id = 0000
             new_purchase_id = purchase_id + 1
             return new_purchase_id
         

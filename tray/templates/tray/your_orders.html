@@ -46,7 +46,7 @@
 
 {% if is_order_day %}
        
-            <table width="30%">
+            <table id='table' width="30%">
             <thead>
                 
                 <th>
@@ -344,15 +344,50 @@
 
 
 
-$(document).ready(function(){
+$(document).ready(function(){     
+            //table otp grouping 
+            table_grouper(2);  
 
+            function table_grouper(group_cell){
+                var table = document.getElementById('table');
+                console.log(table);
+                if (table  === null){
+                    return;
+                }
+                var rowLength = table.rows.length;
+                console.log("rowlength: "+rowLength);
+                var prev_cell = null;
+                for(let c=2; c<rowLength; c+=1){
+                    var row = table.rows[c];
+                    var cellLength = row.cells.length;
+                    console.log("no of cells in row: "+ cellLength);
+                        /*if (cellLength =1){
+                            c++;
+                            row = table.rows[c];
+                            
+                        }*/
+                    var cell = row.cells[group_cell];
+                    console.log(cell.innerText);
+                    if (prev_cell === null || cell.innerText !== prev_cell.innerText){
+                        prev_cell = cell;
+                    }
+                    else {
+                        prev_cell.rowSpan++;
+                        cell.remove();
+                    }
+                } 
+            }
+        
+            
     //cancels the clicked item from orders
         $("tr #cancel").on("click", function(){
-            order_id = $(this).parent().prev().prev().prev().find("#order_id").html().trim();
-            item_name = $(this).parent().prev().prev().text().trim();
+            console.log($(this).parent().parent().find("#order_id").html().trim());
+            //$(this).parent().prev().prev().prev().find("#order_id").html().trim();
+            order_id = $(this).parent().parent().find("#order_id").html().trim();
             console.log(order_id);
-            var row = $(this).parent().parent();
-            
+            item_name = $(this).parent().prev().prev().text().trim();
+            //console.log(order_id);
+            //var row = $(this).parent().parent();       
             $.ajax({
                                 url: '/ajax/validate_order_cancel/',
                                 data: {
@@ -362,7 +397,7 @@ $(document).ready(function(){
                                 success: function (data) {
                                     if (data.cancelled == "success") {
                                         alert(item_name+" order is cancelled" );
-                                        row.fadeOut(500);
+                                        location.reload();
                                     }
                                     else if (data.cancelled == "failure") {
                                         $("#no_delete_condition").fadeIn(1000).delay(4000).fadeOut(1000);
