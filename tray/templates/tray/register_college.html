@@ -143,7 +143,7 @@
                     
                     data: {
                         'college_name': college_name,
-                        'user_name' : user_name
+                        'email' : email
                     },
                     dataType: 'json',
                     success: function (data) {
@@ -152,8 +152,8 @@
                             location.reload();
                             return false;
                         }
-                        else if (data.user_name_taken) {
-                            alert("User name already taken, try another name");
+                        else if (data.email_taken) {
+                            alert("mail id already taken, try another mail id");
                             location.reload();
                             return false;
                         }

@@ -43,7 +43,7 @@ def register_card_post(request):
         college_id = request.POST['college_id']
         email = request.POST['mail_id']
         college_object = Institute.objects.get(id = college_id)
-        user = User.objects.create_user(student_name,email,password)
+        user = User.objects.create_user(email,password)
         user.save
         student = Student(name = student_name, branch = branch, sem = semester,college = college_object, user = user)
         student.save()
@@ -71,24 +71,43 @@ def entry(request):
 
 def home_post(request):
     if request.method == 'POST':
-        username = request.POST['username']
+        email = request.POST['email']
         password = request.POST['password']
-        request.session['username'] = username
+        request.session['email'] = email
         request.session['password'] = password
         return redirect(home)
 
 def home(request):
-    student_username = request.session['username']
+    student_email = request.session['email']
     student_password = request.session['password']
-    user = authenticate(request, email = student_username, password = student_password)
+    user = authenticate(request, email = student_email, password = student_password)
     print("Student "+str(user)+" just logged in")
     
     if user is not None:
         login(request, user)
-        stores = Store.objects.filter(college = user.student.college)
-        student = user.student
-        request.session['student_id'] = student.id
-        return render (request, 'tray/home.html', {'stores':stores, 'student': student})
+        
+        if request.user.is_authenticated:
+            student_user = Student.objects.filter(user = request.user).exists()
+            store_user = Store.objects.filter(user = request.user).exists()
+            college_user = Institute.objects.filter(user = request.user).exists()
+        if student_user:
+            stores = Store.objects.filter(college = user.student.college)
+            student = user.student
+            request.session['student_id'] = student.id
+            print("logged in student")
+            return render (request, 'tray/home.html', {'stores':stores, 'student': student})
+        if store_user:
+            print("logged in store")
+            store_id = user.store.id
+            request.session['store_id'] = store_id
+            return redirect('store_home')
+        if college_user:
+            institute_id = user.institute.id
+            request.session['institute_id'] = institute_id
+            print("logged in college")
+            return redirect('college_home')
+        
+        
     else:
         c = "Sorry login failed!"
         return HttpResponse(c)  
@@ -168,11 +187,11 @@ def open_store_success(request):
         store_details = request.POST['store_description']
         email = request.POST['email']
         password = request.POST['password']
-        user = User.objects.create_user(username,email,password)
+        user = User.objects.create_user(email,password)
         user.save
         store = Store( store_name = store_name, store_status=True, store_details=store_details, college = institute, user = user )
         store.save()
-        return redirect(store_login)
+        return redirect('entry')
 
 def store_login(request):
     if request.user.is_authenticated:
@@ -358,7 +377,7 @@ def edit_item_save(request):
 
 def store_logout(request):
     logout(request)
-    return redirect('store_login')
+    return redirect('entry')
 
 def store_order_list(request):
     store_id = request.session['store_id']
@@ -432,13 +451,13 @@ def register_college_success(request):
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-        user = User.objects.create_user(username,email,password)
+        user = User.objects.create_user(email,password)
         user.save()
         institute = Institute(institute_name = college, user = user, )
         institute.save()
         break_time = Break(first_break = first_break, lunch_break = lunch_break, last_break = last_break, college = institute)
         break_time.save()
-        return redirect(login_college)
+        return redirect('entry')
 
 def login_college(request):
     if request.user.is_authenticated:
@@ -446,10 +465,9 @@ def login_college(request):
         if college_user:
             print("Already logged in")
             return redirect('college_home')
-        else:
-            return render (request, 'tray/login_college.html')
+        
     else:
-        return render (request, 'tray/login_college.html')
+        return redirect ( 'entry')
 
 def college_login_verify(request):
     username = request.POST['username']
@@ -517,38 +535,55 @@ def college_recharge(request):
 
 def college_recharge_post(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        student_object = Student.objects.get(name = username)
+        email = request.POST['email']
+        college_recharge_student_id = request.session['college_recharge_student_id']
+        student_object = Student.objects.get(id = college_recharge_student_id)
         student_name =  student_object.name
         student_balance = student_object.balance
-    return render(request, 'tray/college_recharge_details.html', {'student_balance':student_balance, 'student_name':student_name})
+    return render(request, 'tray/college_recharge_details.html', {'email':email,'student_balance':student_balance, 'student_name':student_name})
 
 def college_recharge_details(request):
     return render(request, 'tray/college_recharge_details.html')
 
 def validate_recharge(request):
-    username = request.GET['username']
+    email = request.GET['email']
+    print(email)
     college_id = request.session['college_id']
-    student_valid = Student.objects.filter(name = username, college = college_id).exists()
-    if student_valid:
-        data = {
-            'username_status': "correct"
-        } 
-        return JsonResponse(data)
-
+    user_valid = User.objects.filter(email = email).exists()
+    print("USER: "+str(user_valid))
+    if user_valid:
+        user = User.objects.get(email = email)
+        student_valid = Student.objects.filter(user = user, college = college_id).exists()
+        college_recharge_student_obj = Student.objects.get(user = user, college = college_id)
+        college_recharge_student_id = college_recharge_student_obj.id 
+        request.session['college_recharge_student_id'] = college_recharge_student_id
+        print("Student valid: "+str(student_valid)+str(user)+ str(college_id))
+        print(str(Institute.objects.get(id = college_id)))
+        if student_valid:
+            data = {
+                'email_status': "correct"
+            } 
+            return JsonResponse(data)
+        else:
+            data = {
+            'email_status': "incorrect"
+            }  
+            return JsonResponse(data)
+    
 
     else:
         data = {
-            'username_status': "incorrect"
+            'email_status': "incorrect"
         }  
         return JsonResponse(data)
     
 
 
 def college_recharge_final(request):
-    username = request.GET['username']
+    email = request.GET['email']
     amount = request.GET['amount']
-    student_object = Student.objects.get(name = username)
+    user = User.objects.get(email = email)
+    student_object = Student.objects.get(user = user)
     current_balance = student_object.balance
     student_object.balance = current_balance + int(amount)
     student_object.save()
@@ -562,7 +597,7 @@ def college_recharge_final(request):
 
 def college_logout(request):
     logout(request)
-    return redirect(login_college)
+    return redirect('entry')
 
 # ajaxify with jquery views____________________________________________________________________
 def validate_store_item(request):
@@ -648,7 +683,7 @@ def update_item_availability(request):
            return JsonResponse(data)
 
 def validate_entry(request):
-    username = request.GET['username']
+    username = request.GET['email']
     password = request.GET['password']
     user_exist = User.objects.filter(email = username).exists()
     if user_exist:
@@ -670,7 +705,7 @@ def validate_entry(request):
         return JsonResponse(data)
     else :
         data = {
-                'incorrect_status' : 'wrong_username'
+                'incorrect_status' : 'wrong_email'
             }
         return JsonResponse(data)
 
@@ -896,11 +931,11 @@ def pickup_order(request):
     return JsonResponse(data)
 
 def store_login_validate(request):
-    user_name = request.GET['user_name']
+    email = request.GET['email']
     password = request.GET['password'] 
-    user_exists = User.objects.filter(username=user_name).exists()
+    user_exists = User.objects.filter(email=email).exists()
     if user_exists:
-        user = User.objects.get(username=user_name)
+        user = User.objects.get(email=email)
         user_store_exist = Store.objects.filter(user = user).exists()
     else:
         user_store_exist = False
@@ -954,12 +989,11 @@ def college_login_validate(request):
 def store_register_validate(request):
     store_name = request.GET['store_name']
     college_id = request.GET['college_id']
-    user_name = request.GET['user_name']
+    email = request.GET['email']
     college_object = Institute.objects.get(id = college_id)
     data = {
         'store_name_taken': Store.objects.filter(store_name = store_name, college = college_object).exists(),
-        'user_name_taken' : User.objects.filter(username = user_name).exists()
-
+        'email_taken' : User.objects.filter(email = email).exists()
     }
     return JsonResponse(data)
 
@@ -975,20 +1009,22 @@ def store_edit_validate(request):
 
 def college_register_validate(request):
     college_name = request.GET['college_name']
-    user_name = request.GET['user_name']
+    email = request.GET['email']
     data = {
         'college_name_taken': Institute.objects.filter(institute_name = college_name).exists(),
-        'user_name_taken' : User.objects.filter(username = user_name).exists()
+        'email_taken' : User.objects.filter(email = email).exists()
 
     }
+    print("email taken"+ str(data['email_taken']))
     return JsonResponse(data)
 
 def student_register_validate(request):
-    user_name = request.GET['user_name']
+    email = request.GET['email']
     password = request.GET['password']
     data = {
-        'user_name_taken' : User.objects.filter(username = user_name).exists(),
+        'email_taken' : User.objects.filter(email = email).exists(),
     }
+    print('email_taken'+str(data['email_taken']))
     return JsonResponse(data)
 
 def student_pin_edit_validate(request):

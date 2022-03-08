@@ -34,7 +34,7 @@
                             <h3>E-mail</h3>
                             <div class="container">
                                 <div class="col-xs-2">
-                                    <input type="text" class="form-control" id="username" name="username"><br/>
+                                    <input type="text" class="form-control" id="email" name="email"><br/>
                                 </div>
                             </div>
                         </div>
@@ -52,7 +52,9 @@
 
                         <!--login button-->    
                             <input type="button" id="enter" value="Login" class="login-button">
-                        <br/><br/>
+                        <br/>
+                        <a href={% url 'password_reset'%}>Forgot password?</a>
+                        <br/>
                         <p style="font-style:unset;">Not yet started with All Tray?<br/>
                         Start now!</p>
                     </div>
@@ -81,6 +83,12 @@ $(document).ready(function(){
         //filling fields with values on reload
         //window.onload=set_fields();
 
+        function checkemail(email) 
+        {
+            var re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        }
+
         function set_fields(){
             var password = sessionStorage.getItem('password');
             if (password !== null) $('#password').val(password);
@@ -93,16 +101,16 @@ $(document).ready(function(){
 
     //submit click
     $("#enter").click(function(event){
-                
-        if ( $("#username").val() == "" ) {
-                document.getElementById("incorrect_alert_1").innerHTML = "Please enter username."
-                $("#username").css("border-color","red");
+        var email = $("#email").val()
+        if (  email == "" || checkemail(email) == false ) {
+                document.getElementById("incorrect_alert_1").innerHTML = "Please enter valid email."
+                $("#email").css("border-color","red");
                 //swal("Here's a message!", " Have a nice day!");  
                 //swal("Oops!", "Something went wrong, you should choose again!", "error");  
                 //swal("Good job!", "You clicked the button!", "success"); 
 
                 //error shake 
-                $("#username").addClass("error");
+                $("#email").addClass("error");
                 event.preventDefault();
             }
 
@@ -113,32 +121,32 @@ $(document).ready(function(){
                 event.preventDefault();
             }
         
-        /*else if ( ($("#username").val() == "" && $("#id_card").val() != "" )||( $("#username").val() =="" && $("#pin").val() != "") ) {       
-                    document.getElementById("incorrect_alert_1").innerHTML = "Please enter username or refresh and swipe card first then enter username."
+        /*else if ( ($("#email").val() == "" && $("#id_card").val() != "" )||( $("#email").val() =="" && $("#pin").val() != "") ) {       
+                    document.getElementById("incorrect_alert_1").innerHTML = "Please enter email or refresh and swipe card first then enter email."
                     $("#incorrect_alert_1").fadeIn(1000).delay(4000).fadeOut(1000);
                     event.preventDefault();
-                    console.log(username);
+                    console.log(email);
                     console.log(pin);
                     console.log(id_card);
                 }*/
 
         else{
             console.log("test on enter button");
-                    var username =  $("#username").val();
+                    var email =  $("#email").val();
                     var password = $("#password").val();
                     //var id_card = $("#id_card").val();
-                    console.log(username);
+                    console.log(email);
         //sending form fields in ajax for checking if registered pin or card
                 $.ajax({
                     url: '/ajax/validate_entry/',
                     data: {
-                        'username': username,
+                        'email': email,
                         'password': password,
                         //'id_card': id_card,
                     },
                     dataType: 'json',
                     success: function (data){
-                            if (data.incorrect_status == "wrong_username"){
+                            if (data.incorrect_status == "wrong_email"){
                                 document.getElementById("incorrect_alert_2").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
                                 //alert("Sorry non-existent user  please register if not registered and try again");
                                 Swal.fire(
@@ -148,20 +156,9 @@ $(document).ready(function(){
                                     ).then(function() {
                                         location.reload();
                                     });
-                                //$("#pin").css("border-color","red");
-                                //location.reload();
                             }
                             if (data.incorrect_status == "incorrect_password"){
-                                //document.getElementById("incorrect_alert_2").innerHTML = "Sorry incorrect password, please register if not registered and try again"
-                                //$("#pin").css("border-color","red");
-                                /*Swal.fire(
-                                    'Oops',
-                                    '<p>Sorry incorrect password.<br/>Try again.<p>',
-                                    imageUrl: 'https://unsplash.it/400/200',
-                                    imageWidth: 400,
-                                    imageHeight: 200,
-                                    imageAlt: 'Custom image',
-                                    )*/
+                                
                                     
                                     Swal.fire({
                                         title: 'grr!',

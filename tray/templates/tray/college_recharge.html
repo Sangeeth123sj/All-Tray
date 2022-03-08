@@ -36,10 +36,10 @@
     <br/> <br/>
     <form action="/college_recharge_post/" class="form" method="POST">
         {% csrf_token %}
-    <h4>Username</h4>
+    <h4>Email</h4>
     <br/>
     <div>
-        <input type="text" id="username" name="username" autofocus >
+        <input type="text" id="email" name="email" autofocus >
     </div> 
     <br/> <br/>
     <p id="incorrect_alert" style="color: rgb(245, 149, 149); font-weight: 1000; width: fit-content;" ></p>
@@ -50,30 +50,30 @@
         $(document).ready(function(){
         $("#enter").click(function(event){
             console.log("test on enter button");
-            if ($("#username").val() == ""){
-                $("#username").css("border-color","red");
-                document.getElementById("incorrect_alert").innerHTML = "Please enter username."
+            if ($("#email").val() == ""){
+                $("#email").css("border-color","red");
+                document.getElementById("incorrect_alert").innerHTML = "Please enter email."
                 $('#incorrect_alert').fadeToggle(2000);
                 event.preventDefault();
             }
     
             else{   
-                    username = $("#username").val()
+                    email = $("#email").val()
                     console.log("test on enter button in else");
-        //sending form fields in ajax for checking if registered username
+        //sending form fields in ajax for checking if registered email
                 $.ajax({
                     url: '/ajax/validate_recharge/',
                     data: {
-                        'username': username,
+                        'email': email,
                     },
                     dataType: 'json',
                     success: function (data){
-                        if (data.username_status == "incorrect"){
-                            alert("Sorry incorrect username");
+                        if (data.email_status == "incorrect"){
+                            alert("Sorry incorrect email");
                             //window.location.href = " ";
                             event.preventDefault();
                         }
-                        if(data.username_status == "correct"){
+                        if(data.email_status == "correct"){
                             $("form").submit();
                         }
     

@@ -173,13 +173,13 @@
                     url: '/ajax/student_register_validate/',
                     
                     data: {
-                        'user_name' : user_name,
+                        'email' : email,
                         'password' : password,
                     },
                     dataType: 'json',
                     success: function (data) {
-                        if (data.user_name_taken) {
-                            alert("User name already taken, try another name");
+                        if (data.email_taken) {
+                            alert("mail id already taken, try another mail id");
                             location.reload();
                             return false;
                         }
