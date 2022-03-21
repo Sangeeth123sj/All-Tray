@@ -88,6 +88,12 @@
 <br/>
 <input type="password" name="password" id="password" minlength="4" class="form-control" >
 <br/><br/>
+
+<h4>Rfid card pin</h4>
+<br/>
+<input type="password" name="card_pin" id="card_pin" minlength="4" class="form-control" >
+<br/><br/>
+
 <h4>College</h4>
 
 <select id="college_id" name="college_id" id="college_id" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;" >
@@ -160,6 +166,7 @@
 
             var user_name = $("#student_name").val();
             var password = $("#password").val();
+            var card_pin = $("#card_pin").val();
             var email = $("#mail_id").val();
             console.log(email);
             var flag = checkemail(email);
@@ -175,6 +182,8 @@
                     data: {
                         'email' : email,
                         'password' : password,
+                        'card_pin' : card_pin,
+
                     },
                     dataType: 'json',
                     success: function (data) {
@@ -182,6 +191,9 @@
                             alert("mail id already taken, try another mail id");
                             location.reload();
                             return false;
+                        }
+                        else if (data.card_pin_taken){
+                            alert('rfid card already registered please use another card')
                         }
                         else{
                             $("form").submit();

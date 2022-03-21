@@ -1,0 +1,96 @@
+{% extends "tray/base.html" %}
+
+{% block head %}
+    <h1>Bulk Recharge</h1>
+{% endblock %}
+{% block content %}
+<center>
+<h2>Enter recharge amount</h2>
+<input type="number" id="amount"  name="amount">
+
+<br><br/>
+<h2>Enter each mail id <br> of students & press enter</h2>
+<textarea id="mails"   name="mails" rows="4" cols="50"></textarea>
+<br><br>
+<button id='submit' name="submit" class='btn btn-success'>Add mails</button>
+<br>
+<p id='ml'></p>
+<script>
+    
+
+
+$(document).ready(function(){
+    var mails = []
+
+//mail adding to list on enter press and clearing input
+    $("#mails").keyup(function(e){
+        if (e.keyCode == 13){
+            console.log('pressed enter')
+            var mail = document.getElementById('mails')
+            mail_valid_flag = checkemail(mail.value.trim())
+            if (mail_valid_flag){
+                mails.push(mail.value.trim())
+                console.log(mails)
+                const pm = document.createElement("button"); 
+                pm.innerHTML =mail.value + '<span  style="color:black">x</span>'
+                pm.setAttribute('class','bubble')
+                document.getElementById('ml').appendChild(pm);
+                mail.value = ''
+            }
+            else{
+                alert('invalid email please try again')
+            }
+        }
+    });
+
+
+    $(document).on('click','.bubble',function(){
+        console.log("reached span click on bubble: "+$(this).text())
+        clean_delete_mail_text =  remove_last_char($(this).text())
+        console.log('clean mail: '+ clean_delete_mail_text)
+        console.log(mails.length);
+        delete_mail_index = mails.indexOf(clean_delete_mail_text)
+        console.log('delete index: '+ delete_mail_index)
+        mails.splice(delete_mail_index,1)
+        $(this).remove()
+        console.log('mail array: '+ mails)
+    });
+
+    $('#submit').click(function(){
+        if (mails.length>0){
+            var recharge_amount = $("#amount").val();
+            console.log(recharge_amount)
+            
+            $.ajax({
+                url: '/ajax/bulk_recharge/',
+                data: {
+                    'mails': JSON.stringify(mails),
+                    'recharge_amount': recharge_amount,
+                },
+                dataType: 'json',
+                success: function (data){
+                    if (data.added == 'success'){
+                        alert('emails successfully added!')
+                        location.reload();
+                    }
+                    else{
+                        alert('email submitting failed')
+                    }
+                }
+            }); 
+        }
+        else{
+            alert('Please add each mail and press enter')
+        }
+    });
+
+    function remove_last_char(string){
+        var clean_string = string.substring(0,string.length - 2)
+        return clean_string
+    }
+
+});
+
+</script>
+</center>
+{% endblock %}

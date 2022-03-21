@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth.admin import UserAdmin
-from .models import Student, Item, Store, Order, Institute, Break, CartItem, Bill
+from .models import Student, Item, Store, Order, Institute, Break, CartItem, Bill, BulkRechargeMail
 from users.models import User
 admin.site.register(Institute)
 #admin.site.register(Student)
@@ -13,6 +13,7 @@ admin.site.register(Break)
 admin.site.register(CartItem)
 admin.site.register(Bill)
 admin.site.register(User)
+admin.site.register(BulkRechargeMail)
 # Register your models here for admin
 
 class StudentAdmin(admin.ModelAdmin):

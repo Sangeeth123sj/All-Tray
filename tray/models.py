@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.db.models import Model
 #from django.contrib.auth.models import User
@@ -34,24 +35,28 @@ SEMESTERS = (
     ('semester 6', 'semester 6'),
     ('semester 7', 'semester 7'),
     ('semester 8', 'semester 8'),
+)
 
-
+PLANS = (
+    ('free','free'),
+    ('standard','standard')
 )
 
 class Institute(models.Model):
     institute_name = models.CharField(max_length=200)
     institute_balance = models.IntegerField(default=0)
+    plan = models.CharField(max_length=200, choices=PLANS, default='free')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     def __str__(self):
         return str(self.institute_name)
     
 class Student(models.Model):
-    name = models.CharField(max_length=200, unique = True)
+    name = models.CharField(max_length=200)
     branch = models.CharField(max_length=200, choices=BRANCHES)
     sem = models.CharField(max_length=200, choices=SEMESTERS)
-    reg_no = models.CharField(max_length=200)
+    reg_no = models.CharField(max_length=200, blank=True)
     balance = models.IntegerField(default=0)
-    pin_no = models.CharField(max_length=200)
+    pin_no = models.CharField(max_length=200, blank=True)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     def __str__(self):
@@ -125,3 +130,12 @@ class Bill(models.Model):
     status = models.BooleanField(default=False)
     def __str__(self):
         return "Item: "+str(self.item)+" | Store: "+str(self.store.store_name)
+    
+class BulkRechargeMail(models.Model):
+    email = models.EmailField(max_length=254)
+    recharge_amount = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=False)
+    college = models.ForeignKey(Institute, on_delete=models.CASCADE)
+    def __str__(self):
+        return "Bulk recharge: "+str(self.email)+" | status: "+str(self.active)

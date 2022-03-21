@@ -41,6 +41,7 @@ urlpatterns = [
     path('login_college/', views.login_college, name='login_college'),
     path('college_login_verify/', views.college_login_verify, name='college_login_verify'),
     path('college_home/', views.college_home, name = 'college_home'),
+    path('college_bulk_recharge/', views.college_bulk_recharge, name = 'college_bulk_recharge'),
     path('college_store_order_list_post/', views.college_store_order_list_post, name='college_store_order_list_post'),
     path('college_store_order_list/', views.college_store_order_list, name='college_store_order_list'),
     path('college_break_edit/', views.college_break_edit, name='college_break_edit'),
@@ -53,6 +54,7 @@ urlpatterns = [
     path('paytm/', views.paytm, name='paytm'),
     path('invoice_print/',views.invoice_print, name='invoice_print'),
     path('qr_code/',views.qr_code, name='qr_code'),
+    
 
     #ajaxify using jquery_____________________________________________________________________________________________
     path('ajax/validate_store_item/', views.validate_store_item, name='validate_store_item'),
@@ -75,6 +77,7 @@ urlpatterns = [
     path('ajax/college_recharge_final/', views.college_recharge_final, name='college_recharge_final'),
     path('ajax/billing/item_price/', views.billing_item_price, name='item_price'),
     path('ajax/billing/invoice/', views.billing_invoice, name = 'billing_invoice'),
+    path('ajax/bulk_recharge/', views.bulk_recharge_submit, name = 'bulk_recharge_submit')
 ] 
 #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

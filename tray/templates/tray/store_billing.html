@@ -111,15 +111,22 @@
 <br/>
 <h3>Enter amount given by customer</h3>
 <input type="number" style="width:150px" name="customer_cash" id="customer_cash"/>
-<br/><br/>
-<button id="check_balance" class="blue-button">Check balance</button>
+
+
 <br/><br/>
 <h3 class="btn-grad" id="balance" >Balance: nil  </h3>
 
-<h4>Payment Confirmation:</h4>
+<h4>Payment:</h4>
 
-<input type="button"  id="confirm" value="Confirm" class="btn btn-primary"> 
+<input type="button"  class='confirm btn btn-primary' value="Cash" data-id="cash"> 
+<input type="button" class='confirm btn btn-warning' value="Rfid Card" data-id="card"> 
 
+<div id="card_section" hidden>
+<br/><br/>
+<input type="text" id='pin_no'>
+<br/><br/>
+<input type="button" id="card_submit" value="Submit" >
+</div>
 {% with student_id=student.id  %}
 {% with store_id=store.id %}
 <br/><br/>
@@ -148,7 +155,7 @@
             var order_list = [];
 
            
-        $("#check_balance").click(function(){
+        $("#customer_cash").keyup(function(){
             customer_balance();
         });
 
@@ -349,7 +356,7 @@
             
 
             //confirming purchase and saving to order table
-            $("#confirm").click(function(){
+            $(".confirm").click(function(){
                         if (order_list.length !== 0){
                                     console.log("entered If");
                                     buy_clicked = true;
@@ -359,6 +366,14 @@
                                     order_list.unshift(store_detail_object);*/
                                     order_list_json = JSON.stringify(order_list);
                                     console.log(order_list_json);
+                                    cash_or_card = $(this).data("id")
+                                    console.log(cash_or_card)
+                                    if (cash_or_card == 'card')
+                                        {
+                                            $('#card_section').attr("hidden",false);
+                                            pin_no = $('#pin_no').val()
+                                            return
+                                        }
                                     //device check
                                     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
                                         // true for mobile device
@@ -371,12 +386,14 @@
                                         var device = 'desktop'
                                     }
 
+
                                     $.ajax({
                                         url: '/ajax/billing/invoice/',
                                         data:{
                                             'order_list_json':order_list_json,
                                             'total': total,
                                             'device': device,
+                                            'cash_or_card': cash_or_card,
                                         },
                                         dataType: 'json',
                                         success: function (data){
@@ -393,7 +410,63 @@
                         }   
                         if (order_list.length === 0){
                             alert("no item in bill");
-                        }             
+                        }  
+             });
+            $('#card_submit').click(function(){
+                //device check
+                if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+                    // true for mobile device
+                    console.log("mobile device");
+                    var device = 'mobile'
+                }
+                else{
+                    // false for not mobile device
+                    console.log("not mobile device");
+                    var device = 'desktop'
+                }
+                pin_no = $('#pin_no').val()
+                if (pin_no == ''){
+                    alert('please enter card pin')
+                    return
+                }
+                $.ajax({
+                    url: '/ajax/billing/invoice/',
+                    data:{
+                        'order_list_json':order_list_json,
+                        'total': total,
+                        'device': device,
+                        'cash_or_card': cash_or_card,
+                        'pin_no': pin_no,
+                    },
+                    dataType: 'json',
+                    success: function (data){
+                        if (data.card_status == 'card_invalid'){
+                            Swal.fire(
+                            'Invalid card',
+                            'please try again',
+                            'error',
+                            )
+                            return
+                        }
+                        if (data.card_status == 'low_balance'){
+                            Swal.fire(
+                            'Oops',
+                            'Low balance on card',
+                            'error',
+                            )
+                            return
+                        }
+                        else{
+                            Swal.fire(
+                                'Bill confirmed',
+                                '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
+                                'success'
+                            ).then(function() {
+                                $("form").submit();
+                            });
+                        }
+                    }
+                });
                                 
             });
 

@@ -392,6 +392,13 @@ div.left {
   margin-bottom:0;
 }
 
+.bubble{
+  background-color:#56709c;
+  border-radius: 10px;
+  color:white;
+  
+}
+
 /* Credit to https://epicbootstrap.com/snippets/footer-basic */
 
 
@@ -452,9 +459,17 @@ div.left {
       <br/>
     </div>
   {% endblock %}
+
+<center>
+  {% block head %}
+
+  {% endblock %}
+</center>
+
   {% block frost %}
     <div class="frostprimary">
   {% endblock %}
+  
         {% block content%}
         
         {% endblock %}

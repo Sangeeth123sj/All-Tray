@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from .models import Student,Item,Store,User,Order, Break, CartItem, Institute, Bill
+from .models import BulkRechargeMail, Student,Item,Store,User,Order, Break, CartItem, Institute, Bill
 from django.db.models import Sum
 #from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -9,6 +10,7 @@ User = get_user_model()
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
+from datetime import date
 from datetime import timedelta
 from django.contrib.auth.hashers import check_password, make_password
 import string,random
@@ -40,13 +42,20 @@ def register_card_post(request):
         branch = request.POST['branch_name']
         semester = request.POST['semester']
         password = request.POST['password']
+        card_pin = request.POST['card_pin']
         college_id = request.POST['college_id']
         email = request.POST['mail_id']
         college_object = Institute.objects.get(id = college_id)
         user = User.objects.create_user(email,password)
         user.save
         student = Student(name = student_name, branch = branch, sem = semester,college = college_object, user = user)
+        if card_pin:
+            student.pin_no = card_pin
         student.save()
+        if (BulkRechargeMail.objects.filter(email = email).exists()):
+            bulk_recharge_email = BulkRechargeMail.objects.get(email = email)
+            student.balance = bulk_recharge_email.recharge_amount
+            student.save()
         messages.success(request, 'Profile created.')
         return render (request, 'tray/entry.html')
 
@@ -96,16 +105,19 @@ def home(request):
             request.session['student_id'] = student.id
             print("logged in student")
             return render (request, 'tray/home.html', {'stores':stores, 'student': student})
-        if store_user:
+        elif store_user:
             print("logged in store")
             store_id = user.store.id
             request.session['store_id'] = store_id
             return redirect('store_home')
-        if college_user:
+        elif college_user:
             institute_id = user.institute.id
             request.session['institute_id'] = institute_id
             print("logged in college")
             return redirect('college_home')
+        else:
+            c = "Sorry login failed! you're just a user, not a student or store or college!"
+            return HttpResponse(c)
         
         
     else:
@@ -145,9 +157,10 @@ def order_page(request):
     student_id = request.session['student_id']
     store_id = request.session['store_id']
     student = Student.objects.get(id = student_id)
+    college = student.college
     store = Store.objects.get(id = store_id)
     items = store.item_set.filter(available = True)
-    return render (request, 'tray/order_page.html', {'student': student, 'store': store, 'items': items})
+    return render (request, 'tray/order_page.html', {'student': student, 'store': store,'college':college, 'items': items})
 
 def student_pin_edit(request):
     student_id = request.session['student_id']
@@ -254,7 +267,8 @@ def billing_item_price(request):
     return JsonResponse(data)
 
 def invoice_number_gen(store):
-    last_bill = Bill.objects.all().order_by('id').last()
+    last_bill = Bill.objects.filter(store = store).order_by('id').last()
+    #print('last bill ' + str(last_bill.invoice_no))
     if last_bill:
         last_invoice_no = last_bill.invoice_no
         #invoice number format is 'customer_name_short + number' eg: CS003 
@@ -263,7 +277,9 @@ def invoice_number_gen(store):
         new_invoice_digits = int(last_invoice_digits) + 1
         new_invoice_no =  last_invoice_initials+ str(new_invoice_digits)
     else:
-        new_invoice_no = store.invoice_code + str(1)
+        new_invoice_no = store.invoice_code +'01'
+        
+        
     return (new_invoice_no) 
 
 def billing_invoice(request):
@@ -272,9 +288,28 @@ def billing_invoice(request):
     store_name = store.store_name
     load = json.loads(request.GET['order_list_json'])
     total = request.GET['total']
+    cash_or_card = request.GET['cash_or_card']
     device = request.GET['device']
+    if cash_or_card == 'card':
+        pin_no = request.GET['pin_no']
+        student_check = Student.objects.filter(pin_no = pin_no).exists()
+        print('student check '+ str(student_check))
+        if student_check == False:
+            data={
+                'card_status': 'card_invalid'
+            }
+            return JsonResponse(data)
+        elif student_check:
+            student = get_object_or_404(Student, pin_no = pin_no)
+            if int(student.balance) < int(total) :
+                data = {
+                    'card_status' : 'low_balance'
+                }
+                return JsonResponse(data)
+    
     request.session['device'] = device
     #generating incremented invoice no
+    
     new_invoice_no = invoice_number_gen(store)
     
     #load is the list of orders
@@ -290,6 +325,25 @@ def billing_invoice(request):
     for i in load:
         new_object = Bill(item=i['item'], price=i['price'], quantity=i['quantity'], invoice_no=new_invoice_no,invoice=file , store=store)
         objects.append(new_object)
+        item = Item.objects.get(item = i['item'])
+        #initializing stock of item variable
+        item_stock = item.stock
+        #updating stock at store
+        item.stock = int(item_stock) - int(i['quantity'])
+        item.save()
+        #unticking item availability to customers on reaching low stock at store
+        if item.stock < 5:
+            item.available = False
+            item.save()
+        if cash_or_card == 'card':
+            pin_no = request.GET['pin_no']
+            #updating store balance
+            cost = i['quantity'] * i['price']
+            store.store_balance = store.store_balance + cost
+            store.save()
+            #updating student balance
+            student.balance = student.balance - cost
+            student.save()
     Bill.objects.bulk_create(objects)
     
     print(store_name)
@@ -401,32 +455,60 @@ def store_item_pickup(request):
 
 
 def store_item_pickup_validate(request):
-    otp = request.GET['otp']
-    check_otp = Order.objects.filter(otp = otp).exists()
+    otp_or_card = request.GET['otp_or_card']
+    print('otp or card: '+str(type(otp_or_card)))
+    check_otp = Order.objects.filter(otp = otp_or_card, created_at__date = date.today()).exists()
+    print('check otp '+str(check_otp))
     if check_otp:
+        request.session['otp_or_card_selected'] = 'otp'
         data = {
             'incorrect_status' : 'correct_otp',
         }
         return JsonResponse(data)
+    else:
+        check_student_valid = Student.objects.filter(pin_no = otp_or_card).exists()
+        print('check student: '+ str(check_student_valid))
+        if check_student_valid:
+            check_student = Student.objects.get(pin_no = otp_or_card)
+            check_card = Order.objects.filter(student = check_student, created_at__date = date.today() ).exists()
+            #order = Order.objects.filter( created_at__date = date.today(), student = student)
+
+        else:
+            check_card = False
+    if check_card:
+        request.session['otp_or_card_selected'] = 'card'
+        data = {
+            'card_pin' : 'correct_card_pin'
+        }
+        return JsonResponse(data)
     else :
         data = {
-            'incorrect_status' : 'incorrect_otp',
-            'check_otp' : check_otp,
+            'incorrect_status' : 'incorrect_otp_and_card',
         }
         return JsonResponse(data)
 
 def user_pickup_orders_post(request):
     if request.method == 'POST':
-        otp = request.POST['student_otp']
-        request.session['otp'] = otp
+        otp_or_card = request.POST['otp_or_card']
+        request.session['otp_or_card'] = otp_or_card
         return redirect(user_pickup_orders)
 
 def user_pickup_orders(request):
     store_id = request.session['store_id']
-    otp = request.session['otp']
-    store_object = Store.objects.get(id = store_id)
-    orders = Order.objects.filter(otp = otp)
-    return render(request,'tray/user_pickup_orders.html', {'orders': orders} )
+    otp_or_card = request.session['otp_or_card']
+    otp_or_card_selected = request.session['otp_or_card_selected']
+    print('otp/card: '+ otp_or_card_selected)
+    if otp_or_card_selected == 'otp':
+    #store_object = Store.objects.get(id = store_id)
+        orders = Order.objects.filter(otp = otp_or_card)
+        return render(request,'tray/user_pickup_orders.html', {'orders': orders} )
+    elif otp_or_card_selected == 'card':
+        check_student = Student.objects.get(pin_no = otp_or_card)
+        print('check student: '+ str(check_student))
+        orders = Order.objects.filter(student = check_student)
+        print(str(orders))
+        return render(request,'tray/user_pickup_orders.html', {'orders': orders} )
+        
 
 def store_bills(request):
     store_id = request.session['store_id']
@@ -491,6 +573,9 @@ def college_home(request):
     stores = Store.objects.filter(college = college)
 
     return render(request,'tray/college_home.html', {'college': college, 'stores':stores})
+
+def college_bulk_recharge(request):
+    return render(request, 'tray/college_bulk_recharge.html' )
 
 def college_store_order_list_post(request):
     if request.method == 'POST':
@@ -712,6 +797,7 @@ def validate_entry(request):
 def validate_order_cancel(request):
     order_id = request.GET['order_id']
     order = Order.objects.get(id = order_id)
+    item_name = order.item
 #'break_time_find' is variable which gives break name in string format from the respective order. eg. 'First Break'
     break_time_find = order.pickup_time
 #this isn't hard code 'id = 1' there is only one break object for now will change and add relation
@@ -740,7 +826,9 @@ def validate_order_cancel(request):
         order.store.save()
         order.delete()
         data = {
-                'cancelled' : 'success'
+                'cancelled' : 'success',
+                'item' : item_name
+                
             }
         return JsonResponse(data)
     else:
@@ -1021,8 +1109,13 @@ def college_register_validate(request):
 def student_register_validate(request):
     email = request.GET['email']
     password = request.GET['password']
+    card_pin = request.GET['card_pin']
+    card_pin_taken = False
+    if card_pin:
+        card_pin_taken = Student.objects.filter(pin_no = card_pin).exists()
     data = {
         'email_taken' : User.objects.filter(email = email).exists(),
+        'card_pin_taken': card_pin_taken
     }
     print('email_taken'+str(data['email_taken']))
     return JsonResponse(data)
@@ -1034,4 +1127,22 @@ def student_pin_edit_validate(request):
     data = {
         'pin_taken' : Student.objects.exclude(id = student_id).filter(pin_no = pin_no).exists(),
          }
+    return JsonResponse(data)
+
+def bulk_recharge_submit(request):
+    mails = json.loads(request.GET['mails'])
+    recharge_amount = request.GET['recharge_amount']
+    college_id = request.session['college_id']
+    college = Institute.objects.get(id = college_id)
+    print(mails)
+    print('amount: '+recharge_amount)
+    new_mail = []
+    all_mail_objects = []
+    for i in mails:
+        new_mail = BulkRechargeMail(email = i, recharge_amount=recharge_amount, college = college)
+        all_mail_objects.append(new_mail)
+    BulkRechargeMail.objects.bulk_create(all_mail_objects)
+    data = {
+        'added': 'success'
+    }
     return JsonResponse(data)

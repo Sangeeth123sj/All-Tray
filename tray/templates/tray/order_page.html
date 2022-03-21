@@ -129,8 +129,10 @@
 
 //function to calculate commission on adding item
     function alltray_revenue(total){
-
-        if (total>0 && total<=10){
+        if ('{{college.plan}}'=='free'){
+            commission=0;
+        }
+        else if (total>0 && total<=10){
             commission = 0.01 * total;
         }
         else if (total>10 && total<=50){
@@ -171,7 +173,7 @@
                 function check_exist_in_cart(item, quantity){
                     console.log("entered exist check function");
                     $("#cart_body").find(id="#item").each(function(){
-                            console.log("checking through each"+$(this).text());
+                            console.log("checking through each"+$(this).val());
                             cart_item = $(this).text()
                             if(cart_item == item)
                             {
@@ -395,7 +397,7 @@ function delete_from_order_list(item_name, item_cost)
                             subtotal = 0;
                             }
                             else if (data.status == 'low_balance')
-                            alert("Insufficient balance in card try, google pay.")
+                            alert("Insufficient balance in card.")
                         }
 
                 });

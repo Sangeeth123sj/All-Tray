@@ -203,7 +203,7 @@
 
         {% if is_order_day %}
                
-                    <table width="30%">
+                    <table width="30%" id='table2'>
                     <thead>
                         
                         <th>
@@ -213,8 +213,9 @@
                             Quantity
                         </th>
                         <th>
-                            Cancellation
+                            Otp
                         </th>
+                        
                         
                     </thead>
                 
@@ -239,9 +240,10 @@
                         <td align="center">
                             {{order.quantity}}
                         </td>
-                        <td align="center" >
-                            
+                        <td align="center">
+                            {{order.otp}}
                         </td>
+                        
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -267,9 +269,10 @@
                         <td align="center">
                             {{order.quantity}}
                         </td>
-                        <td align="center" >
-                            
+                        <td align="center">
+                            {{order.otp}}
                         </td>
+                        
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -294,9 +297,10 @@
                         <td align="center">
                             {{order.quantity}}
                         </td>
-                        <td align="center" >
-                            
+                        <td align="center">
+                            {{order.otp}}
                         </td>
+                       
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -321,9 +325,10 @@
                         <td align="center">
                             {{order.quantity}}
                         </td>
-                        <td align="center" >
-                            
+                        <td align="center">
+                            {{order.otp}}
                         </td>
+                        
                     </tr>
                 {% endif %}
 
@@ -346,10 +351,12 @@
 
 $(document).ready(function(){     
             //table otp grouping 
-            table_grouper(2);  
-
-            function table_grouper(group_cell){
-                var table = document.getElementById('table');
+            table_grouper(2,'table');  
+            table_grouper(2,'table2');
+            
+        
+            function table_grouper(grouping_cell,table_id){
+                var table = document.getElementById(table_id);
                 console.log(table);
                 if (table  === null){
                     return;
@@ -357,35 +364,76 @@ $(document).ready(function(){
                 var rowLength = table.rows.length;
                 console.log("rowlength: "+rowLength);
                 var prev_cell = null;
+                var prev_follow_cell = null;
                 for(let c=2; c<rowLength; c+=1){
                     var row = table.rows[c];
                     var cellLength = row.cells.length;
                     console.log("no of cells in row: "+ cellLength);
-                        /*if (cellLength =1){
-                            c++;
-                            row = table.rows[c];
-                            
-                        }*/
-                    var cell = row.cells[group_cell];
-                    console.log(cell.innerText);
-                    if (prev_cell === null || cell.innerText !== prev_cell.innerText){
-                        prev_cell = cell;
+                    var group_cell = row.cells[grouping_cell];
+                    if (group_cell === undefined){
+                        continue;
+                    }
+                    console.log(group_cell.innerText);
+                    console.log('rowspan of it: '+group_cell.rowSpan)
+        
+                    if (prev_cell === null || group_cell.innerText !== prev_cell.innerText){
+                        prev_cell = group_cell;
                     }
                     else {
                         prev_cell.rowSpan++;
-                        cell.remove();
+                        console.log('group cell: ' + group_cell)
+                        group_cell.remove();
                     }
-                } 
+                    console.log('rowspan final: ' + prev_cell.rowSpan)
+        
+                }//end of for loop 
             }
         
             
+            function follower_cell_grouper(grouping_cell,following_cell){
+                var table = document.getElementById('table');
+                var rowLength = table.rows.length;
+                //alert(rowLength);
+                console.log('following cell:' + following_cell)
+                console.log('grouping cell:' + grouping_cell)
+        
+                for(let j=2; j<rowLength; j++){
+                    
+                    var row = table.rows[j];
+                    var follow_cell = row.cells[following_cell];
+                    if (follow_cell === undefined){
+                        continue;
+                    }
+                    var group_cell = row.cells[grouping_cell];
+                    if (group_cell === undefined){
+                        continue;
+                    }
+                    console.log('group cell: ' + group_cell)
+                    if (group_cell.rowSpan > 1){
+                        cells_difference = group_cell.rowSpan - follow_cell.rowSpan
+                        console.log('cell difference:' + cells_difference)
+                        follow_cell.rowSpan = group_cell.rowSpan
+                        for(let i=j+1; i<=j+cells_difference; i++){
+                            console.log('i in j: ' + i)
+                            console.log('j ' + j)
+                            drop_row = table.rows[i];
+                            console.log('drop row: ' + drop_row)
+                            drop_cell = drop_row.cells[following_cell];
+                            console.log('drop cell: ' + drop_cell.innerText);
+                            drop_cell.remove();
+                            rowLength--;
+                        }
+                    }
+                    
+                }
+            }
     //cancels the clicked item from orders
         $("tr #cancel").on("click", function(){
             console.log($(this).parent().parent().find("#order_id").html().trim());
             //$(this).parent().prev().prev().prev().find("#order_id").html().trim();
             order_id = $(this).parent().parent().find("#order_id").html().trim();
             console.log(order_id);
-            item_name = $(this).parent().prev().prev().text().trim();
+            item_name = $(this).parent().parent().text().trim();
             //console.log(order_id);
             //var row = $(this).parent().parent();       
             $.ajax({
@@ -396,7 +444,7 @@ $(document).ready(function(){
                                 dataType: 'json',
                                 success: function (data) {
                                     if (data.cancelled == "success") {
-                                        alert(item_name+" order is cancelled" );
+                                        alert(" order is cancelled" );
                                         location.reload();
                                     }
                                     else if (data.cancelled == "failure") {

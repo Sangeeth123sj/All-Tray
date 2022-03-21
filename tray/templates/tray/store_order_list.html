@@ -214,7 +214,7 @@
             {% if is_break %}
             <tr>
                 <td colspan="6" align="center" style="background-color: #4eb7d4;">Last Break</td>
-            </tr> 
+            </tr>
             {% endif %}
 
             {% for order in orders %}
@@ -266,61 +266,13 @@
 <script>
 $(document).ready(function(){
 
-    var table = document.getElementById('table');
-    var rowLength = table.rows.length;
-    
-    console.log("rowlength: "+rowLength);
-    var prev_cell = null;
-        for(let c=0; c<rowLength; c+=1){
-            var row = table.rows[c];
-            var cellLength = row.cells.length;
-            console.log("no of cells in row: "+ cellLength);
-            /*if (cellLength =1){
-                c++;
-                row = table.rows[c];
-                
-            }*/
-            const cell = row.cells[0];
-            console.log(cell.innerText);
-            if (prev_cell === null || cell.innerText !== prev_cell.innerText){
-                prev_cell = cell;
-            }
-            else {
-                prev_cell.rowSpan++;
-                cell.remove();
-            }
-        }
+table_grouper(0,'table')
 
-    });
-    
-    /*
-    var table = document.getElementById('test');
+//follower_cell_grouper(0,3)
 
-    let headerCell = null;
+});
     
-    for (let row of table.rows) {
-      const firstCell = row.cells[4];
-      console.log(firstCell.innerText);
-      if (headerCell === null || firstCell.innerText !== headerCell.innerText) {
-        headerCell = firstCell;
-      } else {
-        headerCell.rowSpan++;
-        firstCell.remove();
-      }
-    }
-    
-/*    let headerCell = null;
-    for (let row of table.rows) {
-    var firstCell = row.cells[2];
-    
-    if (headerCell === null || firstCell.innerText !== headerCell.innerText) {
-        headerCell = firstCell;
-    } else {
-        headerCell.rowSpan++;
-        firstCell.remove();
-    }
-    }
-*/
+   
 
 </script>
 
