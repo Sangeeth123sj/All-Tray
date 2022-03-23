@@ -77,7 +77,8 @@ urlpatterns = [
     path('ajax/college_recharge_final/', views.college_recharge_final, name='college_recharge_final'),
     path('ajax/billing/item_price/', views.billing_item_price, name='item_price'),
     path('ajax/billing/invoice/', views.billing_invoice, name = 'billing_invoice'),
-    path('ajax/bulk_recharge/', views.bulk_recharge_submit, name = 'bulk_recharge_submit')
+    path('ajax/bulk_recharge/', views.bulk_recharge_submit, name = 'bulk_recharge_submit'),
+    path('ajax/home_store_status_update/', views.home_store_status_update, name = 'home_store_status_update'),
 ] 
 #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

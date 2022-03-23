@@ -63,10 +63,15 @@
                     <div class="col-sm-12" >
             {% for store in stores %}
            
-                <button type="submit" class="btn btn-outline-dark" id="store_button" name="store_id" value="{{store.id}}" > 
+                <button type="submit" class="store_id btn btn-outline-dark" id="store_button" name="store_id" value="{{store.id}}" > 
+                  <p id='{{store.id}}' > </p>
                     <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
-                    {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
-                    {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>
+                    <div id = 'store_status'>
+                    
+                    
+                    <!-- {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
+                    {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>    --> 
+                    </div>
                     {{store.store_details}}
                 </button>
                
@@ -83,5 +88,35 @@
      </form>
 
     </center>
-
+<script>
+$(document).ready(function(){
+  $('.store_id').each(function(){
+    store_id = $(this).val()
+    console.log('s: '+store_id)
+    setInterval(store_status_update, 1000, store_id);
+  });
+  
+  //$(document).on('click','.bubble',function(){
+  function store_status_update(store_id){
+    console.log('s: in function '+store_id)
+    $.ajax({
+      url: '/ajax/home_store_status_update/',
+      data: {
+        store_id : store_id
+      },
+      dataType: 'json',
+      success: function (data){
+              console.log(data.store_status)
+              if(data.store_status == 'open'){
+                $('#'+store_id).html('<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>')
+              }
+              else if(data.store_status == 'closed'){
+                $('#'+store_id).html('<span style="color: rgb(218, 106, 98);">(Closed now) </span> <br/>')
+              }
+          
+      }
+    }); 
+  }
+});
+</script>
 {% endblock %}

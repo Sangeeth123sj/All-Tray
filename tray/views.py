@@ -5,6 +5,7 @@ from .models import BulkRechargeMail, Student,Item,Store,User,Order, Break, Cart
 from django.db.models import Sum
 #from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.contrib import messages
@@ -77,6 +78,7 @@ def entry(request):
             return render (request, 'tray/entry.html')
     else:
         return render (request, 'tray/entry.html')
+    
 
 def home_post(request):
     if request.method == 'POST':
@@ -84,53 +86,47 @@ def home_post(request):
         password = request.POST['password']
         request.session['email'] = email
         request.session['password'] = password
-        return redirect(home)
-
-def home(request):
-    student_email = request.session['email']
-    student_password = request.session['password']
-    user = authenticate(request, email = student_email, password = student_password)
-    print("Student "+str(user)+" just logged in")
-    
-    if user is not None:
+        user = authenticate(request, email = email, password = password)
         login(request, user)
-        
-        if request.user.is_authenticated:
-            student_user = Student.objects.filter(user = request.user).exists()
-            store_user = Store.objects.filter(user = request.user).exists()
-            college_user = Institute.objects.filter(user = request.user).exists()
-        if student_user:
-            stores = Store.objects.filter(college = user.student.college)
-            student = user.student
-            request.session['student_id'] = student.id
-            print("logged in student")
-            return render (request, 'tray/home.html', {'stores':stores, 'student': student})
-        elif store_user:
-            print("logged in store")
-            store_id = user.store.id
-            request.session['store_id'] = store_id
-            return redirect('store_home')
-        elif college_user:
-            institute_id = user.institute.id
-            request.session['institute_id'] = institute_id
-            print("logged in college")
-            return redirect('college_home')
-        else:
-            c = "Sorry login failed! you're just a user, not a student or store or college!"
-            return HttpResponse(c)
-        
-        
+        print("Student "+str(user)+" just logged in")
+        return redirect(home)
+    
+@login_required
+def home(request):    
+    if request.user.is_authenticated:
+        user = request.user
+        student_user = Student.objects.filter(user = request.user).exists()
+        store_user = Store.objects.filter(user = request.user).exists()
+        college_user = Institute.objects.filter(user = request.user).exists()
+    if student_user:
+        stores = Store.objects.filter(college = user.student.college)
+        student = user.student
+        request.session['student_id'] = student.id
+        print("logged in student")
+        return render (request, 'tray/home.html', {'stores':stores, 'student': student})
+    elif store_user:
+        print("logged in store")
+        store_id = user.store.id
+        request.session['store_id'] = store_id
+        return redirect('store_home')
+    elif college_user:
+        institute_id = user.institute.id
+        request.session['institute_id'] = institute_id
+        print("logged in college")
+        return redirect('college_home')
     else:
-        c = "Sorry login failed!"
-        return HttpResponse(c)  
+        c = "Sorry login failed! you're just a user, not a student or store or college!"
+        return HttpResponse(c)
+         
 
-
+@login_required
 def your_orders_post(request):
     if request.method == 'POST':
         student_id = request.POST['student_id']
         request.session['student_id'] = student_id
         return redirect(your_orders)
 
+@login_required
 def your_orders(request):
         student_id = request.session['student_id']
         student_object = Student.objects.get(id = student_id)
@@ -142,6 +138,7 @@ def your_orders(request):
             otp = ""
         return render(request, 'tray/your_orders.html', {'orders': orders, 'otp': otp})
 
+@login_required
 def order_page_post(request):
     if request.method == 'POST':
         student_id = request.POST['student_id']
@@ -153,6 +150,7 @@ def order_page_post(request):
         c = "Sorry login failed!"
         return HttpResponse(c)   
 
+@login_required
 def order_page(request):
     student_id = request.session['student_id']
     store_id = request.session['store_id']
@@ -162,12 +160,14 @@ def order_page(request):
     items = store.item_set.filter(available = True)
     return render (request, 'tray/order_page.html', {'student': student, 'store': store,'college':college, 'items': items})
 
+@login_required
 def student_pin_edit(request):
     student_id = request.session['student_id']
     student = Student.objects.get(id = student_id)
     request.session['student_id'] = student_id
     return render(request, 'tray/student_pin_edit.html', {'student': student})
 
+@login_required
 def student_pin_edit_post(request):
     student_id = request.session['student_id']
     if request.method == 'POST':
@@ -180,12 +180,13 @@ def student_pin_edit_post(request):
         logout(request)
         return redirect(entry)
 
-
+@login_required
 def student_logout(request):
     logout(request)
     return redirect('entry')
 
 #store views_______________________________________________________________________________
+
 
 def open_store(request):
     colleges = Institute.objects.all()
@@ -233,6 +234,7 @@ def store_login_processing(request):
         c = "Sorry login failed!"
         return HttpResponse(c)   
 
+@login_required
 def store_home(request):
     store_id = request.session['store_id']
     store = Store.objects.get(id = store_id)
@@ -246,6 +248,7 @@ def store_home(request):
         c = "Closed"
     return render(request, 'tray/store_home.html',{'store': store, 'store_name':store_name, 'store_id':store_id, 'status':c, 'items':items})
 
+@login_required
 def store_billing(request):
     store_id = request.session['store_id']
     print("entering billing store id  = "+str(store_id))
@@ -255,6 +258,7 @@ def store_billing(request):
     context = {'store':store,'store_name':store_name, 'items': items}
     return render (request, 'tray/store_billing.html', context )
 
+@login_required
 def billing_item_price(request):
     item_name = request.GET['item_name']
     store_id = request.GET['store_id']
@@ -265,6 +269,7 @@ def billing_item_price(request):
         'item_price' : item_price,
     }
     return JsonResponse(data)
+
 
 def invoice_number_gen(store):
     last_bill = Bill.objects.filter(store = store).order_by('id').last()
@@ -278,10 +283,9 @@ def invoice_number_gen(store):
         new_invoice_no =  last_invoice_initials+ str(new_invoice_digits)
     else:
         new_invoice_no = store.invoice_code +'01'
-        
-        
     return (new_invoice_no) 
 
+@login_required
 def billing_invoice(request):
     store_id = request.session['store_id']
     store = Store.objects.get(id = store_id)
@@ -355,6 +359,7 @@ def billing_invoice(request):
     }
     return JsonResponse(data)
 
+@login_required
 def invoice_print(response):
     device = response.session['device']
     invoice_name = response.session['invoice_name']
@@ -369,12 +374,14 @@ def invoice_print(response):
         response['Content-Disposition'] = 'attachment; filename= "' + invoice_name + '"'
     return response
 
+@login_required
 def store_edit_details(request):
     store_id = request.session['store_id']
     store_object = Store.objects.get(id = store_id)
     college_object = store_object.college
     return render(request, 'tray/store_edit_details.html',{'store': store_object, 'college': college_object })
 
+@login_required
 def store_edit_details_post(request):
     if request.method == 'POST':
         store_id = request.session['store_id']
@@ -386,11 +393,12 @@ def store_edit_details_post(request):
         store_object.save()
     return redirect(store_home)
 
+@login_required
 def store_add_item(request):
     store_id = request.session['store_id']
     return render (request, 'tray/store_add_item.html',{'store_id': store_id})
     
-
+@login_required
 def store_add_item_save(request):
     if request.method == 'POST':
         store_id = request.session['store_id']
@@ -402,6 +410,7 @@ def store_add_item_save(request):
         new_item.save()
     return redirect(store_home)
 
+@login_required
 def edit_items_post(request):
     if request.method == 'POST':
        item_id = request.POST['item_id']
@@ -410,12 +419,14 @@ def edit_items_post(request):
        request.session['item_id'] = item_id
        return redirect (edit_items)
 
+@login_required
 def edit_items(request):
     store_id = request.session['store_id']
     item_id = request.session['item_id']
     item = Item.objects.get(id = item_id)
     return render(request, 'tray/edit_store_items.html', {'item': item, 'store_id': store_id} )
 
+@login_required
 def edit_item_save(request):
     if request.method == 'POST':
         item_id = request.POST['item_id']
@@ -433,6 +444,7 @@ def store_logout(request):
     logout(request)
     return redirect('entry')
 
+@login_required
 def store_order_list(request):
     store_id = request.session['store_id']
     store_object = Store.objects.get(id = store_id)
@@ -448,12 +460,13 @@ def store_order_list(request):
         month_total = month_total + total 
     return render(request, 'tray/store_order_list.html',{'orders': sorted_orders, 'current_month': current_month, 'month_total': month_total}) 
 
+@login_required
 def store_item_pickup(request):
     store_id = request.session['store_id']
     request.session['store_id'] = store_id 
     return render(request, 'tray/store_item_pickup.html')
 
-
+@login_required
 def store_item_pickup_validate(request):
     otp_or_card = request.GET['otp_or_card']
     print('otp or card: '+str(type(otp_or_card)))
@@ -487,12 +500,14 @@ def store_item_pickup_validate(request):
         }
         return JsonResponse(data)
 
+@login_required
 def user_pickup_orders_post(request):
     if request.method == 'POST':
         otp_or_card = request.POST['otp_or_card']
         request.session['otp_or_card'] = otp_or_card
         return redirect(user_pickup_orders)
 
+@login_required
 def user_pickup_orders(request):
     store_id = request.session['store_id']
     otp_or_card = request.session['otp_or_card']
@@ -509,7 +524,7 @@ def user_pickup_orders(request):
         print(str(orders))
         return render(request,'tray/user_pickup_orders.html', {'orders': orders} )
         
-
+@login_required
 def store_bills(request):
     store_id = request.session['store_id']
     store_object = Store.objects.get(id = store_id)
@@ -521,6 +536,7 @@ def qr_code(request):
     return render(request, 'tray/qr_code.html')
 
 #college views__________________________________________________________________________________
+
 def register_college(request):
     return render(request, 'tray/register_college.html')
 
@@ -566,6 +582,7 @@ def college_login_verify(request):
         c = "Sorry login failed!"
         return HttpResponse(c)   
 
+@login_required
 def college_home(request):
     institute_id = request.session['institute_id']
     college = Institute.objects.get(id = institute_id)
@@ -574,15 +591,18 @@ def college_home(request):
 
     return render(request,'tray/college_home.html', {'college': college, 'stores':stores})
 
+@login_required
 def college_bulk_recharge(request):
     return render(request, 'tray/college_bulk_recharge.html' )
 
+@login_required
 def college_store_order_list_post(request):
     if request.method == 'POST':
         store_id = request.POST['store_id']
         request.session['store_id'] = store_id
         return redirect(college_store_order_list)
 
+@login_required
 def college_store_order_list(request):
     store_id =  request.session['store_id']
     store_object = Store.objects.get(id = store_id)
@@ -598,9 +618,11 @@ def college_store_order_list(request):
         month_total = month_total + total 
     return render(request, 'tray/college_store_order_list.html', {'orders': sorted_orders,'store': store_object, 'current_month': current_month, 'month_total': month_total })
 
+@login_required
 def college_break_edit(request):
     return render(request, 'tray/college_break_edit.html')
 
+@login_required
 def college_break_edit_post(request):
     if request.method == 'POST':
         first_break = request.POST['first_break']
@@ -615,9 +637,11 @@ def college_break_edit_post(request):
         break_time_object.save()
         return redirect (college_home)
 
+@login_required
 def college_recharge(request):
     return render(request, 'tray/college_recharge.html')
 
+@login_required
 def college_recharge_post(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -627,9 +651,11 @@ def college_recharge_post(request):
         student_balance = student_object.balance
     return render(request, 'tray/college_recharge_details.html', {'email':email,'student_balance':student_balance, 'student_name':student_name})
 
+@login_required
 def college_recharge_details(request):
     return render(request, 'tray/college_recharge_details.html')
 
+@login_required
 def validate_recharge(request):
     email = request.GET['email']
     print(email)
@@ -663,7 +689,7 @@ def validate_recharge(request):
         return JsonResponse(data)
     
 
-
+@login_required
 def college_recharge_final(request):
     email = request.GET['email']
     amount = request.GET['amount']
@@ -685,6 +711,8 @@ def college_logout(request):
     return redirect('entry')
 
 # ajaxify with jquery views____________________________________________________________________
+
+@login_required
 def validate_store_item(request):
     item_name = request.GET['item_name']
     data = {
@@ -692,6 +720,7 @@ def validate_store_item(request):
     }
     return JsonResponse(data)
 
+@login_required
 def validate_store_edit_item(request):
     item_name = request.GET['item_name']
     item_id = request.GET['item_id']
@@ -700,9 +729,11 @@ def validate_store_edit_item(request):
     }
     return JsonResponse(data)
 
-
+@login_required
 def add_new_store_item(request):
     return 
+
+@login_required
 def update_store_status(request):
     store_open = request.GET['open']
     store_id = request.GET['store_id']
@@ -725,7 +756,7 @@ def update_store_status(request):
 
         return JsonResponse(data)
 
-
+@login_required
 def update_item_availability(request):
     if request.GET['status'] == 'availability_change' :
         availability = request.GET['availability']
@@ -794,6 +825,7 @@ def validate_entry(request):
             }
         return JsonResponse(data)
 
+@login_required
 def validate_order_cancel(request):
     order_id = request.GET['order_id']
     order = Order.objects.get(id = order_id)
@@ -854,6 +886,7 @@ def validate_order_cancel(request):
                 }
             return JsonResponse(data)
 
+@login_required
 def cart(request):
     #block that adds items to cart
     student = False
@@ -995,6 +1028,7 @@ def cart(request):
             }
         return JsonResponse(data)
 
+
 def purchase_id_generator(store):
             last_bill = Order.objects.filter(store = store).order_by('id').last()
             if last_bill:
@@ -1008,6 +1042,7 @@ def purchase_id_generator(store):
 def paytm(request):
     return render(request,'paytm_checkout.html')
 
+@login_required
 def pickup_order(request):
     order_id = request.GET['order_id']
     order = Order.objects.get(id = order_id)
@@ -1017,6 +1052,7 @@ def pickup_order(request):
         'deliver' : 'true'
     }
     return JsonResponse(data)
+
 
 def store_login_validate(request):
     email = request.GET['email']
@@ -1074,6 +1110,7 @@ def college_login_validate(request):
         }
         return JsonResponse(data)
 
+
 def store_register_validate(request):
     store_name = request.GET['store_name']
     college_id = request.GET['college_id']
@@ -1085,6 +1122,7 @@ def store_register_validate(request):
     }
     return JsonResponse(data)
 
+@login_required
 def store_edit_validate(request):
     store_name = request.GET['store_name']
     college_id = request.GET['college_id']
@@ -1120,6 +1158,7 @@ def student_register_validate(request):
     print('email_taken'+str(data['email_taken']))
     return JsonResponse(data)
 
+@login_required
 def student_pin_edit_validate(request):
     password = request.GET['password']
     student_id = request.GET['student_id']
@@ -1129,6 +1168,7 @@ def student_pin_edit_validate(request):
          }
     return JsonResponse(data)
 
+@login_required
 def bulk_recharge_submit(request):
     mails = json.loads(request.GET['mails'])
     recharge_amount = request.GET['recharge_amount']
@@ -1146,3 +1186,19 @@ def bulk_recharge_submit(request):
         'added': 'success'
     }
     return JsonResponse(data)
+
+@login_required
+def home_store_status_update(request):
+    store_id = request.GET['store_id']
+    store = Store.objects.get(id = store_id )
+    if store.store_status:
+        data = {
+        'store_status' : 'open'
+        }
+        return JsonResponse(data)
+    else:
+        data = {
+        'store_status' : 'closed'
+        }
+        return JsonResponse(data)
+    

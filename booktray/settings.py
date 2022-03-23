@@ -48,6 +48,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'sangeeth123sj@gmail.com'
 EMAIL_HOST_PASSWORD = 'gayhwgwsrdwryopf'
 
+LOGIN_URL = 'entry'
 
 INSTALLED_APPS = [
     'users',
