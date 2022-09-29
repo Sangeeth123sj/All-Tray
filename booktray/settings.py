@@ -58,7 +58,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms'
+    'crispy_forms',
+    'django_extensions',
+    "graphene_django",
 ]
 
 MIDDLEWARE = [
@@ -229,3 +231,14 @@ CACHES = get_cache()
 
 MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
+
+GRAPHENE = {
+    "SCHEMA": "booktray.schema.schema"
+}
+
