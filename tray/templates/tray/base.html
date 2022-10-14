@@ -56,7 +56,6 @@
 
 
 
-
 /* CSS green button  */
 .green-button {
   background-color: initial;
@@ -158,6 +157,11 @@ font-family: Cambria, Georgia, serif;
   padding-left: 35.45%;*/
   }
 
+  .bg_color{
+    background: rgb(58,175,160);
+background: linear-gradient(180deg, rgba(58,175,160,1) 0%, rgba(53,157,147,1) 10%, rgba(50,147,139,1) 18%, rgba(47,139,133,1) 25%, rgba(45,131,126,1) 32%, rgba(43,122,120,1) 44%);
+  }
+
   body {
     background-size: cover;
     background-repeat: no-repeat;
@@ -167,7 +171,7 @@ font-family: Cambria, Georgia, serif;
 
   .bg_infinite { 
 	/* The image used */
-	background-image: url('{% static "tray/images/roadmin.jpg" %}');
+	
   background-attachment: fixed;
   /*url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");*/
 	/* Full height */
@@ -176,7 +180,7 @@ font-family: Cambria, Georgia, serif;
 	/* Center and scale the image nicely */
 	background-position: center;
 	background-repeat: no-repeat;
-  background-color: lightblue;
+  background-color: #4A66163;
   height: cover;
   }
 
@@ -197,7 +201,7 @@ font-family: Cambria, Georgia, serif;
   }
 
   .frostprimary{
-	background-color:rgba(243, 245, 247, 0.788);
+	background-color: #88bdbc;
   border-radius:3%;
 	width: fit-content;
   padding-bottom:min(50px, 5%);
@@ -262,11 +266,13 @@ font-family: Cambria, Georgia, serif;
         background-position: center;
         background-repeat: no-repeat;
     }
-    .heading{
-        font-family: Helvetica, sans-serif;
-        font-size: 54px;
-        color: #464975;
-    }
+    h1 {
+      font-family: Arial, 
+          Helvetica, sans-serif;
+      background: white;
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+  }
     #store_button { 
         background-color: rgba(255,255, 255, 1);
           /* #ebf2f5; */
@@ -423,12 +429,12 @@ div.left {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.5/dist/sweetalert2.all.min.js" integrity="sha256-sq9BgeqJAlCLfjfAO+2diFGt5O8aIYNrds+yhlpFnvg=" crossorigin="anonymous"></script>
 
 </head>
-<body>
+<body class="bg_color">
 
 
 <!--new navbar source-->
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-dark" style="background-color: #17252a;">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
   </li>
@@ -454,15 +460,16 @@ div.left {
 
 {% endblock %}
   {% block heading %}
-    <div class="heading" >
+    
       <center>
-      <strong>All Tray</strong>
+      <h1>All Tray</h1>
       </center>
       <br/>
-    </div>
+
   {% endblock %}
 
 <center>
+
   {% block head %}
 
   {% endblock %}
