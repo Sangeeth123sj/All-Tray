@@ -25,7 +25,7 @@ SECRET_KEY = "-lo^_fjlxwcn*!d03^fy!-tb%c)4_-wfrp9mf8=p70yb#h$mup"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [*]
 
 # authentication backends
 AUTHENTICATION_BACKENDS = [
