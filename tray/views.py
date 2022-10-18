@@ -1,11 +1,9 @@
 # from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from payments.models import Transaction
-from payments.PaytmChecksum import generate_checksum, verify_checksum
+
 
 from .models import (
     Bill,
