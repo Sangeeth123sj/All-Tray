@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tray', '0002_auto_20220303_1525'),
+        ("tray", "0002_auto_20220303_1525"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='institute',
-            name='plan',
-            field=models.CharField(choices=[('free', 'free'), ('standard', 'standard')], default='free', max_length=200),
+            model_name="institute",
+            name="plan",
+            field=models.CharField(
+                choices=[("free", "free"), ("standard", "standard")],
+                default="free",
+                max_length=200,
+            ),
         ),
     ]

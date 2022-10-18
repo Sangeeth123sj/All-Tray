@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tray', '0004_bulk_recharge_mails'),
+        ("tray", "0004_bulk_recharge_mails"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Bulk_recharge_mails',
-            new_name='BulkRechargeMails',
+            old_name="Bulk_recharge_mails",
+            new_name="BulkRechargeMails",
         ),
     ]

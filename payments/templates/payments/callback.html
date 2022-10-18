@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% extends "tray/base.html" %}
+
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'your_orders' %}">Your Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">Recharge</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
+      </li>
+      
+    </ul>
+    
+  </div>
+</nav>
+{% endblock %}
+
+{% block title%} Response Details   {% endblock %}
+
+{% block content %}
+
+    <h2>Response Details: </h2>                    <br>
+    {% comment %} <h3> Checksum Verification: {{ message }} </h3> <br> {% endcomment %}
+    {% comment %} MID: {{ MID }}                                  <br> {% endcomment %}
+    {% comment %} TXNID: {{ TXNID }}                              <br> {% endcomment %}
+    ORDERID: {{ ORDERID }}                          <br>
+    BANKTXNID: {{ BANKTXNID }}                      <br>
+    TXNAMOUNT: {{ TXNAMOUNT }}                      <br>
+    {% comment %} CURRENCY: {{ CURRENCY }}                        <br> {% endcomment %}
+    <h3> STATUS: {{ STATUS }} </h3>                 <br>
+    RESPCODE: {{ RESPCODE }}                        <br>
+    RESPONSE: {{ RESPMSG }}                          <br>
+    TXNDATE: {{ TXNDATE }}                          <br>
+    {% comment %} GATEWAYNAME: {{ GATEWAYNAME }}                  <br> {% endcomment %}
+    BANKNAME: {{ BANKNAME }}                        <br>
+    {% comment %} BIN_NAME: {{ BIN_NAME }}                        <br> {% endcomment %}
+    PAYMENTMODE: {{ PAYMENTMODE }}                  <br>
+    {% comment %} CHECKSUMHASH: <br/> {{ CHECKSUMHASH }} {% endcomment %}
+
+
+{% endblock %}

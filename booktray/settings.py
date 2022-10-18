@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "django_extensions",
     # "graphene_django",
+    "payments",
 ]
 
 MIDDLEWARE = [
@@ -239,3 +240,13 @@ GRAPH_MODELS = {
 }
 
 GRAPHENE = {"SCHEMA": "booktray.schema.schema"}
+
+PAYTM_MERCHANT_ID = 'AillzC86868525023191'
+
+PAYTM_SECRET_KEY = 'GDMJNBUUMh&#zn9K'
+
+PAYTM_WEBSITE = 'DEFAULT'
+
+PAYTM_CHANNEL_ID = 'WEB'
+
+PAYTM_INDUSTRY_TYPE_ID = 'Retail'
