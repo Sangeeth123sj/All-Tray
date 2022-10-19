@@ -2,6 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Model
+import uuid
 
 User = get_user_model()
 import random
@@ -45,7 +46,7 @@ class Institute(models.Model):
     institute_balance = models.IntegerField(default=0)
     plan = models.CharField(max_length=200, choices=PLANS, default="free")
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="institute")
-
+    identification_token = models.UUIDField(default = uuid.uuid4)
     def __str__(self):
         return str(self.institute_name)
 
@@ -72,7 +73,7 @@ class Student(models.Model):
     pin_no = models.CharField(max_length=200, blank=True)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="student" )
-
+    identification_token = models.UUIDField(default = uuid.uuid4)
     def __str__(self):
         return (
             "Student: "

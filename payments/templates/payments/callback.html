@@ -56,4 +56,33 @@
     {% comment %} CHECKSUMHASH: <br/> {{ CHECKSUMHASH }} {% endcomment %}
 
 
+<script>
+    $(document).ready(function(){
+      alert("{{ RESPCODE }}")
+      amount = "{{ TXNAMOUNT }}"
+      cleaned_amount = amount.replace("&#x27;","")
+      if ('{{ RESPCODE }}' == "[&#x27;01&#x27;]"){
+        Swal.fire(
+          'Recharge Successful!',
+          '<p>the amount <strong>'+cleaned_amount+ '</strong> has been deposited in your institute account.<p>',
+          'success'
+          ).then(function() {
+            window.location.href = "/home";
+        });
+      }
+
+      else {
+        Swal.fire(
+          'Oops',
+          '<p>Recharge unsuccessful please try again.<br> if problem persists contact support.<p>',
+          'error'
+          ).then(function() {
+            window.location.href = "/home";
+        });
+      }
+
+
+    });
+</script>
+
 {% endblock %}
