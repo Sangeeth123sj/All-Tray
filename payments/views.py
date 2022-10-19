@@ -47,7 +47,7 @@ def initiate_payment(request):
         # ('EMAIL', request.user.email),
         # ('MOBILE_N0', '9911223388'),
         ('INDUSTRY_TYPE_ID', institute_merchant_creds.paytm_industry_type_id),
-        ('CALLBACK_URL', 'http://127.0.0.1:8000/callback/'+ str(institute.identification_token)+ "/"+ str(student.identification_token)),
+        ('CALLBACK_URL', 'https://sangeethjoseph.pythonanywhere.com/callback/'+ str(institute.identification_token)+ "/"+ str(student.identification_token)),
         # ('PAYMENT_MODE_ONLY', 'NO'),
     )
 
