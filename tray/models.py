@@ -38,13 +38,13 @@ SEMESTERS = (
     ("semester 8", "semester 8"),
 )
 
-PLANS = (("free", "free"), ("standard", "standard"))
+PLANS = (("basic", "basic"), ("standard", "standard"))
 
 
 class Institute(models.Model):
     institute_name = models.CharField(max_length=200)
     institute_balance = models.IntegerField(default=0)
-    plan = models.CharField(max_length=200, choices=PLANS, default="free")
+    plan = models.CharField(max_length=200, choices=PLANS, default="basic")
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="institute")
     identification_token = models.UUIDField(default = uuid.uuid4)
     def __str__(self):

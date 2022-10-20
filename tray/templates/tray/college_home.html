@@ -51,8 +51,13 @@
             <h3>Welcome {{college.institute_name}}</h3>
 
             <br/>
-            
-            
+
+            {% if not merchant_credentials %}
+            <a href="{% url 'home' %}" class="blue-button">Setup online payments</a>
+            <br/><br/>
+            {% endif %}
+
+
             <form action="/college_store_order_list_post/" method="POST">
                 {% csrf_token %}
                 <div class="container">

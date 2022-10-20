@@ -16,6 +16,7 @@ from .models import (
     Store,
     Student,
     User,
+    InstituteMerchantCredentail,
 )
 
 User = get_user_model()
@@ -639,11 +640,13 @@ def register_college_success(request):
         username = request.POST["username"]
         email = request.POST["email"]
         password = request.POST["password"]
+        plan = request.POST.get("plan_type",None)
         user = User.objects.create_user(email, password)
         user.save()
         institute = Institute(
             institute_name=college,
             user=user,
+            plan= plan,
         )
         institute.save()
         break_time = Break(
@@ -687,11 +690,16 @@ def college_login_verify(request):
 def college_home(request):
     institute_id = request.session["institute_id"]
     college = Institute.objects.get(id=institute_id)
+    try:
+        merchant_credentials = InstituteMerchantCredentail.objects.get(college=college)
+    except InstituteMerchantCredentail.DoesNotExist:
+        merchant_credentials = None
+    print("mc:",merchant_credentials)
     request.session["college_id"] = college.id
     stores = Store.objects.filter(college=college)
 
     return render(
-        request, "tray/college_home.html", {"college": college, "stores": stores}
+        request, "tray/college_home.html", {"college": college, "stores": stores, "merchant_credentials": merchant_credentials}
     )
 
 

@@ -53,6 +53,19 @@
                     return false;
                 }
             }
+    
+    function displayRadioValue() {
+        var ele = document.getElementsByName('plan_type');
+            
+        for(i = 0; i < ele.length; i++) {
+            if(ele[i].checked){
+                alert("Plan: "+ele[i].value);
+                var plan = ele[i].value
+                return plan
+            }
+        }
+        return false;
+    }
 </script>
 
 <h4> <strong> Register Your Institute </strong></h4>
@@ -60,19 +73,33 @@
 <div class="form-group centered">
 <form action="/register_college_success/" name="form" method="POST" onsubmit="return validateForm()">
 {% csrf_token %}
-<p>Institute name</p>
+<h3>Institute name</h3>
 <input type="text" name="college_name" id="college_name" class="form-control"><br/><br/>
-<p>First Break</p>
+<h3>Plan type</h3>
+    <div class="form-check">
+        <input class="form-check-input" value="basic" type="radio" name="plan_type" id="flexRadioDefault1" checked>
+        <label class="form-check-label" for="flexRadioDefault1">
+        Basic
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" value="standard" type="radio" name="plan_type" id="flexRadioDefault2">
+        <label class="form-check-label" for="flexRadioDefault2">
+        Standard
+        </label>
+    </div>
+<br/><br/>
+<h3>First Break</h3>
 <input type="time" name="first_break" id="first_break" class="form-control"><br/><br/>
-<p>Lunch break</p>
+<h3>Lunch break</h3>
 <input type="time" name="lunch_break" id="lunch_break" class="form-control"><br/><br/>
-<p>Last break</p>
+<h3>Last break</h3>
 <input type="time" name="last_break" id="last_break" class="form-control"><br/><br/>
-<p>username</p>
+<h3>username</h3>
 <input type="text" name="username" id="username" class="form-control"><br/><br/>
-<p>email id</p>
+<h3>email id</h3>
 <input type="email" name="email" id="email" class="form-control"><br/><br/>
-<p>password</p>
+<h3>password</h3>
 <input type="password" name="password" id="password" class="form-control"><br/><br/>
 <input type="button" id="submit_button" value="Submit" class="btn btn-success">
 </form>
@@ -132,7 +159,12 @@
             var email = $("#email").val();
             //console.log(email);
             var flag = checkemail(email);
+            var plan = displayRadioValue();
             console.log(flag);
+            if (plan == false){
+                alert("Please select a plan");
+                event.preventDefault();
+            }
             if (flag == false){
                 alert("Please enter a valid email");
                 event.preventDefault();
@@ -152,7 +184,7 @@
                             location.reload();
                             return false;
                         }
-                        else if (data.email_taken) {
+                        if (data.email_taken) {
                             alert("mail id already taken, try another mail id");
                             location.reload();
                             return false;
