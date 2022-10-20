@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "django_extensions",
     # "graphene_django",
     "payments",
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -162,9 +163,9 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 STATIC_URL = "/static/"
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "/var/www/static/"),)
 
-STATIC_ROOT = "/static/"
+STATIC_ROOT = "var/www/static/"
 
 
 SESSION_SAVE_EVERY_REQUEST = True
