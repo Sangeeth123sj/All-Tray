@@ -1084,6 +1084,7 @@ def cart(request):
         time = request.GET["time"]
         store_id = request.GET["store_id"]
         store = Store.objects.get(id=store_id)
+        institute = store.college
         student_id = request.GET["student_id"]
         total = request.GET["total"]
         # revenue = request.GET["revenue"]
@@ -1122,17 +1123,21 @@ def cart(request):
                     order_group=order_group,
                 )
                 order_group.save()
-                try:
-                    revenue = Revenue.objects.get(created_at__date=date.today(), student = student)
-                    revenue.total = revenue.total + order_group.order_group_total
-                    revenue.day_revenue = revenue.total * 0.01
-                    revenue.save()
-                    print("incrementing revenue", revenue.day_revenue)
-                except:
-                    day_order_groups_total = OrderGroup.objects.filter(created_at__date=date.today(),student=student).aggregate(Sum('order_group_total'))
-                    print("initial revenue total",day_order_groups_total)
-                    revenue = Revenue.objects.create(total=int(day_order_groups_total["order_group_total__sum"]), day_revenue= float(day_order_groups_total["order_group_total__sum"] *0.01), student = student)
-                    print("creating revenue value of the day", revenue.day_revenue)
+                free_trial_expiry_date = institute.created_at.date() + relativedelta(months=2)
+                if free_trial_expiry_date <= date.today():
+                    # conditional block to calculate revenue after free trial
+                    try:
+                        revenue = Revenue.objects.get(created_at__date=date.today(), student = student)
+                        revenue.total = revenue.total + order_group.order_group_total
+                        revenue.day_revenue = revenue.total * 0.01
+                        revenue.save()
+                        print("incrementing revenue", revenue.day_revenue)
+                    except:
+                        day_order_groups_total = OrderGroup.objects.filter(created_at__date=date.today(),student=student).aggregate(Sum('order_group_total'))
+                        print("initial revenue total",day_order_groups_total)
+                        revenue = Revenue.objects.create(total=int(day_order_groups_total["order_group_total__sum"]), day_revenue= float(day_order_groups_total["order_group_total__sum"] *0.01), student = student)
+                        print("creating revenue value of the day", revenue.day_revenue)
+                
                 # new_object = Bill(item=i['item'], price=i['price'], quantity=i['quantity'], invoice_no=new_invoice_no,invoice=file , store=store)
                 objects.append(new_object)
                 item = Item.objects.get(item=i["item"])
