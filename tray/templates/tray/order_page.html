@@ -127,32 +127,6 @@
     var buy_clicked = false;
     var order_list = [];
 
-//function to calculate commission on adding item
-    function alltray_revenue(total){
-        if ('{{college.plan}}'=='free'){
-            commission=0;
-        }
-        else if (total>0 && total<=10){
-            commission = 0.01 * total;
-        }
-        else if (total>10 && total<=50){
-            commission = 0.5;
-        }
-        else if (total>50 && total<=100){
-            commission = 1;
-        }
-        else if (total>100 && total<=400){
-            commission = 0.01 * total;
-        }
-        else if (total>=400){
-            commission = 4;
-        }
-        else{
-            commission = 0;
-        }
-
-        return commission;
-    };
 
 
             $("#add").click(function(event){
@@ -191,9 +165,9 @@
                                 $(this).next().next().next().text(cost);
                                 update_total();
                                 order_list_update(item,quantity,price,cost);
-                                var revenue = parseInt(alltray_revenue(total));
-                                var tray_revenue_display = "tray revenue: "+revenue;
-                                $("#tray_revenue").text(tray_revenue_display);
+                                //var revenue = parseInt(alltray_revenue(total));
+                                //var tray_revenue_display = "tray revenue: "+revenue;
+                                //$("#tray_revenue").text(tray_revenue_display);
                             }
                         
                         
@@ -222,27 +196,26 @@
                         dataType: 'json',
                         success: function (data){
                             if (data.added == 'success'){
-                                console.log("item add to cart success");
-                                var price = data.item_price;
-                                console.log("price is: "+price);
-                                console.log("price type: "+ typeof price);
-                                var cost = price * quantity;
-                                var item_row = '<tr id = '+data.cart_item_id+'> <td id="item">'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
-                                $("#cart_table").find('tbody').append(item_row );
-                                update_total();
-                                var revenue = parseInt(alltray_revenue(total));
-                                var tray_revenue_display = "tray revenue: "+revenue;
-                                $("#tray_revenue").text(tray_revenue_display);
-                                $("#total").text("Total: "+total);
-
                                 //adding order to list
      
                                 order_obj = {
                                     "item":item,
                                     "quantity":quantity,
-                                    "price":price,
+                                    "price":data.item_price,
                                 }
-                                order_list_push();
+                                item_id = order_list_push();
+                                console.log("item add to cart success");
+                                var price = data.item_price;
+                                console.log("price is: "+price);
+                                console.log("price type: "+ typeof price);
+                                var cost = price * quantity;
+                                var item_row = '<tr id='+item_id+'> <td id="item">'+item+'</td> <td>'+quantity+'</td> <td>'+ price +'</td> <td>'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
+                                $("#cart_table").find('tbody').append(item_row );
+                                update_total();
+                                //var revenue = parseInt(alltray_revenue(total));
+                                //var tray_revenue_display = "tray revenue: "+revenue;
+                                //$("#tray_revenue").text(tray_revenue_display);
+                                $("#total").text("Total: "+total);
                             
                             }
                             else if (data.added == 'failure'){
@@ -260,9 +233,11 @@
         function order_list_push()
         {
             order_list.push(order_obj);
+            index_of_added_item = order_list.findIndex(a => (a.item === item && a.quantity === a.quantity));
             for(let i in order_list){
-                console.log("item:"+i+" "+order_list[i].item+" quantity:"+order_list[i].quantity+ "price:"+order_list[i].price );
+                    console.log("__________________item:"+i+" "+order_list[i]["item"]+" quantity:"+order_list[i]["quantity"]+ "price:"+order_list[i]["price"] );
             }
+            return index_of_added_item
         }
 
         function order_list_update(item,quantity, price, cost){
@@ -313,23 +288,6 @@
                     update_total();
                     console.log("total after deleting item:"+total+"item_cost:"+item_cost );
                     $("#total").text("Total: "+total);
-                    var revenue = parseInt(alltray_revenue(total));
-                    tray_revenue_display = "tray revenue: "+revenue;
-                    $("#tray_revenue").text(tray_revenue_display);
-                    $.ajax({
-                        url: '/ajax/cart/',
-                        data: {
-                            'status' : 'delete_from_cart',
-                            'item_id' : delete_item_id
-                        },
-                        dataType: 'json',
-                        success: function (data){
-                            if (data.status == 'item_deleted'){
-                                //alert("Item deleted");
-                            }
-                        }
-
-                    });
 
 
                 }
@@ -359,8 +317,8 @@ function delete_from_order_list(item_name, item_cost)
                 var time = $("#pickup_time").val();
                 order_list_json = JSON.stringify(order_list);
                 console.log(order_list_json);
-                var revenue = parseInt(alltray_revenue(total));
-                console.log("revenue: "+revenue);
+                //var revenue = parseInt(alltray_revenue(total));
+                //console.log("revenue: "+revenue);
                 $.ajax({
                         url: '/ajax/cart/',
                         data: {
@@ -370,7 +328,7 @@ function delete_from_order_list(item_name, item_cost)
                             'total' : total,
                             'order_list_json' : order_list_json,
                             'time' : time,
-                            'revenue' : revenue,
+                            //'revenue' : revenue,
                         },
                         dataType: 'json',
                         success: function (data){

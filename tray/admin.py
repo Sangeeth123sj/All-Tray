@@ -21,6 +21,8 @@ from .models import (
     Store,
     Student,
     InstituteMerchantCredentail,
+    Revenue,
+    OrderGroup,
 )
 
 
@@ -33,6 +35,7 @@ admin.site.register(Order)
 admin.site.register(Break)
 admin.site.register(CartItem)
 admin.site.register(Bill)
+admin.site.register(OrderGroup)
 
 admin.site.register(BulkRechargeMail)
 # Register your models here for admin
@@ -41,6 +44,11 @@ class UserAdmin(ImportExportMixin, admin.ModelAdmin):
     search_fields = ("email",)
 
 admin.site.register(User,UserAdmin)
+
+class RevenueAdmin(ImportExportMixin, admin.ModelAdmin):
+    search_fields = ("student",)
+
+admin.site.register(Revenue,RevenueAdmin)
 
 
 class InstituteAdmin(ImportExportMixin, admin.ModelAdmin):

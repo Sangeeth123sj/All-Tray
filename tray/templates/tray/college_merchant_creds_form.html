@@ -1,0 +1,96 @@
+{% extends "tray/base.html" %}
+
+{% block title %} Add Paytm credentials{% endblock %}
+
+{% block background %}
+<div class="bg_infinite">
+{% endblock %}
+
+{% block content %}
+<center>
+<script>
+    function validateForm() {
+                var paytm_merchant_id = document.forms["form"]["paytm_merchant_id"].value;
+                var paytm_secret_key = document.forms["form"]["paytm_secret_key"].value;
+                var paytm_website = document.forms["form"]["paytm_website"].value;
+                var paytm_channel_id = document.forms["form"]["paytm_channel_id"].value;
+                var paytm_industry_type = document.forms["form"]["paytm_industry_type"].value;
+
+                if (paytm_merchant_id == "") {
+                    document.getElementById("paytm_merchant_id").style.borderColor = "red";
+                    alert("Paytm merchant id name must be filled out");
+                    return false;
+                }
+                if (paytm_secret_key == "") {
+                    document.getElementById("paytm_secret_key").style.borderColor = "red";
+                    alert("Paytm secret key must be filled out");
+                    return false;
+                }
+                if (paytm_website == "") {
+                    document.getElementById("paytm_website").style.borderColor = "red";
+                    alert("Paytm website type time must be filled out");
+                    return false;
+                }
+                if (paytm_channel_id == "") {
+                    document.getElementById("paytm_channel_id").style.borderColor = "red";
+                    alert("Paytm channel id break time must be filled out");
+                    return false;
+                }
+                if (paytm_industry_type == "") {
+                    document.getElementById("paytm_industry_type").style.borderColor = "red";
+                    alert("Paytm industry type name must be filled out");
+                    return false;
+                }
+
+            }
+    
+ 
+</script>
+
+<h4> <strong> Paytm credentails page </strong></h4>
+<br/>
+{% if error %} <strong style="color:red">something went wrong please contact support</strong> {% endif %}
+<h4>please visit and signup with <a href="https://business.paytm.com/payment-gateway-campaign1?utm_source=Google&utm_medium=cpc&utm_campaign=Google_Sign_Up_sitelink&redirectUrl=instant-onboard&gclid=Cj0KCQjwhsmaBhCvARIsAIbEbH6J0lpyFYmqbcKMDWj8LKfGoZvW7FyTFpAqW9jvAkcw_qk37h3bINQaAgxNEALw_wcB" target="_blank" rel="noreferrer noopener">paytm payment gateway</a> <br/>and fill up the credentials from paytm account in this page.</h4><br/>
+<div class="form-group centered">
+<form action="/college_merchant_creds_form/" name="form" method="POST" onsubmit="return validateForm()">
+{% csrf_token %}
+<h3>Paytm merchant id</h3>
+<input type="text" name="paytm_merchant_id" id="paytm_merchant_id" class="form-control"><br/><br/>
+
+<h3>Paytm secret key</h3>
+<input type="text" name="paytm_secret_key" id="paytm_secret_key" class="form-control"><br/><br/>
+
+<h3>Paytm website</h3>
+<input type="text" name="paytm_website" id="paytm_website" class="form-control"><br/><br/>
+
+<h3>Paytm channel id</h3>
+<input type="text" name="paytm_channel_id" id="paytm_channel_id" class="form-control"><br/><br/>
+
+<h3>Paytm industry type id</h3>
+<input type="text" name="paytm_industry_type" id="paytm_industry_type" class="form-control"><br/><br/>
+
+<input type="button" id="submit_button" class="btn btn-success" value="Submit" >
+{% comment %} <button type="submit" class="btn btn-success" value="Submit" onclick=message() >Submit</button> {% endcomment %}
+</form>
+</div>
+<script>
+    $(document).ready(function(){
+        $("#submit_button").click(function (event) {
+            var paytm_merchant_id = $("#paytm_merchant_id").val();
+            var paytm_secret_key = $("#paytm_secret_key").val();
+            var paytm_website = $("#paytm_website").val();
+            var paytm_channel_id = $("#paytm_channel_id").val();
+            var paytm_industry_type = $("#paytm_industry_type").val();    
+            //submit the form        
+            $("form").submit();
+        });
+       
+});
+    
+    
+    
+</script>
+
+
+</center>
+{% endblock %}

@@ -31,11 +31,9 @@ def initiate_payment(request):
     transaction.save()
     try:
         institute_merchant_creds = InstituteMerchantCredentail.objects.get(college=institute)
-        # request.session['institute_merchant_creds_paytm_secret_key'] = institute_merchant_creds.paytm_secret_key
     except:
         return render(request, 'payments/pay.html', context={'error': 'College has not setup online payments'})
     
-    # settings.PAYTM_SECRET_KEY
     merchant_key = institute_merchant_creds.paytm_secret_key
     params = (
         ('MID', institute_merchant_creds.paytm_merchant_id),
@@ -46,8 +44,8 @@ def initiate_payment(request):
         ('WEBSITE', institute_merchant_creds.paytm_website),
         # ('EMAIL', request.user.email),
         # ('MOBILE_N0', '9911223388'),
-        ('INDUSTRY_TYPE_ID', institute_merchant_creds.paytm_industry_type_id),
-        ('CALLBACK_URL', 'https://sangeethjoseph.pythonanywhere.com/callback/'+ str(institute.identification_token)+ "/"+ str(student.identification_token)),
+        ('INDUSTRY_TYPE_ID', institute_merchant_creds.paytm_industry_type),
+        ('CALLBACK_URL', 'http://127.0.0.1:8000/callback/'+ str(institute.identification_token)+ "/"+ str(student.identification_token)),
         # ('PAYMENT_MODE_ONLY', 'NO'),
     )
 
@@ -65,15 +63,18 @@ def initiate_payment(request):
 
 
 @csrf_exempt
-def callback(request,merchant_key,student_key):
+def callback(request,merchant_token,student_token):
     if request.method == 'POST':
-        merchant_key_decoded = uuid.UUID(merchant_key).hex
-        student_key_decoded = uuid.UUID(student_key).hex
-        print("secret key",merchant_key)
-        print("secret key decoded",merchant_key_decoded)
-        institute = Institute.objects.get(identification_token=merchant_key_decoded)
+        merchant_token_decoded = uuid.UUID(merchant_token).hex
+        student_token_decoded = uuid.UUID(student_token).hex
+        print("secret key",merchant_token)
+        print("secret key decoded",merchant_token_decoded)
+        institute = Institute.objects.get(identification_token=merchant_token_decoded)
+        institute.identification_token = None
+        institute.save()
         institute_merchant_creds = InstituteMerchantCredentail.objects.get(college=institute)
-        student = Student.objects.get(identification_token=student_key_decoded)
+        student = Student.objects.get(identification_token=student_token_decoded)
+        student.identification_token = None
         paytm_checksum = ''
         print(request.body)
         print(request.POST)
@@ -108,7 +109,7 @@ def callback(request,merchant_key,student_key):
         print(received_data.get('RESPCODE'))
         if received_data.get('RESPCODE')[0] == '01':
             student.balance += int(float(received_data.get("TXNAMOUNT")[0]))
-            student.save()
+        student.save()
         return render(request, 'payments/callback.html', context=received_data)
 
 

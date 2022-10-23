@@ -1,9 +1,13 @@
 # from django.contrib.auth.models import User
+from logging import exception
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-
+from datetime import time
+import time
+from dateutil.relativedelta import relativedelta
+from django.db.models import Sum
 
 from .models import (
     Bill,
@@ -17,6 +21,8 @@ from .models import (
     Student,
     User,
     InstituteMerchantCredentail,
+    OrderGroup,
+    Revenue,
 )
 
 User = get_user_model()
@@ -179,10 +185,11 @@ def order_page(request):
     college = student.college
     store = Store.objects.get(id=store_id)
     items = store.item_set.filter(available=True)
+    # college_free_trial_expiry_date_in_milliseconds = int(time.mktime((college.created_at+relativedelta(months=2)).timetuple())) * 1000
     return render(
         request,
         "tray/order_page.html",
-        {"student": student, "store": store, "college": college, "items": items},
+        {"student": student, "store": store, "college": college, "items": items,}
     )
 
 
@@ -709,6 +716,37 @@ def college_bulk_recharge(request):
 
 
 @login_required
+def college_merchant_creds_form(request):
+    if request.method == "GET":
+        return render(request, "tray/college_merchant_creds_form.html")
+    if request.method == "POST":
+        paytm_merchant_id = request.POST.get("paytm_merchant_id")
+        paytm_secret_key = request.POST.get("paytm_secret_key")
+        paytm_website = request.POST.get("paytm_website")
+        paytm_channel_id = request.POST.get("paytm_channel_id")
+        paytm_industry_type = request.POST.get("paytm_industry_type")
+        
+        college_id = request.session["college_id"]
+        college = Institute.objects.get(id= college_id)
+        try:
+            InstituteMerchantCredentail.objects.update_or_create(
+            college=college,
+            defaults={
+                "paytm_merchant_id" : paytm_merchant_id,
+                "paytm_secret_key" : paytm_secret_key,
+                "paytm_website" : paytm_website,
+                "paytm_channel_id" : paytm_channel_id,
+                "paytm_industry_type" : paytm_industry_type
+            }
+            )
+            return redirect(college_home)
+        except:
+            print(exception)
+            print("entered except")
+            return render(request,"tray/college_merchant_creds_form.html", context={'error': 'Wrong Credentials please contact support'})
+
+
+@login_required
 def college_store_order_list_post(request):
     if request.method == "POST":
         store_id = request.POST["store_id"]
@@ -727,9 +765,12 @@ def college_store_order_list(request):
     # month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
     month_orders = orders.filter(created_at__month=current_month_number)
     month_total = 0
+    
+    revenue_month_total = 0
     for order in month_orders:
         total = order.cost * order.quantity
         month_total = month_total + total
+
     return render(
         request,
         "tray/college_store_order_list.html",
@@ -1029,7 +1070,6 @@ def cart(request):
             data = {
                 "added": "success",
                 "item_price": price,
-                #'time' : time,
             }
             return JsonResponse(data)
         else:
@@ -1046,7 +1086,7 @@ def cart(request):
         store = Store.objects.get(id=store_id)
         student_id = request.GET["student_id"]
         total = request.GET["total"]
-        revenue = request.GET["revenue"]
+        # revenue = request.GET["revenue"]
         student = Student.objects.get(id=student_id)
         # cart_items = CartItem.objects.filter(student = student)
         if int(student.balance) > int(total):
@@ -1066,18 +1106,33 @@ def cart(request):
             objects = []
             new_object = []
             purchase_id = purchase_id_generator(store)
+            # creating order group
+            order_group = OrderGroup(store = store, student = student, otp = otp, order_group_total=0)
             for i in load:
+                order_group.order_group_total += (i["price"]*i["quantity"])
                 new_object = Order(
                     item=i["item"],
-                    cost=i["price"],
+                    cost=i["price"]*i["quantity"],
                     quantity=i["quantity"],
                     pickup_time=time,
                     otp=otp,
                     store=store,
                     student=student,
-                    revenue=revenue,
                     purchase_id=purchase_id,
+                    order_group=order_group,
                 )
+                order_group.save()
+                try:
+                    revenue = Revenue.objects.get(created_at__date=date.today(), student = student)
+                    revenue.total = revenue.total + order_group.order_group_total
+                    revenue.day_revenue = revenue.total * 0.01
+                    revenue.save()
+                    print("incrementing revenue", revenue.day_revenue)
+                except:
+                    day_order_groups_total = OrderGroup.objects.filter(created_at__date=date.today(),student=student).aggregate(Sum('order_group_total'))
+                    print("initial revenue total",day_order_groups_total)
+                    revenue = Revenue.objects.create(total=int(day_order_groups_total["order_group_total__sum"]), day_revenue= float(day_order_groups_total["order_group_total__sum"] *0.01), student = student)
+                    print("creating revenue value of the day", revenue.day_revenue)
                 # new_object = Bill(item=i['item'], price=i['price'], quantity=i['quantity'], invoice_no=new_invoice_no,invoice=file , store=store)
                 objects.append(new_object)
                 item = Item.objects.get(item=i["item"])
@@ -1100,28 +1155,6 @@ def cart(request):
             # saving orders to db
             Order.objects.bulk_create(objects)
 
-            # for cart_item in cart_items :
-            #    item = Item.objects.get(item = cart_item.item)
-            #    #initializing stock of item variable
-            #    item_stock = item.stock
-            #    #saving the order from cart
-            #    order = Order(item = cart_item.item, quantity = cart_item.quantity, cost = cart_item.cost, pickup_time = cart_item.pickup_time, otp=otp, store = cart_item.store, student = cart_item.student )
-            #    order.save()
-            # updating stock at store
-            #    item.stock = int(item_stock) - int(cart_item.quantity)
-            # unticking item availability to customers on reaching low stock at store
-            #    if item.stock < 5:
-            #        item.available = False
-            #    item.save()
-            # updating store balance
-            # store.store_balance = store.store_balance + int(cart_item.cost)
-            # store.save()
-            # updating student balance
-            # student.balance = student.balance - int(cart_item.cost)
-            # student.save()
-            # deleting item from cart
-            # cart_item.delete()
-
             data = {
                 "status": "order_placed",
                 "cart_items": False,
@@ -1136,8 +1169,8 @@ def cart(request):
 
     if request.GET["status"] == "delete_from_cart":
         item_id = request.GET["item_id"]
-        cart_item = CartItem.objects.get(id=item_id)
-        cart_item.delete()
+        # cart_item = CartItem.objects.get(id=item_id)
+        # cart_item.delete()
         data = {"status": "item_deleted"}
         return JsonResponse(data)
 

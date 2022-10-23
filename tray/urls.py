@@ -12,6 +12,7 @@ urlpatterns = [
     path("", views.entry, name="entry"),
     path("home_post/", views.home_post, name="home_post"),
     path("home/", views.home, name="home"),
+    path("college_merchant_creds_form/", views.college_merchant_creds_form, name="college_merchant_creds_form"),
     path("your_orders_post/", views.your_orders_post, name="your_orders_post"),
     path("your_orders/", views.your_orders, name="your_orders"),
     path("order_page_post/", views.order_page_post, name="order_page_post"),
@@ -58,6 +59,7 @@ urlpatterns = [
         "college_login_verify/", views.college_login_verify, name="college_login_verify"
     ),
     path("college_home/", views.college_home, name="college_home"),
+    # path("college_merchant_creds_post/", views.college_merchant_creds_post, name="college_merchant_creds_post"),
     path(
         "college_bulk_recharge/",
         views.college_bulk_recharge,

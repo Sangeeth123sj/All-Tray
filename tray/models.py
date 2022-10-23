@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Model
 import uuid
-
 User = get_user_model()
 import random
 import string
@@ -46,7 +45,8 @@ class Institute(models.Model):
     institute_balance = models.IntegerField(default=0)
     plan = models.CharField(max_length=200, choices=PLANS, default="basic")
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="institute")
-    identification_token = models.UUIDField(default = uuid.uuid4)
+    identification_token = models.UUIDField(default=None, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     def __str__(self):
         return str(self.institute_name)
 
@@ -56,9 +56,10 @@ class InstituteMerchantCredentail(models.Model):
     paytm_secret_key = models.CharField(max_length=200)
     paytm_website = models.CharField(max_length=200)
     paytm_channel_id = models.CharField(max_length=200)
-    paytm_industry_type_id = models.CharField(max_length=200)
+    paytm_industry_type = models.CharField(max_length=200)
     college = models.OneToOneField(Institute, on_delete=models.CASCADE, related_name="merchant_creds")
-
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
+        
     def __str__(self):
         return "Merchant creds of: " + str(self.college.institute_name) 
 
@@ -73,7 +74,8 @@ class Student(models.Model):
     pin_no = models.CharField(max_length=200, blank=True)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="student" )
-    identification_token = models.UUIDField(default = uuid.uuid4)
+    identification_token = models.UUIDField(default=None, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     def __str__(self):
         return (
             "Student: "
@@ -91,7 +93,7 @@ class Store(models.Model):
     invoice_code = models.CharField(max_length=2, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
-
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     def __str__(self):
         return (
             "Store: "
@@ -109,7 +111,7 @@ class Item(models.Model):
     price = models.IntegerField(default=0)
     available = models.BooleanField(default=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
-
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     def __str__(self):
         return (
             "Item: "
@@ -121,6 +123,16 @@ class Item(models.Model):
         )
 
 
+class OrderGroup(models.Model):
+    # to find which time purchase the orders belong to
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=4,null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
+    order_group_total = models.IntegerField(default=0)
+    def __str__(self):
+        return("Store: "+ str(self.store) + "Student: "+ str(self.student) + "otp: "+ str(self.otp))
+
 class Order(models.Model):
     item = models.CharField(max_length=200, blank=True)
     quantity = models.IntegerField(default=0)
@@ -128,11 +140,11 @@ class Order(models.Model):
     pickup_time = models.CharField(max_length=200, choices=BREAKS)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     status = models.BooleanField(default=False)
     otp = models.CharField(max_length=4)
     purchase_id = models.IntegerField(default=0)
-    revenue = models.IntegerField(default=0)
+    order_group = models.ForeignKey(OrderGroup, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return (
@@ -145,6 +157,17 @@ class Order(models.Model):
         )
 
 
+
+class Revenue(models.Model):
+    # to find the total revenue from the student for the day
+    day_revenue = models.FloatField(default=0)
+    total = models.IntegerField(default=0)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
+    
+    def __str__(self):
+        return("student: "+ str(self.student) + "day_revenue: "+ str(self.day_revenue) + "day: "+ str(self.created_at.date()))
+
 class CartItem(models.Model):
     item = models.CharField(max_length=200, blank=True)
     quantity = models.IntegerField(default=0)
@@ -152,7 +175,7 @@ class CartItem(models.Model):
     pickup_time = models.CharField(max_length=200, choices=BREAKS)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
 
     def __str__(self):
         return (
@@ -170,7 +193,7 @@ class Break(models.Model):
     lunch_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     last_break = models.TimeField(auto_now=False, auto_now_add=False, null=True)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
-
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     def __str__(self):
         return "Breaks of: " + str(self.college.institute_name)
 
@@ -188,7 +211,7 @@ class Bill(models.Model):
         upload_to="django_field_pdf",
         max_length=254,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     status = models.BooleanField(default=False)
 
     def __str__(self):
@@ -198,7 +221,7 @@ class Bill(models.Model):
 class BulkRechargeMail(models.Model):
     email = models.EmailField(max_length=254)
     recharge_amount = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     active = models.BooleanField(default=False)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
 
