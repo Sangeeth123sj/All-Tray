@@ -41,3 +41,9 @@ def break_checker(context, day, format_string):
         created_at__date=day.date(), pickup_time=format_string
     ).count()
     return check
+
+@register.simple_tag(takes_context=True)
+def revenue_day_checker(context, day):
+    revenues = context["revenues"]
+    check = revenues.filter(created_at__date=day.date()).exists()
+    return check

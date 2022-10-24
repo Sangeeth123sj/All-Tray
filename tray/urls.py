@@ -4,7 +4,10 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 
+
 from . import views
+
+
 
 urlpatterns = [
     path("register_card/", views.register_card, name="register_card"),
@@ -81,6 +84,8 @@ urlpatterns = [
         views.college_break_edit_post,
         name="college_break_edit_post",
     ),
+    path("college_alltray_revenue_student_list/", views.college_alltray_revenue_student_list, name="college_alltray_revenue_student_list"),
+    path("college_alltray_revenue_student_details/<int:student_id>/", views.college_alltray_revenue_student_details, name="college_alltray_revenue_student_details"),
     path("college_recharge/", views.college_recharge, name="college_recharge"),
     path(
         "college_recharge_post/",

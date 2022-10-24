@@ -8,6 +8,7 @@ from datetime import time
 import time
 from dateutil.relativedelta import relativedelta
 from django.db.models import Sum
+from django.urls import reverse
 
 from .models import (
     Bill,
@@ -633,7 +634,6 @@ def qr_code(request):
 
 # college views__________________________________________________________________________________
 
-
 def register_college(request):
     return render(request, "tray/register_college.html")
 
@@ -695,7 +695,8 @@ def college_login_verify(request):
 
 @login_required
 def college_home(request):
-    institute_id = request.session["institute_id"]
+    institute_id = request.session.get("institute_id")
+    print("_________",institute_id)
     college = Institute.objects.get(id=institute_id)
     try:
         merchant_credentials = InstituteMerchantCredentail.objects.get(college=college)
@@ -784,8 +785,45 @@ def college_store_order_list(request):
 
 
 @login_required
+def college_alltray_revenue_student_list(request):
+    institute_id = request.session.get("institute_id")
+    institute = get_object_or_404(Institute,id=institute_id)
+    students = Student.objects.filter(college=institute)
+    context = {"students":students}
+    # revenues = Revenue.objects.filter(institute=institute)
+    return render(request, "tray/college_alltray_revenue_student_list.html", context)
+
+@login_required
+def college_alltray_revenue_student_details(request,student_id):
+    institute_id = request.session.get("institute_id")
+    institute = get_object_or_404(Institute,id=institute_id)
+    student = get_object_or_404(Student,id=student_id)
+    revenues = Revenue.objects.filter(institute=institute,student=student)
+    current_month = datetime.today().strftime("%h")
+    month_revenue_total = revenues.aggregate(Sum('day_revenue'))
+    if month_revenue_total['day_revenue__sum']:
+        rounded_month_revenue_total = round(month_revenue_total.get('day_revenue__sum'),2)
+    else: rounded_month_revenue_total = 0
+    context = {"student":student, "revenues":revenues, "current_month": current_month, "month_revenue_total": rounded_month_revenue_total}
+    return render(request, "tray/college_alltray_revenue_student_details.html", context)
+
+
+
+@login_required
 def college_break_edit(request):
-    return render(request, "tray/college_break_edit.html")
+    institute_id = request.session.get("institute_id")
+    institute = get_object_or_404(Institute,id=institute_id)
+    try:
+        college_break = Break.objects.get(college=institute)
+        first_break = college_break.first_break.strftime("%H:%M:%S")
+        lunch_break = college_break.lunch_break.strftime("%H:%M:%S")
+        last_break = college_break.last_break.strftime("%H:%M:%S")
+    except:
+        first_break = None
+        lunch_break = None
+        last_break = None
+    context = {"first_break": first_break, "lunch_break":lunch_break, "last_break": last_break}
+    return render(request, "tray/college_break_edit.html",context)
 
 
 @login_required
@@ -1127,7 +1165,7 @@ def cart(request):
                 if free_trial_expiry_date <= date.today():
                     # conditional block to calculate revenue after free trial
                     try:
-                        revenue = Revenue.objects.get(created_at__date=date.today(), student = student)
+                        revenue = Revenue.objects.get(created_at__date=date.today(), student = student, institute=institute)
                         revenue.total = revenue.total + order_group.order_group_total
                         revenue.day_revenue = revenue.total * 0.01
                         revenue.save()
