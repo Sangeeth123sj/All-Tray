@@ -77,7 +77,7 @@
             });
           }
         },*/
-        "callback_url": "http://127.0.0.1:8000/college_subscription_callback/{{institute.identification_token}}/",
+        "callback_url": "{{callback_url}}/{{institute.identification_token}}/",
         "prefill": {
           "name": "{{institute.user.name}}",
           "email": "{{institute.user.email}}",

@@ -260,6 +260,8 @@ RAZORPAY_KEY_ID = "rzp_test_sv9b6ulPTe1ydd"
 
 RAZORPAY_SUBSCRIPTION_ID = 'sub_KY0nie3ffRqcPu'
 
-CALLBACK_URL = "https://sangeethjoseph.pythonanywhere.com/"
+SUBSCRIPTION_CALLBACK_URL = "https://sangeethjoseph.pythonanywhere.com/college_subscription_callback"
+
+RECHARGE_CALLBACK_URL = "https://sangeethjoseph.pythonanywhere.com/callback"
 
 BASIC_PLAN_ID = "plan_KY0lxlEjAXMJwR"

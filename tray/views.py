@@ -752,8 +752,9 @@ def college_subscription_form(request):
         
         context = {"basic_cost":basic_cost, "standard_cost":standard_cost, "institute": college,
                 "subscription_id": subscription_id, "key_id": settings.RAZORPAY_KEY_ID,
-                "key_secret": settings.RAZORPAY_KEY_SECRET}
+                "callback_url":settings.SUBSCRIPTION_CALLBACK_URL,"key_secret": settings.RAZORPAY_KEY_SECRET}
         print("rendering checkout")
+        
     return render(request, "tray/college_subscription_checkout.html",context)
 
 @login_required
@@ -782,6 +783,8 @@ def college_subscription_callback(request,institute_token):
             'razorpay_signature': razorpay_signature
             })
         
+        if result:
+            Subscription.objects.create(subscription_payment_status=True,revenue_payment_status=True,institute=institute)
         context = {
             "result" : result
         }

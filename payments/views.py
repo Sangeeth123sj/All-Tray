@@ -45,7 +45,7 @@ def initiate_payment(request):
         # ('EMAIL', request.user.email),
         # ('MOBILE_N0', '9911223388'),
         ('INDUSTRY_TYPE_ID', institute_merchant_creds.paytm_industry_type),
-        ('CALLBACK_URL', settings.CALLBACK_URL + str(institute.identification_token)+ "/"+ str(student.identification_token)),
+        ('CALLBACK_URL', settings.RECHARGE_CALLBACK_URL+ "/" + str(institute.identification_token)+ "/"+ str(student.identification_token)),
         # ('PAYMENT_MODE_ONLY', 'NO'),
     )
 
