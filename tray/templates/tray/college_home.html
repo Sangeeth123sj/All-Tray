@@ -21,6 +21,9 @@
             <a class="nav-link" href="{% url 'college_bulk_recharge' %}">Bulk Recharge</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="{% url 'college_alltray_revenue_student_list' %}">Alltray Revenue</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="{% url 'college_logout' %}">Logout</a>
         </li>
         
@@ -54,6 +57,11 @@
 
             {% if not merchant_credentials %}
             <a href="{% url 'college_merchant_creds_form' %}" class="blue-button">Setup online payments</a>
+            <br/><br/>
+            {% endif %}
+
+            {% if not subscription %}
+            <a href="{% url 'college_subscription_form' %}" class="green-button">Setup subscription</a>
             <br/><br/>
             {% endif %}
 

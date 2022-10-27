@@ -62,7 +62,9 @@ urlpatterns = [
         "college_login_verify/", views.college_login_verify, name="college_login_verify"
     ),
     path("college_home/", views.college_home, name="college_home"),
-    # path("college_merchant_creds_post/", views.college_merchant_creds_post, name="college_merchant_creds_post"),
+    path("college_subscription_form/", views.college_subscription_form, name="college_subscription_form"),
+    path("college_subscription_checkout/", views.college_subscription_checkout, name="college_subscription_checkout"),
+    path("college_subscription_callback/<str:institute_token>/", views.college_subscription_callback, name="college_subscription_callback"),
     path(
         "college_bulk_recharge/",
         views.college_bulk_recharge,

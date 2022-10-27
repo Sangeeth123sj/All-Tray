@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+{% extends "tray/base.html" %}
+
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'your_orders' %}">Your Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">Recharge</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
+      </li>
+      
+    </ul>
+    
+  </div>
+</nav>
+{% endblock %}
+
+{% block title%} Subscription Checkout  {% endblock %}
+
+
+{% block content %}
+<center>
+    <h2>Subscription Checkout</h2>
+    <button id = "rzp-button1" class="btn btn-success">Pay</button>
+    <script src = "https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options = {
+        "key": "{{key_id}}",
+        "subscription_id": "{{subscription_id}}",
+        "name": "ALLTRAY",
+        "description": "Monthly Basic Plan",
+        "image": "/your_logo.jpg",
+        /*"handler": function(response) {
+          alert(response.razorpay_payment_id),
+          alert(response.razorpay_subscription_id),
+          alert(response.razorpay_signature);
+          generated_signature = hmac_sha256(response.razorpay_payment_id + "|" + "{{subscription_id}}", "{{key_secret}}");
+
+          if (generated_signature == response.razorpay_signature) {
+            alert("payment is successful")
+          }
+          if (generated_signature == response.razorpay_signature){
+            Swal.fire(
+              'Subscription Successful!',
+              '<p><p>',
+              'success'
+              ).then(function() {
+                window.location.href = "/college_home";
+            });
+          }
+          else{
+            Swal.fire(
+              'Subscription Failure!',
+              '<p>please contact alltray<p>',
+              'success'
+              ).then(function() {
+                window.location.href = "/college_home";
+            });
+          }
+        },*/
+        "callback_url": "http://127.0.0.1:8000/college_subscription_callback/{{institute.identification_token}}/",
+        "prefill": {
+          "name": "{{institute.user.name}}",
+          "email": "{{institute.user.email}}",
+          "contact": "",
+        },
+        "notes": {
+          //"note_key_1": "Tea. Earl Grey. Hot",
+          //"note_key_2": "Make it so."
+        },
+        "theme": {
+          "color": "rgba(58,175,160,1)"
+        }
+      };
+    var rzp1 = new Razorpay(options);
+    //document.getElementById('rzp-button1').onclick = function(e) {
+      rzp1.open();
+      //e.preventDefault();
+    //}
+
+  //}); 
+</script>
+</center>
+{% endblock %}

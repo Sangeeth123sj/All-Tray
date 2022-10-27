@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+{% extends "tray/base.html" %}
+
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'your_orders' %}">Your Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">Recharge</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
+      </li>
+      
+    </ul>
+    
+  </div>
+</nav>
+{% endblock %}
+
+{% block title%} Subscription Form  {% endblock %}
+
+
+{% block content %}
+
+
+
+<center>
+    <h2>Subscription Form</h2>
+    {% if error %}
+    <h3>{{ error }}</h3>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <h3>Plan type</h3>
+        <div class="form-check">
+            <input class="form-check-input" value="basic" type="radio" name="plan_type" id="plan_basic" checked>
+            <label class="form-check-label" for="flexRadioDefault1">
+            Basic
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" value="standard" type="radio" name="plan_type" id="plan_standard" >
+            <label class="form-check-label" for="flexRadioDefault2">
+            Standard
+            </label>
+        </div>
+        <br/><br/>
+        <label id="amount" for="amount"> Monthly amount after free trial of 2 months </label>
+        <br/>
+        <h4 id="plan_amount">Monthly student revenue<br/>(1% of daily transaction)</h4>
+        <input type="hidden" id="plan_type" name="plan_type" value="basic">
+        <br/><br/>
+        <input type="submit" class="btn btn-success" name="submit" value="Submit" required>
+    </form>
+
+
+    
+
+    <script>
+        $(document).ready(function(){ 
+            $('#plan_basic').click(function () {
+                console.log("clicked")
+                document.getElementById('plan_amount').innerHTML = "Monthly student revenue"+"<br/>"+ "(1% of daily transaction)";
+                document.getElementById('plan_type').value = "basic"
+            });
+            $('#plan_standard').click(function () {
+                console.log("clicked")
+                document.getElementById('plan_amount').innerHTML = "Monthly student revenue"+"<br/>"+ "(1% of daily transaction)" + "+ ₹{{standard_cost}}";
+                document.getElementById('plan_type').value = "standard"
+            });
+        });
+    </script>
+
+
+
+        
+{% endblock %}

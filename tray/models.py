@@ -51,12 +51,12 @@ class Institute(models.Model):
         return str(self.institute_name)
 
 class InstituteMerchantCredentail(models.Model):
-    # paytm_secret_key is stored as a hash
-    paytm_merchant_id = models.CharField(max_length=200)
-    paytm_secret_key = models.CharField(max_length=200)
-    paytm_website = models.CharField(max_length=200)
-    paytm_channel_id = models.CharField(max_length=200)
-    paytm_industry_type = models.CharField(max_length=200)
+    # paytm creds
+    paytm_merchant_id = models.CharField(max_length=200, null=True, blank=True)
+    paytm_channel_id = models.CharField(max_length=200, null=True, blank=True)
+    paytm_website = models.CharField(max_length=200, null=True, blank=True)
+    paytm_industry_type = models.CharField(max_length=200, null=True, blank=True)
+    paytm_secret_key = models.CharField(max_length=200, null=True, blank=True)
     college = models.OneToOneField(Institute, on_delete=models.CASCADE, related_name="merchant_creds")
     created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
         
@@ -168,6 +168,18 @@ class Revenue(models.Model):
     
     def __str__(self):
         return("student: "+ str(self.student) + "day_revenue: "+ str(self.day_revenue) + "day: "+ str(self.created_at.date()))
+    
+class Subscription(models.Model):
+    # show subscription details and payment status for subscription and revenue
+    created_at = models.DateTimeField(auto_now_add=True)
+    subscription_payment_status = models.BooleanField(default=False)
+    revenue_payment_status = models.BooleanField(default=False)
+    institute = models.ForeignKey(Institute, on_delete=models.CASCADE)
+
+class SubscriptionPlans(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    basic = models.IntegerField(default=0)
+    standard = models.IntegerField(default=1000)
 
 class CartItem(models.Model):
     item = models.CharField(max_length=200, blank=True)

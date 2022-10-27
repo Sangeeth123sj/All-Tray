@@ -122,13 +122,6 @@
             if (email !== null) $('#email').val(email);
             var password = sessionStorage.getItem('password');
             if (password !== null) $('#password').val(password);
-            /*var first_break = sessionStorage.getItem('first_break');
-            if (first_break !== null) $('#first_break').val('first_break');
-            var lunch_break = sessionStorage.getItem('lunch_break');
-            if (lunch_break !== null) $('#password').val(lunch_break);
-            var last_break = sessionStorage.getItem('last_break');
-            if (last_break !== null) $('#last_break').val(last_break);
-            */
         }
 
 
@@ -139,10 +132,6 @@
             sessionStorage.setItem("username", $('#username').val());
             sessionStorage.setItem("email", $('#email').val());
             sessionStorage.setItem("password", $('#password').val());
-            /*sessionStorage.setItem("first_break", $('#first_break').val());
-            sessionStorage.setItem("lunch_break", $('#lunch_break').val());
-            sessionStorage.setItem("last_break", $('#last_break').val());
-            */
         }
 
         function checkemail(email) 

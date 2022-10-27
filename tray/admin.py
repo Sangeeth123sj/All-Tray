@@ -23,10 +23,11 @@ from .models import (
     InstituteMerchantCredentail,
     Revenue,
     OrderGroup,
+    SubscriptionPlans,
 )
 
 
-
+admin.site.register(SubscriptionPlans)
 # admin.site.register(Student)
 admin.site.register(InstituteMerchantCredentail)
 admin.site.register(Item)

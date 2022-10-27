@@ -3,12 +3,18 @@ from logging import exception
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render
 from datetime import time
 import time
 from dateutil.relativedelta import relativedelta
 from django.db.models import Sum
 from django.urls import reverse
+import string
+import random
+import razorpay
+from django.conf import settings
+import uuid
 
 from .models import (
     Bill,
@@ -24,6 +30,8 @@ from .models import (
     InstituteMerchantCredentail,
     OrderGroup,
     Revenue,
+    Subscription,
+    SubscriptionPlans
 )
 
 User = get_user_model()
@@ -703,14 +711,95 @@ def college_home(request):
     except InstituteMerchantCredentail.DoesNotExist:
         merchant_credentials = None
     print("mc:",merchant_credentials)
+    try:
+        subscription = Subscription.objects.get(institute=college)
+    except Subscription.DoesNotExist:
+        subscription = None
     request.session["college_id"] = college.id
     stores = Store.objects.filter(college=college)
-
+    context = {"college": college, "stores": stores, "merchant_credentials": merchant_credentials, "subscription":subscription}
     return render(
-        request, "tray/college_home.html", {"college": college, "stores": stores, "merchant_credentials": merchant_credentials}
+        request, "tray/college_home.html", context
     )
 
 
+@login_required
+def college_subscription_form(request):
+    if request.method == "GET":
+        return render(request, "tray/college_subscription_form.html")
+    if request.method == "POST":
+        institute_id = request.session.get("institute_id")
+        college = Institute.objects.get(id=institute_id)
+        college.identification_token = uuid.uuid4()
+        college.save()
+        global client
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+        subscription_response = client.subscription.create({
+            'plan_id': settings.BASIC_PLAN_ID,
+            'customer_notify': 1,
+            'quantity': 1,
+            'total_count': 6,
+            'addons': [{'item': {'name': 'Student revenue', 'amount': 100,
+                    'currency': 'INR'}}],
+            'notes': {'institute': college.institute_name}
+            })
+        print("subscription_response-----",subscription_response)
+        subscription_id = subscription_response["id"]
+        request.session["subscription_id"] = subscription_id
+        basic_cost = SubscriptionPlans.basic
+        standard_cost = SubscriptionPlans.objects.first().standard
+        
+        context = {"basic_cost":basic_cost, "standard_cost":standard_cost, "institute": college,
+                "subscription_id": subscription_id, "key_id": settings.RAZORPAY_KEY_ID,
+                "key_secret": settings.RAZORPAY_KEY_SECRET}
+        print("rendering checkout")
+    return render(request, "tray/college_subscription_checkout.html",context)
+
+@login_required
+def college_subscription_checkout(request):
+    return render(request, "tray/college_subscription_checkout.html")
+
+
+@csrf_exempt
+def college_subscription_callback(request,institute_token):
+    if request.method == 'POST':
+        institute_token_decoded = uuid.UUID(institute_token).hex
+        print("secret key",institute_token)
+        print("secret key decoded",institute_token_decoded)
+        institute = Institute.objects.get(identification_token=institute_token_decoded)
+        institute_merchant_creds = InstituteMerchantCredentail.objects.get(college=institute)
+        print(request.body)
+        print(request.POST)
+        received_data = dict(request.POST)
+        razorpay_signature = received_data.get('razorpay_signature')[0]
+        razorpay_payment_id = received_data.get('razorpay_payment_id')[0]
+        print("received callback DATAAAA:",received_data)
+        # checking authenticity of callback response
+        result = client.utility.verify_subscription_payment_signature({
+            'razorpay_subscription_id': request.session.get("subscription_id"),
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature
+            })
+        
+        context = {
+            "result" : result
+        }
+        return render(request, "tray/college_subscription_callback.html", context)
+
+
+
+
+def receipt_number_generator():
+    # initializing size of string
+    N = 7
+ 
+    # using random.choices()
+    # generating random strings
+    res = ''.join(random.choices(string.ascii_uppercase +
+                                string.digits, k=N))
+    return str(res)
+    
 @login_required
 def college_bulk_recharge(request):
     return render(request, "tray/college_bulk_recharge.html")
@@ -721,11 +810,9 @@ def college_merchant_creds_form(request):
     if request.method == "GET":
         return render(request, "tray/college_merchant_creds_form.html")
     if request.method == "POST":
-        paytm_merchant_id = request.POST.get("paytm_merchant_id")
-        paytm_secret_key = request.POST.get("paytm_secret_key")
-        paytm_website = request.POST.get("paytm_website")
-        paytm_channel_id = request.POST.get("paytm_channel_id")
-        paytm_industry_type = request.POST.get("paytm_industry_type")
+        razorpay_merchant_id = request.POST.get("razorpay_merchant_id")
+        razorpay_key_secret = request.POST.get("razorpay_key_secret")
+        razorpay_key_id = request.POST.get("razorpay_key_id")
         
         college_id = request.session["college_id"]
         college = Institute.objects.get(id= college_id)
@@ -733,11 +820,9 @@ def college_merchant_creds_form(request):
             InstituteMerchantCredentail.objects.update_or_create(
             college=college,
             defaults={
-                "paytm_merchant_id" : paytm_merchant_id,
-                "paytm_secret_key" : paytm_secret_key,
-                "paytm_website" : paytm_website,
-                "paytm_channel_id" : paytm_channel_id,
-                "paytm_industry_type" : paytm_industry_type
+                "razorpay_merchant_id" : razorpay_merchant_id,
+                "razorpay_key_secret" : razorpay_key_secret,
+                "razorpay_key_id" : razorpay_key_id,
             }
             )
             return redirect(college_home)

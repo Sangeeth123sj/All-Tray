@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+{% extends "tray/base.html" %}
+
+
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
+  <li class="nav-item active">
+    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
+  </li>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'your_orders' %}">Your Orders</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">Recharge</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
+      </li>
+      
+    </ul>
+    
+  </div>
+</nav>
+{% endblock %}
+
+{% block title%} Response Details   {% endblock %}
+
+{% block content %}
+
+    <h2>Response Details: </h2>                    <br>
+
+
+
+<script>
+
+
+      if ('{{result}}' == "True"){
+        Swal.fire(
+          'Subscription Successful!',
+          '<p>the subscription student revenue will be charged each month on this date from your account<p>',
+          'success'
+          ).then(function() {
+            window.location.href = "/home";
+        });
+      }
+      if ('{{result}}' == "False"){
+        Swal.fire(
+          'Recharge Failed!',
+          '<p>Please try again or contact alltray<p>',
+          'error'
+          ).then(function() {
+            window.location.href = "/home";
+        });
+      }
+      if ('{{result}}' == "fail"){
+        Swal.fire(
+          'Oops!',
+          '<p>Something broke down, try again or please contact alltray<p>',
+          'error'
+          ).then(function() {
+            window.location.href = "/college_home";
+        });
+      }
+      
+      </script>
+
+{% endblock %}
