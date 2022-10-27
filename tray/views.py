@@ -769,7 +769,6 @@ def college_subscription_callback(request,institute_token):
         print("secret key",institute_token)
         print("secret key decoded",institute_token_decoded)
         institute = Institute.objects.get(identification_token=institute_token_decoded)
-        institute_merchant_creds = InstituteMerchantCredentail.objects.get(college=institute)
         print(request.body)
         print(request.POST)
         received_data = dict(request.POST)
