@@ -260,6 +260,6 @@ RAZORPAY_KEY_ID = "rzp_test_sv9b6ulPTe1ydd"
 
 RAZORPAY_SUBSCRIPTION_ID = 'sub_KY0nie3ffRqcPu'
 
-CALLBACK_URL = "http://127.0.0.1:8000/callback/"
+CALLBACK_URL = "https://sangeethjoseph.pythonanywhere.com/"
 
 BASIC_PLAN_ID = "plan_KY0lxlEjAXMJwR"
