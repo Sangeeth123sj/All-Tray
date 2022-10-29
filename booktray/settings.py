@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     # "graphene_django",
     "payments",
     'import_export',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -260,8 +261,16 @@ RAZORPAY_KEY_ID = "rzp_test_sv9b6ulPTe1ydd"
 
 RAZORPAY_SUBSCRIPTION_ID = 'sub_KY0nie3ffRqcPu'
 
-SUBSCRIPTION_CALLBACK_URL = "https://sangeethjoseph.pythonanywhere.com/college_subscription_callback"
+SUBSCRIPTION_CALLBACK_URL = "http://127.0.0.1:8000/college_subscription_callback"
+# "https://sangeethjoseph.pythonanywhere.com/college_subscription_callback"
 
-RECHARGE_CALLBACK_URL = "https://sangeethjoseph.pythonanywhere.com/callback"
+RECHARGE_CALLBACK_URL = "http://127.0.0.1:8000/callback"
+# "https://sangeethjoseph.pythonanywhere.com/callback"
 
 BASIC_PLAN_ID = "plan_KY0lxlEjAXMJwR"
+
+
+
+CRONJOBS = [
+    ('*/5 * * * *', 'tray.management.commands.subscription_revenue_update')
+]

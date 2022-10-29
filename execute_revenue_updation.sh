@@ -1,0 +1,2 @@
+export DJANGO_SETTINGS_MODULE=booktray.settings 
+python manage.py subscription_revenue_update

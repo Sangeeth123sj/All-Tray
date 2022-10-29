@@ -55,6 +55,9 @@ from .modules.invoice import *
 
 # student views______________________________________________________________________________
 
+def index(request):
+    return render(request, "tray/index.html")
+
 
 def register_card(request):
     colleges = Institute.objects.all()
@@ -715,6 +718,9 @@ def college_home(request):
         subscription = Subscription.objects.get(institute=college)
     except Subscription.DoesNotExist:
         subscription = None
+    except Subscription.MultipleObjectsReturned:
+        subscription = Subscription.objects.filter(institute=college).first()
+        print("multiple subscriptions for this college")
     request.session["college_id"] = college.id
     stores = Store.objects.filter(college=college)
     context = {"college": college, "stores": stores, "merchant_credentials": merchant_credentials, "subscription":subscription}
@@ -763,7 +769,7 @@ def college_subscription_checkout(request):
 
 
 @csrf_exempt
-def college_subscription_callback(request,institute_token):
+def college_subscription_callback(request,institute_token, subscription_id):
     if request.method == 'POST':
         institute_token_decoded = uuid.UUID(institute_token).hex
         print("secret key",institute_token)
@@ -777,7 +783,7 @@ def college_subscription_callback(request,institute_token):
         print("received callback DATAAAA:",received_data)
         # checking authenticity of callback response
         result = client.utility.verify_subscription_payment_signature({
-            'razorpay_subscription_id': request.session.get("subscription_id"),
+            'razorpay_subscription_id': subscription_id,
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature
             })
@@ -888,9 +894,11 @@ def college_alltray_revenue_student_details(request,student_id):
     revenues = Revenue.objects.filter(institute=institute,student=student)
     current_month = datetime.today().strftime("%h")
     month_revenue_total = revenues.aggregate(Sum('day_revenue'))
-    if month_revenue_total['day_revenue__sum']:
+    try:
+        month_revenue_total['day_revenue__sum']
         rounded_month_revenue_total = round(month_revenue_total.get('day_revenue__sum'),2)
-    else: rounded_month_revenue_total = 0
+    except:
+        rounded_month_revenue_total = 0
     context = {"student":student, "revenues":revenues, "current_month": current_month, "month_revenue_total": rounded_month_revenue_total}
     return render(request, "tray/college_alltray_revenue_student_details.html", context)
 
@@ -1249,7 +1257,7 @@ def cart(request):
                 )
                 order_group.save()
                 free_trial_expiry_date = institute.created_at.date() + relativedelta(months=2)
-                if free_trial_expiry_date <= date.today():
+                if date.today() > free_trial_expiry_date:
                     # conditional block to calculate revenue after free trial
                     try:
                         revenue = Revenue.objects.get(created_at__date=date.today(), student = student, institute=institute)

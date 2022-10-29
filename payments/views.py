@@ -27,6 +27,9 @@ def initiate_payment(request):
     except:
         return render(request, 'payments/pay.html', context={'error': 'Wrong Account Details or amount'})
     
+    if amount < 1 :
+        return render(request, 'payments/pay.html', context={'error': "Amount can't be less than 1 rupee"})
+    
     transaction = Transaction.objects.create(made_by=user, amount=amount)
     transaction.save()
     try:

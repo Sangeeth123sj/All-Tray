@@ -10,6 +10,7 @@ from . import views
 
 
 urlpatterns = [
+    path("index/", views.index, name="index"),
     path("register_card/", views.register_card, name="register_card"),
     path("register_card_post/", views.register_card_post, name="register_card_post"),
     path("", views.entry, name="entry"),
@@ -64,7 +65,7 @@ urlpatterns = [
     path("college_home/", views.college_home, name="college_home"),
     path("college_subscription_form/", views.college_subscription_form, name="college_subscription_form"),
     path("college_subscription_checkout/", views.college_subscription_checkout, name="college_subscription_checkout"),
-    path("college_subscription_callback/<str:institute_token>/", views.college_subscription_callback, name="college_subscription_callback"),
+    path("college_subscription_callback/<str:institute_token>/<str:subscription_id>/", views.college_subscription_callback, name="college_subscription_callback"),
     path(
         "college_bulk_recharge/",
         views.college_bulk_recharge,
