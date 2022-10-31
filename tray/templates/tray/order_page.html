@@ -1,6 +1,6 @@
-{% extends "tray/base.html" %}
+{% extends "tray/homepage_layout.html" %}
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -22,7 +22,7 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 {% block title%} {{store.store_name}} {% endblock %}
@@ -44,7 +44,7 @@
     <tbody>
         <tr >
             <td>
-                <select name="item_name" id="item" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;">
+                <select name="item_name" id="item" class="btn btn-sm dropdown-toggle" aria-placeholder="selects" style="background-color: white; color: black;">
                     
                     
                         <option value="none" selected disabled hidden> 
@@ -66,7 +66,7 @@
 <br/>
 
 <h4>Time of pickup:</h4>
-<select name="time" id="pickup_time" class="btn dropdown-toggle" required style="background-color: azure;">
+<select name="time" id="pickup_time" class="btn dropdown-toggle" required style="background-color: black; color: white;">
 <option input value="Now">Now</option>
 <option input value="First Break">First Break</option>
 <option input value="Lunch Break">Lunch Break</option>
@@ -79,16 +79,16 @@
 
 <br/>
 
-<button class="green-button" type="button" id="add">Add to cart <!--div class="fa-3x">
+<button class="btn btn-darker" type="button" id="add">Add to cart <!--div class="fa-3x">
   <i class="fas fa-spinner fa-spin"></i></div--> </button>
 <br/> <br/>
 
 <h3><strong>Cart</strong><i class="fas fa-shopping-cart"></i></h3>
 
 
-<table id="cart_table" style="background-color: rgba(249, 251, 252, 0.746); width: 20%;" class="table table-striped" class="table-responsive-xs" >
+<table id="cart_table" style="width: 20%;" class="table table-striped" class="table-responsive-xs" >
 <thead>
-    <tr style="background-color: rgba(205, 248, 255, 0.52);" >
+    <tr >
     <th>Item</th>
     <th>Qty</th>
     <th>Price</th>
@@ -109,9 +109,10 @@
 </table>
 
 
-<p>Pay using:</p>
+<h3>Pay using:</h3>
 
-<input type="button"  id="confirm" value="pay with alltray balance" class="blue-button"> 
+<input type="button"  id="confirm" value="pay with alltray balance" class="btn btn-darker"> 
+<br/><br/>
 
 {% with student_id=student.id  %}
 {% with store_id=store.id %}
@@ -401,3 +402,5 @@ function delete_from_order_list(item_name, item_cost)
 
 </center>
 {% endblock %}
+
+{% block footer %} {% endblock %}

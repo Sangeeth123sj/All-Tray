@@ -32,10 +32,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # authentication backends
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "booktray.backend.MyBackend",
-]
+
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "tray.backend.MyBackend",

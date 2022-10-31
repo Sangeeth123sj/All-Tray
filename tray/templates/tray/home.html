@@ -1,8 +1,8 @@
-{% extends "tray/base.html" %}
+{% extends "tray/homepage_layout.html" %}
 
 
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -30,12 +30,12 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 {% block title%} All Tray  {% endblock %}
 
-{% block frost %}
-{% endblock %}
+{% comment %} {% block frost %}
+{% endblock %} {% endcomment %}
 
 {% block content %}
 
@@ -45,14 +45,15 @@
         <form action="/your_orders_post/" method="POST">
             {% csrf_token %}
         <input type="hidden" name="student_id" value="{{student.id}}">
-        <input type="submit" class="blue-button" value="Your orders"> 
+        <!--input type="submit" class="black-button" value="Your orders"--> 
+        <button type="submit" class="black-button" value="Your orders" >Your orders</button>
         </form>
 
         <form action="" method="POST">
             {% csrf_token %}
-        <a href="{% url 'pay' %}" class="green-button">Recharge your id card</a>
+        <a href="{% url 'pay' %}" class="green-button">Recharge your card</a>
         </form>
-        
+        <br/><br/>
         
    
         <form action="/order_page_post/" method="POST">
@@ -63,7 +64,7 @@
                     <div class="col-sm-12" >
             {% for store in stores %}
            
-                <button type="submit" class="store_id btn btn-outline-dark" id="store_button" name="store_id" value="{{store.id}}" > 
+                <button type="submit" class="store_id white-button" id="store_button" name="store_id" value="{{store.id}}" > 
                   <p id='{{store.id}}' > </p>
                     <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
                     <div id = 'store_status'>

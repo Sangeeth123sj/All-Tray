@@ -1,9 +1,9 @@
-{% extends "tray/base.html" %}
+{% extends "tray/homepage_layout.html" %}
 
 
 {% block title %} Edit Pin {% endblock %}
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -28,7 +28,7 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 
@@ -38,16 +38,25 @@
 
 
 <h3>Edit Password</h3>
-
-<div class="form-group centered">
-    <form action="/student_pin_edit_post/" method="POST" name="form">
-    {% csrf_token %}
-    <p>Password</p>
-    <input type="text" name="password" id="password" class="form-control" required><br/><br/>
-    <input type="submit" id="submit_button" value="Submit" class="green-button">
-    </form>
+<div class="container py-5 h-100">
+  <div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+      <div class="card shadow-2-strong" style="border-radius: 1rem;">
+        <div class="card-body p-5 text-center">
+          <div class="form-group centered">
+              <form action="/student_pin_edit_post/" method="POST" name="form">
+              {% csrf_token %}
+              <label class="form-label">New Password</label>
+              <input type="text" name="password" id="password" class="form-control form-control-lg" required><br/><br/>
+              <input type="submit" id="submit_button" value="Submit" class="green-button">
+              </form>
+          </div>
+          
+        </div>
+      </div>
     </div>
-
+  </div>
+</div>
 
 
 

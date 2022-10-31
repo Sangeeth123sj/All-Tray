@@ -11,6 +11,7 @@ from . import views
 
 urlpatterns = [
     path("index/", views.index, name="index"),
+    path("homepage_layout/", views.homepage_layout, name="homepage_layout"),
     path("register_card/", views.register_card, name="register_card"),
     path("register_card_post/", views.register_card_post, name="register_card_post"),
     path("", views.entry, name="entry"),

@@ -1,79 +1,61 @@
-{% extends "tray/base.html" %}
-{% load static %}
+{% extends "tray/login_base.html" %}
 
 
 
 
-                {% block heading %}
-{% load crispy_forms_tags %}
-{% load static %}
-
-        
-                        <div class="heading" style="text-align: center;" >
-                            <h1><strong>All Tray</strong></h1>
-                        </div>
-                         <br/>
-                        {% endblock %}
                         {% block content %}
 
-                    <div class="form-group centered">
-                
-                    <center>     
-                        <form action="/home_post/" class="form" method="POST" >
-                            {% csrf_token %}
-                            {{ form|crispy }}
-                        <!--class 'fixed' to hide rfid card number input field>
-                        <div class="fixed">
-                            <div class="form-group">
-                            <input type="number" id="id_card" name="student_id" autofocus >
-                            </div>
-                        </div-->
-                        
+                   <!--section class="vh-100" style="background-color: #508bfc;"-->
+          <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+              <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                  <div class="card-body p-5 text-center">
+    <form action="/home_post/" method="POST" type="form"/>
+    {% csrf_token %}
 
-                        <div class="form-group">
-                            <h3>E-mail</h3>
-                            <div class="container">
-                                <div class="col-xs-2">
-                                    <input type="text" class="form-control" id="email" name="email"><br/>
-                                </div>
-                            </div>
-                        </div>
+    
+                    <h3 class="mb-5">Sign in</h3>
+        
+                    <div class="form-outline mb-4">
+                      <input type="email" class="form-control form-control-lg" id="email" name="email">
+                      <label class="form-label" for="typeEmailX-2">Email</label>
+                    </div>
+        
+                    <div class="form-outline mb-4">
+                       <input type="password" id="password" name="password" class="form-control form-control-lg"> 
+                      <label class="form-label" for="typePasswordX-2">Password</label>
+                    </div>
+                    <p id="incorrect_alert" style="color:red"></p>
+                    <!-- Checkbox -->
+                    <!--div class="form-check d-flex justify-content-start mb-4">
+                      <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
+                      <label class="form-check-label" for="form1Example3"> Remember password </label>
+                    </div-->
+                  <div class="buttons">
+                    <input  type="button" type="submit" class="btn btn-darker" id="enter" value="Login">
+                    
+                    <!--input type="button" id="enter" value="LOGIN" class="btn btn-darker"-->
                         
-                        <div class="container">
-                            <h3>Password</h3>
-                            <input type="password" id="password" name="password" class="form-control"> 
-                        </div>
-                        <br/>
-                    <!--div class="container">
-                        <i>Swipe id card / enter pin</i>
-                        <br/-->
-                        <p id="incorrect_alert_1" style="color: rgb(131, 54, 54); font-weight: 1000; width: fit-content; display:none;" ></p>
-                        <p id="incorrect_alert_2" style="color: rgb(80, 32, 32); font-weight: 1000; width: fit-content; display:none;" ></p>
+                    <br/><br/>
 
-                        <!--login button-->    
-                            <input type="button" id="enter" value="Login" class="login-button">
-                        <br/>
+                    <button class="btn btn-darker">Sign in with Google</button>
+                    
+                    <br/>
                         <a href={% url 'password_reset'%}>Forgot password?</a>
-                        <br/>
-                        <p style="font-style:unset;">Not yet started with All Tray?<br/>
-                        Start now!</p>
-                    </div>
-                    <div class="centered">
-                        <a href="{% url 'register_card' %}" class="green-button">Register</a>
-                        <br/>
-                    </div>
-                        {%block footer%} {% endblock %}
-                        </form>
-                    </center>  
-                </div>
-            </div>
+                    <br/>
+                  </div>
+  </form>
+                    <hr class="my-4">
         
                    
-     
-    
-</div>
-
-</div>
+        
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!--/section-->
 
 <script>
 //checking if pin or id card entered
@@ -103,7 +85,7 @@ $(document).ready(function(){
     $("#enter").click(function(event){
         var email = $("#email").val()
         if (  email == "" || checkemail(email) == false ) {
-                document.getElementById("incorrect_alert_1").innerHTML = "Please enter valid email."
+                document.getElementById("incorrect_alert").innerHTML = "Please enter valid email."
                 $("#email").css("border-color","red");
                 //swal("Here's a message!", " Have a nice day!");  
                 //swal("Oops!", "Something went wrong, you should choose again!", "error");  
@@ -116,14 +98,14 @@ $(document).ready(function(){
 
         else if ($("#password").val() == ""){
                 $("#password").css("border-color","red");
-                document.getElementById("incorrect_alert_1").innerHTML = "Please enter password."
-                $("#incorrect_alert_1").fadeIn(1000).delay(4000).fadeOut(1000);
+                document.getElementById("incorrect_alert").innerHTML = "Please enter password."
+                $("#incorrect_alert").fadeIn(1000).delay(4000).fadeOut(1000);
                 event.preventDefault();
             }
         
         /*else if ( ($("#email").val() == "" && $("#id_card").val() != "" )||( $("#email").val() =="" && $("#pin").val() != "") ) {       
-                    document.getElementById("incorrect_alert_1").innerHTML = "Please enter email or refresh and swipe card first then enter email."
-                    $("#incorrect_alert_1").fadeIn(1000).delay(4000).fadeOut(1000);
+                    document.getElementById("incorrect_alert").innerHTML = "Please enter email or refresh and swipe card first then enter email."
+                    $("#incorrect_alert").fadeIn(1000).delay(4000).fadeOut(1000);
                     event.preventDefault();
                     console.log(email);
                     console.log(pin);
@@ -147,7 +129,7 @@ $(document).ready(function(){
                     dataType: 'json',
                     success: function (data){
                             if (data.incorrect_status == "wrong_email"){
-                                document.getElementById("incorrect_alert_2").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
+                                document.getElementById("incorrect_alert").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
                                 //alert("Sorry non-existent user  please register if not registered and try again");
                                 Swal.fire(
                                     'Oops',
@@ -163,10 +145,10 @@ $(document).ready(function(){
                                     Swal.fire({
                                         title: 'grr!',
                                         text: 'Sorry incorrect password ;)',
-                                        imageUrl: href="{% static 'tray/images/chihua.png' %}",
-                                        imageWidth: 400,
-                                        imageHeight: 200,
-                                        imageAlt: 'Custom image',
+                                        //imageUrl: 
+                                        //imageWidth: 400,
+                                        //imageHeight: 200,
+                                        //imageAlt: 'Custom image',
                                         }).then(function() {
                                         location.reload();
                                     });

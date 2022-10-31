@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-{% extends "tray/base.html" %}
+{% extends "tray/homepage_layout.html" %}
 
 
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -31,7 +31,7 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 {% block title%} Payment Home  {% endblock %}
 

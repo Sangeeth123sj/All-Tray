@@ -56,8 +56,10 @@ from .modules.invoice import *
 # student views______________________________________________________________________________
 
 def index(request):
-    return render(request, "tray/index.html")
+    return render(request, "tray/login_base.html")
 
+def homepage_layout(request):
+    return render(request, "tray/homepage_layout.html")
 
 def register_card(request):
     colleges = Institute.objects.all()
@@ -113,7 +115,8 @@ def entry(request):
     else:
         return render(request, "tray/entry.html")
 
-
+@csrf_exempt 
+# exempting csrf is temporary fix
 def home_post(request):
     if request.method == "POST":
         email = request.POST["email"]
@@ -138,7 +141,6 @@ def home(request):
         student = user.student
         request.session["student_id"] = student.id
         print("logged in student")
-        
         return render(request, "tray/home.html", {"stores": stores, "student": student})
     elif store_user:
         print("logged in store")
