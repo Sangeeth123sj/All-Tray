@@ -37,7 +37,7 @@ a {
     text-decoration: none !important; }
 
 .hero {
-  height: 100vh;
+  height: cover;
   width: 100%;
   background: #eb8a4d; }
 

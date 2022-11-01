@@ -1,9 +1,9 @@
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
 
 {% block title %} Recharge a card {% endblock %}
 
-{% block navbar %} 
+{% comment %} {% block navbar %} 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <li class="nav-item active">
         <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
@@ -25,72 +25,87 @@
         
     </div>
     </nav> 
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 {% block content %}
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <br/><br/><br/>
+            <h2>Enter student details</h2>
+            <br/> <br/>
+            <form class="form" method="POST">
+                {% csrf_token %}
+            <br/>
+           
+                <input type="email" class="form-control form-control-lg" id="email" name="email" required>
+                <label class="form-label">Email</label>
+                <br/> <br/>
+                <input type="submit" id="enter" name="enter" class="btn btn-darker" value="enter">
+                <br/>
+                <hr class="my-4">
+                {% if error %}
+                <p id="incorrect_alert" style="color:red" >"{{ error }}"</p>
+                {% endif %}
+    
+                <!--input type="text" id="email" name="email" autofocus-- >
+            <br/>
 
-<center>
-    <br/><br/><br/>
-    <h2>Enter customer details</h2>
-    <br/> <br/>
-    <form action="/college_recharge_post/" class="form" method="POST">
-        {% csrf_token %}
-    <h4>Email</h4>
-    <br/>
-    <div>
-        <input type="text" id="email" name="email" autofocus >
-    </div> 
-    <br/> <br/>
-    <p id="incorrect_alert" style="color: rgb(245, 149, 149); font-weight: 1000; width: fit-content;" ></p>
-    <input type="button" id="enter" name="enter" class="btn btn-primary" value="Enter">
-    </form>
-    
-    <script>
-        $(document).ready(function(){
-        $("#enter").click(function(event){
-            console.log("test on enter button");
-            if ($("#email").val() == ""){
-                $("#email").css("border-color","red");
-                document.getElementById("incorrect_alert").innerHTML = "Please enter email."
-                $('#incorrect_alert').fadeToggle(2000);
-                event.preventDefault();
-            }
-    
-            else{   
-                    email = $("#email").val()
-                    console.log("test on enter button in else");
-        //sending form fields in ajax for checking if registered email
-                $.ajax({
-                    url: '/ajax/validate_recharge/',
-                    data: {
-                        'email': email,
-                    },
-                    dataType: 'json',
-                    success: function (data){
-                        if (data.email_status == "incorrect"){
-                            alert("Sorry incorrect email");
-                            //window.location.href = " ";
-                            event.preventDefault();
-                        }
-                        if(data.email_status == "correct"){
-                            $("form").submit();
-                        }
-    
-    
+
+            </form>
+        </div>
+    </div>
+  </div>
+</div>
+</div>
+            <script>
+                $(document).ready(function(){
+                $("#enter").click(function(event){
+                    console.log("test on enter button");
+                    if ($("#email").val() == ""){
+                        $("#email").css("border-color","red");
+                        document.getElementById("incorrect_alert").innerHTML = "Please enter email."
+                        $('#incorrect_alert').fadeToggle(2000);
+                        event.preventDefault();
                     }
-                          
-                });
-            } 
-    
-        }); 
-        });
             
+                    else{   
+                            email = $("#email").val()
+                            console.log("test on enter button in else");
+                //sending form fields in ajax for checking if registered email
+                        $.ajax({
+                            url: '/ajax/validate_recharge/',
+                            data: {
+                                'email': email,
+                            },
+                            dataType: 'json',
+                            success: function (data){
+                                if (data.email_status == "incorrect"){
+                                    alert("Sorry incorrect email");
+                                    //window.location.href = " ";
+                                    event.preventDefault();
+                                }
+                                if(data.email_status == "correct"){
+                                    $("form").submit();
+                                }
+            
+            
+                            }
+                                
+                        });
+                    } 
+            
+                }); 
+                });
+                    
     
-    </script>
+            </script>
     
     
-            <a href="{% url 'college_home' %}" class="btn btn-info">Back</a>
+            <a type="button" href="{% url 'college_home' %}" class="btn btn-darker">Back</a>
         
         
         </div>
@@ -111,3 +126,5 @@
 
 
 {% endblock %}
+
+{% block footer %} {% endblock %}

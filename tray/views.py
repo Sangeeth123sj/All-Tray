@@ -941,26 +941,54 @@ def college_break_edit_post(request):
 
 @login_required
 def college_recharge(request):
-    return render(request, "tray/college_recharge.html")
-
+    if request.method == "GET":
+        return render(request, "tray/college_recharge.html")
+    if request.method == "POST":
+        email = request.POST["email"]
+        request.session["college_recharge_student_mail"] = email
+        try:
+            user = User.objects.get(email=email)
+            student_user = Student.objects.filter(user=user).exists()
+            if student_user:
+                student_name = user.student.name
+                student_balance = user.student.balance
+                print(student_name,"12345678")
+            return render(
+                request,
+                "tray/college_recharge_details.html",
+                {
+                    "email": email,
+                    "student_balance": student_balance,
+                    "student_name": student_name,
+                },
+            )
+        except:
+            print("_________________finished try block")
+            return render(request, 'tray/college_recharge.html', context={'error': 'wrong email for student'})
 
 @login_required
 def college_recharge_post(request):
     if request.method == "POST":
         email = request.POST["email"]
-        college_recharge_student_id = request.session["college_recharge_student_id"]
-        student_object = Student.objects.get(id=college_recharge_student_id)
-        student_name = student_object.name
-        student_balance = student_object.balance
-    return render(
-        request,
-        "tray/college_recharge_details.html",
-        {
-            "email": email,
-            "student_balance": student_balance,
-            "student_name": student_name,
-        },
-    )
+        request.session["college_recharge_student_mail"] = email
+        try:
+            user = User.objects.get(email=email)
+            student_user = Student.objects.filter(user=request.user).exists()
+            student_name = student_user.name
+            student_balance = student_user.balance
+            return render(
+                request,
+                "tray/college_recharge_details.html",
+                {
+                    "email": email,
+                    "student_balance": student_balance,
+                    "student_name": student_name,
+                },
+            )
+        except:
+            print("_________________finished try block")
+            return render(request, 'tray/college_recharge.html', context={'error': 'wrong email for student'})
+        
 
 
 @login_required
@@ -1290,7 +1318,7 @@ def cart(request):
                 store.store_balance = store.store_balance + cost
                 store.save()
                 # updating student balance
-                student.balance = student.balance - cost
+                student.balance = student.balance - (cost + (order_group.order_group_total * 0.01) )
                 student.save()
             # saving orders to db
             Order.objects.bulk_create(objects)

@@ -1,4 +1,4 @@
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
 
 {% block title %} Recharge a card {% endblock %}
@@ -8,7 +8,7 @@
 <center>
     <br/><br/><br/>
     <h3><strong>Student: {{student_name}}</strong></h3>
-    <h3><strong>Balance: <p id="balance">{{student_balance}}</p></strong></h3>
+    <h3><strong id="balance">Balance:{{student_balance}}</strong></h3>
     <br/> <br/>
     <form action="/college_recharge_final/" class="form" method="POST">
         {% csrf_token %}

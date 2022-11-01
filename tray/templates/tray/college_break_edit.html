@@ -1,9 +1,9 @@
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
 
 {% block title %} Edit Break {% endblock %}
 
-{% block navbar %} 
+{% comment %} {% block navbar %} 
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <li class="nav-item active">
@@ -27,7 +27,7 @@
     </div>
     </nav> 
 
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 
@@ -38,28 +38,40 @@
 
 <h2>Edit Break</h2>
 <br/>
-<div class="form-group centered">
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
     <form action="/college_break_edit_post/" method="POST" name="form" >
     {% csrf_token %}
-        <h4>First Break</h4>
-        <input type="time" name="first_break" id="first_break" class="form-control" required><br/><br/>
-        <h4>Lunch break</h4>
-        <input type="time" name="lunch_break" id="lunch_break" class="form-control" required><br/><br/>
-        <h4>Last break</h4>
-        <input type="time" name="last_break" id="last_break" class="form-control" required><br/><br/>
-        <input type="submit" class="form-control btn btn-success" >
+        <div class="form-outline mb-4">
+            <input type="time" class="form-control form-control-lg" id="first_break" name="first_break" required>
+            <label class="form-label">First Break</label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <input type="time" class="form-control form-control-lg" id="lunch_break" name="lunch_break" required>
+            <label class="form-label">Lunch Break</label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <input type="time" class="form-control form-control-lg" id="last_break" name="last_break" required>
+            <label class="form-label">Last Break</label>
+        </div>
+        
+        <input type="submit" class="btn btn-darker" >
     </form>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 
-<div class="row">
-    
-    <div class="col-sm-5">
+
         <a href="{% url 'college_home' %}" class="btn btn-info">Back</a>
-    </div>
-    <div class="col-sm-11">
-    
-    </div>
-    </div>
+
+
 </center>
 
 

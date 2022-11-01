@@ -1,6 +1,6 @@
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
-{% block navbar %} 
+{% comment %} {% block navbar %} 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <li class="nav-item active">
         <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
@@ -31,14 +31,13 @@
         
     </div>
     </nav> 
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 
-{% block title%} Tray  {% endblock %}
+{% block title%} College Home  {% endblock %}
 
-{% block frost %}
-{% endblock %}
+
 {% block content %}
     <center>
     <script type="text/javascript"> 
@@ -72,7 +71,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                 {% for store in stores %}
-                    <button type="submit" id="store_button" class="btn btn-outline-dark" name="store_id" value="{{store.id}}"> 
+                    <button type="submit" id="store_button" class="white-button" name="store_id" value="{{store.id}}"> 
                         <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
                         {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
                         {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>
