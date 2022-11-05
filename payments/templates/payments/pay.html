@@ -40,9 +40,27 @@
 
 <center>
     <h2>Payment Home</h2>
+    <br/>
+    {% if fee_payment %}
+
+  
+<div class="card" style="width: 28rem;">
+  <div class="card-header">
+    <h4>Fee details of {{institute}} </h4>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title"></h5>
+    <p class="card-text"><strong>{{institute.fee_details}}</strong></p>
+  </div>
+</div>
+
+
+
+    {% endif %}
     {% if error %}
     <h3>{{ error }}</h3>
     {% endif %}
+    <br/> <br/>
     <form method="post">
         {% csrf_token %}
         <label id="amount" for="amount"> Enter Amount: </label>

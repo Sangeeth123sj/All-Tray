@@ -24,6 +24,7 @@ from .models import (
     Revenue,
     OrderGroup,
     SubscriptionPlans,
+    FeePayment
 )
 
 
@@ -45,6 +46,11 @@ class UserAdmin(ImportExportMixin, admin.ModelAdmin):
     search_fields = ("email",)
 
 admin.site.register(User,UserAdmin)
+
+
+# class FeePaymentAdmin(ImportExportMixin, admin.ModelAdmin):
+#     search_fields = ("student",)
+admin.site.register(FeePayment)
 
 class RevenueAdmin(ImportExportMixin, admin.ModelAdmin):
     search_fields = ("student",)

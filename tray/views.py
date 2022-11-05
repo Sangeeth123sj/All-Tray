@@ -15,12 +15,14 @@ import random
 import razorpay
 from django.conf import settings
 import uuid
+from django.contrib.auth.hashers import check_password
 
 from .models import (
     Bill,
     Break,
     BulkRechargeMail,
     CartItem,
+    FeePayment,
     Institute,
     Item,
     Order,
@@ -68,13 +70,13 @@ def register_card(request):
 
 def register_card_post(request):
     if request.method == "POST":
-        student_name = request.POST["student_name"]
-        branch = request.POST["branch_name"]
-        semester = request.POST["semester"]
-        password = request.POST["password"]
-        card_pin = request.POST["card_pin"]
-        college_id = request.POST["college_id"]
-        email = request.POST["mail_id"]
+        student_name = request.POST.get("student_name")
+        branch = request.POST.get("branch_name")
+        semester = request.POST.get("semester")
+        password = request.POST.get("password")
+        card_pin = request.POST.get("card_pin")
+        college_id = request.POST.get("college_id")
+        email = request.POST.get("mail_id")
         college_object = Institute.objects.get(id=college_id)
         user = User.objects.create_user(email, password)
         user.save
@@ -89,9 +91,14 @@ def register_card_post(request):
             student.pin_no = card_pin
         student.save()
         if BulkRechargeMail.objects.filter(email=email).exists():
-            bulk_recharge_email = BulkRechargeMail.objects.get(email=email)
-            student.balance = bulk_recharge_email.recharge_amount
-            student.save()
+            student_bulk_recharge_objects = BulkRechargeMail.objects.filter(email=email)
+            for bulk_recharge_object in student_bulk_recharge_objects:
+                student.balance = int(student.balance) +  int(bulk_recharge_object.recharge_amount)
+                bulk_recharge_object.active = True
+                bulk_recharge_object.account_status = True
+                bulk_recharge_object.student = student
+                student.save()
+                bulk_recharge_object.save()
         messages.success(request, "Profile created.")
         return render(request, "tray/entry.html")
 
@@ -167,8 +174,10 @@ def your_orders_post(request):
 
 @login_required
 def your_orders(request):
-    student_id = request.session["student_id"]
-    student_object = Student.objects.get(id=student_id)
+    # student_id = request.session["student_id"]
+    # student_object = Student.objects.get(id=student_id)
+    student_object = request.user.student
+    print(request.user.student)
     orders = Order.objects.filter(student=student_object)
     order_exist = Order.objects.filter(student=student_object).exists()
     if order_exist:
@@ -193,9 +202,10 @@ def order_page_post(request):
 
 @login_required
 def order_page(request):
-    student_id = request.session["student_id"]
+    # student_id = request.session["student_id"]
     store_id = request.session["store_id"]
-    student = Student.objects.get(id=student_id)
+    # student = Student.objects.get(id=student_id)
+    student = request.user.student
     college = student.college
     store = Store.objects.get(id=store_id)
     items = store.item_set.filter(available=True)
@@ -209,19 +219,19 @@ def order_page(request):
 
 @login_required
 def student_pin_edit(request):
-    student_id = request.session["student_id"]
-    student = Student.objects.get(id=student_id)
-    request.session["student_id"] = student_id
+    # student_id = request.session["student_id"]
+    # student = Student.objects.get(id=student_id)
+    student = request.user.student
     return render(request, "tray/student_pin_edit.html", {"student": student})
 
 
 @login_required
 def student_pin_edit_post(request):
-    student_id = request.session["student_id"]
+    # student_id = request.session["student_id"]
     if request.method == "POST":
-        print(student_id)
+        student = request.user.student
         password = request.POST["password"]
-        student = Student.objects.get(id=student_id)
+        # student = Student.objects.get(id=student_id)
         u = student.user
         u.set_password(password)
         u.save()
@@ -295,12 +305,12 @@ def store_login_processing(request):
 
 @login_required
 def store_home(request):
-    store_id = request.session["store_id"]
-    store = Store.objects.get(id=store_id)
+    # store_id = request.session["store_id"]
+    # store = Store.objects.get(id=store_id)
+    store = request.user.store
     store_name = store.store_name
     items = store.item_set.all()
     status = store.store_status
-    request.session["store_id"] = store_id
     if status == True:
         c = "Open"
     else:
@@ -311,7 +321,7 @@ def store_home(request):
         {
             "store": store,
             "store_name": store_name,
-            "store_id": store_id,
+            "store_id": store.id,
             "status": c,
             "items": items,
         },
@@ -320,9 +330,10 @@ def store_home(request):
 
 @login_required
 def store_billing(request):
-    store_id = request.session["store_id"]
-    print("entering billing store id  = " + str(store_id))
-    store = Store.objects.get(id=store_id)
+    # store_id = request.session["store_id"]
+    # store = Store.objects.get(id=store_id)
+    store = request.user.store
+    print("entering billing store: " + str(store))
     store_name = store.store_name
     items = store.item_set.all()
     context = {"store": store, "store_name": store_name, "items": items}
@@ -332,9 +343,10 @@ def store_billing(request):
 @login_required
 def billing_item_price(request):
     item_name = request.GET["item_name"]
-    store_id = request.GET["store_id"]
+    # store_id = request.GET["store_id"]
     # store = Store.objects.get(id = store_id)
-    item = Item.objects.get(item=item_name, store=store_id)
+    store = request.user.store
+    item = Item.objects.get(item=item_name, store=store)
     item_price = item.price
     data = {
         "item_price": item_price,
@@ -359,8 +371,9 @@ def invoice_number_gen(store):
 
 @login_required
 def billing_invoice(request):
-    store_id = request.session["store_id"]
-    store = Store.objects.get(id=store_id)
+    # store_id = request.session["store_id"]
+    # store = Store.objects.get(id=store_id)
+    store = request.user.store
     store_name = store.store_name
     load = json.loads(request.GET["order_list_json"])
     total = request.GET["total"]
@@ -451,8 +464,8 @@ def invoice_print(response):
 
 @login_required
 def store_edit_details(request):
-    store_id = request.session["store_id"]
-    store_object = Store.objects.get(id=store_id)
+    # store_id = request.session["store_id"]
+    store_object = request.user.store
     college_object = store_object.college
     return render(
         request,
@@ -464,10 +477,11 @@ def store_edit_details(request):
 @login_required
 def store_edit_details_post(request):
     if request.method == "POST":
-        store_id = request.session["store_id"]
+        # store_id = request.session["store_id"]
         store_name = request.POST["store_name"]
         store_details = request.POST["store_description"]
-        store_object = Store.objects.get(id=store_id)
+        # store_object = Store.objects.get(id=store_id)
+        store_object = request.user.store
         store_object.store_name = store_name
         store_object.store_details = store_details
         store_object.save()
@@ -483,11 +497,12 @@ def store_add_item(request):
 @login_required
 def store_add_item_save(request):
     if request.method == "POST":
-        store_id = request.session["store_id"]
+        # store_id = request.session["store_id"]
         item_name = request.POST["item_name"]
         stock = request.POST["stock"]
         price = request.POST["price"]
-        store_object = Store.objects.get(id=store_id)
+        # store_object = Store.objects.get(id=store_id)
+        store_object = request.user.store
         new_item = Item(item=item_name, stock=stock, price=price, store=store_object)
         new_item.save()
     return redirect(store_home)
@@ -535,8 +550,9 @@ def store_logout(request):
 
 @login_required
 def store_order_list(request):
-    store_id = request.session["store_id"]
-    store_object = Store.objects.get(id=store_id)
+    # store_id = request.session["store_id"]
+    # store_object = Store.objects.get(id=store_id)
+    store_object = request.user.store
     orders = Order.objects.filter(store=store_object)
     sorted_orders = orders.order_by("student", "pickup_time")
     current_month = datetime.today().strftime("%h")
@@ -560,8 +576,6 @@ def store_order_list(request):
 
 @login_required
 def store_item_pickup(request):
-    store_id = request.session["store_id"]
-    request.session["store_id"] = store_id
     return render(request, "tray/store_item_pickup.html")
 
 
@@ -612,7 +626,7 @@ def user_pickup_orders_post(request):
 
 @login_required
 def user_pickup_orders(request):
-    store_id = request.session["store_id"]
+    # store_id = request.session["store_id"]
     otp_or_card = request.session["otp_or_card"]
     otp_or_card_selected = request.session["otp_or_card_selected"]
     print("otp/card: " + otp_or_card_selected)
@@ -630,8 +644,9 @@ def user_pickup_orders(request):
 
 @login_required
 def store_bills(request):
-    store_id = request.session["store_id"]
-    store_object = Store.objects.get(id=store_id)
+    # store_id = request.session["store_id"]
+    # store_object = Store.objects.get(id=store_id)
+    store_object = request.user.store
     store_bills = Bill.objects.filter(store=store_object)
     # sorted_orders = orders.order_by('student', 'pickup_time')
     return render(
@@ -708,9 +723,10 @@ def college_login_verify(request):
 
 @login_required
 def college_home(request):
-    institute_id = request.session.get("institute_id")
-    print("_________",institute_id)
-    college = Institute.objects.get(id=institute_id)
+    # institute_id = request.session.get("institute_id")
+    print("_________",request.user.institute)
+    # college = Institute.objects.get(id=institute_id)
+    college = request.user.institute
     try:
         merchant_credentials = InstituteMerchantCredentail.objects.get(college=college)
     except InstituteMerchantCredentail.DoesNotExist:
@@ -736,8 +752,9 @@ def college_subscription_form(request):
     if request.method == "GET":
         return render(request, "tray/college_subscription_form.html")
     if request.method == "POST":
-        institute_id = request.session.get("institute_id")
-        college = Institute.objects.get(id=institute_id)
+        # institute_id = request.session.get("institute_id")
+        # college = Institute.objects.get(id=institute_id)
+        college = request.user.institute
         college.identification_token = uuid.uuid4()
         college.save()
         global client
@@ -812,8 +829,12 @@ def receipt_number_generator():
     
 @login_required
 def college_bulk_recharge(request):
-    return render(request, "tray/college_bulk_recharge.html")
-
+    # college_id = request.session.get("college_id")
+    # institute = Institute.objects.get(id = college_id)
+    institute = request.user.institute
+    college_bulk_recharge_list = BulkRechargeMail.objects.filter(college=institute)
+    context = {"institute": institute, "college_bulk_recharge_list": college_bulk_recharge_list}
+    return render(request, "tray/college_bulk_recharge.html", context)
 
 @login_required
 def college_merchant_creds_form(request):
@@ -823,9 +844,10 @@ def college_merchant_creds_form(request):
         razorpay_merchant_id = request.POST.get("razorpay_merchant_id")
         razorpay_key_secret = request.POST.get("razorpay_key_secret")
         razorpay_key_id = request.POST.get("razorpay_key_id")
+        college = request.user.institute
+        # college_id = request.session["college_id"]
+        # college = Institute.objects.get(id= college_id)
         
-        college_id = request.session["college_id"]
-        college = Institute.objects.get(id= college_id)
         try:
             InstituteMerchantCredentail.objects.update_or_create(
             college=college,
@@ -880,9 +902,24 @@ def college_store_order_list(request):
 
 
 @login_required
+def college_feepayment_list(request):
+    college_feepayment_list = FeePayment.objects.filter(institute=request.user.institute)
+    print(college_feepayment_list)
+    context = {"college_feepayment_list":college_feepayment_list}
+    return render(request, "tray/college_feepayment_list.html", context)
+
+@login_required
+def college_feepayment_details(request,student_id):
+    student = Student.objects.get(id=student_id)
+    context = {"student":student}
+    return render(request, "tray/college_feepayment_details.html",context)
+
+
+@login_required
 def college_alltray_revenue_student_list(request):
-    institute_id = request.session.get("institute_id")
-    institute = get_object_or_404(Institute,id=institute_id)
+    # institute_id = request.session.get("institute_id")
+    # institute = get_object_or_404(Institute,id=institute_id)
+    institute = request.user.institute
     students = Student.objects.filter(college=institute)
     context = {"students":students}
     # revenues = Revenue.objects.filter(institute=institute)
@@ -890,8 +927,9 @@ def college_alltray_revenue_student_list(request):
 
 @login_required
 def college_alltray_revenue_student_details(request,student_id):
-    institute_id = request.session.get("institute_id")
-    institute = get_object_or_404(Institute,id=institute_id)
+    # institute_id = request.session.get("institute_id")
+    # institute = get_object_or_404(Institute,id=institute_id)
+    institute = request.user.institute
     student = get_object_or_404(Student,id=student_id)
     revenues = Revenue.objects.filter(institute=institute,student=student)
     current_month = datetime.today().strftime("%h")
@@ -908,8 +946,9 @@ def college_alltray_revenue_student_details(request,student_id):
 
 @login_required
 def college_break_edit(request):
-    institute_id = request.session.get("institute_id")
-    institute = get_object_or_404(Institute,id=institute_id)
+    # institute_id = request.session.get("institute_id")
+    # institute = get_object_or_404(Institute,id=institute_id)
+    institute = request.user.institute
     try:
         college_break = Break.objects.get(college=institute)
         first_break = college_break.first_break.strftime("%H:%M:%S")
@@ -929,8 +968,9 @@ def college_break_edit_post(request):
         first_break = request.POST["first_break"]
         lunch_break = request.POST["lunch_break"]
         last_break = request.POST["last_break"]
-        college_id = request.session["college_id"]
-        college_object = Institute.objects.get(id=college_id)
+        # college_id = request.session["college_id"]
+        # college_object = Institute.objects.get(id=college_id)
+        college_object = request.user.institute
         break_time_object = Break.objects.get(college=college_object)
         break_time_object.first_break = first_break
         break_time_object.lunch_break = lunch_break
@@ -944,50 +984,42 @@ def college_recharge(request):
     if request.method == "GET":
         return render(request, "tray/college_recharge.html")
     if request.method == "POST":
-        email = request.POST["email"]
+        email = request.POST.get("email")
+        card = request.POST.get("card_number")
         request.session["college_recharge_student_mail"] = email
+        print("card:",card)
+        # institute_id = request.session.get("institute_id")
+        # institute = Institute.objects.get(id=institute_id)
+        institute = request.user.institute
         try:
-            user = User.objects.get(email=email)
-            student_user = Student.objects.filter(user=user).exists()
-            if student_user:
-                student_name = user.student.name
-                student_balance = user.student.balance
-                print(student_name,"12345678")
+            if card:
+                student_user = Student.objects.get(college=institute, pin_no = card)
+                print("student from card", student_user)
+                student_name = student_user.name
+                student_balance = student_user.balance
+            if email:
+                user = User.objects.get(email=email)
+                student_user = Student.objects.get(user=user)
+                student_name = student_user.name
+                student_balance = student_user.balance
+            request.session["recharge_student_id"] = student_user.id
             return render(
                 request,
                 "tray/college_recharge_details.html",
                 {
-                    "email": email,
                     "student_balance": student_balance,
                     "student_name": student_name,
                 },
             )
         except:
             print("_________________finished try block")
-            return render(request, 'tray/college_recharge.html', context={'error': 'wrong email for student'})
-
+            return render(request, 'tray/college_recharge.html', context={'error': 'wrong email or card for student'})
+        
 @login_required
+# this view not in use
 def college_recharge_post(request):
-    if request.method == "POST":
-        email = request.POST["email"]
-        request.session["college_recharge_student_mail"] = email
-        try:
-            user = User.objects.get(email=email)
-            student_user = Student.objects.filter(user=request.user).exists()
-            student_name = student_user.name
-            student_balance = student_user.balance
-            return render(
-                request,
-                "tray/college_recharge_details.html",
-                {
-                    "email": email,
-                    "student_balance": student_balance,
-                    "student_name": student_name,
-                },
-            )
-        except:
-            print("_________________finished try block")
-            return render(request, 'tray/college_recharge.html', context={'error': 'wrong email for student'})
+    pass
+
         
 
 
@@ -998,39 +1030,57 @@ def college_recharge_details(request):
 
 @login_required
 def validate_recharge(request):
-    email = request.GET["email"]
-    print(email)
+    email = request.GET.get("email")
+    card = request.GET.get("card")
     college_id = request.session["college_id"]
-    user_valid = User.objects.filter(email=email).exists()
-    print("USER: " + str(user_valid))
-    if user_valid:
-        user = User.objects.get(email=email)
-        student_valid = Student.objects.filter(user=user, college=college_id).exists()
-        college_recharge_student_obj = Student.objects.get(
-            user=user, college=college_id
-        )
+    if email:
+        user_valid = User.objects.filter(email=email).exists()
+        if user_valid:
+            user = User.objects.get(email=email)
+            student_valid = Student.objects.filter(user=user, college=college_id).exists()
+        else:
+            student_valid = False
+    elif card:
+        student_valid = Student.objects.filter(college=college_id, pin_no=card).exists()
+    print("USER: " + str(student_valid))
+    if student_valid:
+        if email:
+            college_recharge_student_obj = Student.objects.get(
+                user=user, college=college_id
+            )
+        elif card:
+            college_recharge_student_obj = Student.objects.get(
+                pin_no=card, college=college_id
+            )
         college_recharge_student_id = college_recharge_student_obj.id
         request.session["college_recharge_student_id"] = college_recharge_student_id
-        print("Student valid: " + str(student_valid) + str(user) + str(college_id))
+        print("Student valid: " + str(student_valid) + str(college_id))
         print(str(Institute.objects.get(id=college_id)))
-        if student_valid:
-            data = {"email_status": "correct"}
+        if student_valid and email:
+            data = {"status": "email correct"}
             return JsonResponse(data)
-        else:
-            data = {"email_status": "incorrect"}
+        
+        elif student_valid and card:
+            data = {"status": "card correct"}
             return JsonResponse(data)
 
     else:
-        data = {"email_status": "incorrect"}
-        return JsonResponse(data)
-
+        print("--------------------entered else")
+        if not email:
+            data = {"status": "card incorrect"}
+            return JsonResponse(data)
+        elif not card:
+            data = {"status": "email incorrect"}
+            return JsonResponse(data)
+        if email and card:
+            data = {"status": "both email and card incorrect"}
+            return JsonResponse(data)
 
 @login_required
 def college_recharge_final(request):
-    email = request.GET["email"]
     amount = request.GET["amount"]
-    user = User.objects.get(email=email)
-    student_object = Student.objects.get(user=user)
+    recharge_student_id = request.session.get("recharge_student_id")
+    student_object = Student.objects.get(id=recharge_student_id)
     current_balance = student_object.balance
     student_object.balance = current_balance + int(amount)
     student_object.save()
@@ -1486,18 +1536,38 @@ def student_pin_edit_validate(request):
 def bulk_recharge_submit(request):
     mails = json.loads(request.GET["mails"])
     recharge_amount = request.GET["recharge_amount"]
-    college_id = request.session["college_id"]
-    college = Institute.objects.get(id=college_id)
+    # college_id = request.session["college_id"]
+    # college = Institute.objects.get(id=college_id)
+    college = request.user.institute
     print(mails)
     print("amount: " + recharge_amount)
     new_mail = []
     all_mail_objects = []
     for i in mails:
-        new_mail = BulkRechargeMail(
+        new_mail = BulkRechargeMail.objects.create(
             email=i, recharge_amount=recharge_amount, college=college
         )
         all_mail_objects.append(new_mail)
-    BulkRechargeMail.objects.bulk_create(all_mail_objects)
+    # removed bulk create as the id is not available for each created object and thus update of fields creates duplicate objects
+    # bulk_recharge_mails = BulkRechargeMail.objects.bulk_create(all_mail_objects)
+    # print(type(bulk_recharge_mails))
+    # print(bulk_recharge_mails)
+    college_students = Student.objects.filter(college=college)
+
+    for recharge_mail in all_mail_objects:
+        for student in college_students:
+            if student.user.email == recharge_mail.email:
+                student.balance = int(student.balance) +  int(recharge_mail.recharge_amount)
+                # shows student account is charged
+                print("id-----",recharge_mail.id)
+                print("entered if")
+                recharge_mail.active = True
+                # shows student account already present
+                recharge_mail.account_status = True
+                recharge_mail.student = student
+                recharge_mail.save()
+                student.save()
+        
     data = {"added": "success"}
     return JsonResponse(data)
 

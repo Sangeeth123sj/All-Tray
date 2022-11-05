@@ -72,6 +72,7 @@ urlpatterns = [
         views.college_bulk_recharge,
         name="college_bulk_recharge",
     ),
+
     path(
         "college_store_order_list_post/",
         views.college_store_order_list_post,
@@ -88,6 +89,8 @@ urlpatterns = [
         views.college_break_edit_post,
         name="college_break_edit_post",
     ),
+    path("college_feepayment_list/", views.college_feepayment_list, name="college_feepayment_list"),
+    path("college_feepayment_details/<int:student_id>", views.college_feepayment_details, name="college_feepayment_details"),
     path("college_alltray_revenue_student_list/", views.college_alltray_revenue_student_list, name="college_alltray_revenue_student_list"),
     path("college_alltray_revenue_student_details/<int:student_id>/", views.college_alltray_revenue_student_details, name="college_alltray_revenue_student_details"),
     path("college_recharge/", views.college_recharge, name="college_recharge"),

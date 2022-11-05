@@ -1,0 +1,84 @@
+{% extends "tray/college_homepage_layout.html" %}
+
+
+
+{% block content %}
+
+
+
+
+<h2>Alltray Bulk Recharge Student list:</h2>
+<strong id="no_delete_condition" style="color: red;"></strong>
+<br/>
+<!--Testing daterange-->
+{% load item_filters %}
+
+
+<table id='table' width="50%">
+    <thead>
+        <th>
+            Student
+        </th>
+        <th>
+            Recharge status
+        </th>
+        <th>
+            Account
+        </th>
+        <th>
+            date
+        </th>
+    </thead>
+    <tbody>
+        {% for recharge in college_bulk_recharge_list %}                
+            <tr height="50px" id="{{order.id}}">
+                <td align="center">
+                    {% if recharge.account_status %}
+                        {{recharge.student.name}}
+                    {% else %}
+                        {{recharge.email}}
+                    {% endif %}
+                </td>
+                <td align="center">
+                    {% if recharge.active %}
+                        recharge done
+                    {% else %}
+                        recharge not done
+                    {% endif %}
+                </td>
+                <td>
+                    {% if recharge.account_status %}
+                        {{recharge.account_status}}   
+                    {% else %}
+                        student not registered
+                    {% endif %}
+                </td>
+                <td>
+                    {{recharge.created_at}}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

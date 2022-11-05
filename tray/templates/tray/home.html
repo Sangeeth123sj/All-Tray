@@ -64,7 +64,7 @@
                     <div class="col-sm-12" >
             {% for store in stores %}
            
-                <button type="submit" class="store_id white-button" id="store_button" name="store_id" value="{{store.id}}" > 
+                <button type="submit" class="store_id white-button long-button" id="store_button" name="store_id" value="{{store.id}}" > 
                   <p id='{{store.id}}' > </p>
                     <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
                     <div id = 'store_status'>
@@ -120,4 +120,7 @@ $(document).ready(function(){
   }
 });
 </script>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

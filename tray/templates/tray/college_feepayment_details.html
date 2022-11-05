@@ -32,35 +32,12 @@
 
 {% block content %}
 
-<h2>Alltray Revenue Student list:</h2>
-<strong id="no_delete_condition" style="color: red;"></strong>
+<h2>Fee Payment Details</h2>
 <br/>
-<!--Testing daterange-->
-{% load item_filters %}
+<h3>Student: {{student.name}}</h3>
+<h3>Semester: {{student.sem}}</h3>
+<h3>Branch: {{student.branch}}</h3>
 
-
-<table id='table' width="50%">
-    <thead>
-        <th>
-            Student
-        </th>
-        <th>
-            Revenue Details
-        </th>
-    </thead>
-    <tbody>
-        {% for student in students %}                
-            <tr height="50px" id="{{order.id}}">
-                <td align="center">
-                    {{student.name}}
-                </td>
-                <td align="center">
-                    <a href="{% url 'college_alltray_revenue_student_details'  student.id %}">Revenue details</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
 {% endblock %}
 

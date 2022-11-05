@@ -1,9 +1,9 @@
-{% extends "tray/base.html" %}
+{% extends "tray/store_homepage_layout.html" %}
 
 {% block title%} Welcome to All Tray {% endblock %}
 
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -30,7 +30,7 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 {% block content %}
@@ -48,6 +48,7 @@
 <br/> 
 
 <p id="incorrect_alert" style="color: rgba(207, 77, 77, 0.774); font-weight: 1000; width: fit-content;" ></p>
+<br/>
 <input type="button" id="enter" class="btn btn-primary" value="Enter">
 </form>
 

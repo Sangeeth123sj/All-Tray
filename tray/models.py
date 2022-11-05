@@ -46,9 +46,12 @@ class Institute(models.Model):
     plan = models.CharField(max_length=200, choices=PLANS, default="basic")
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="institute")
     identification_token = models.UUIDField(default=None, null=True, blank=True)
+    fee_details = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     def __str__(self):
         return str(self.institute_name)
+
+
 
 class InstituteMerchantCredentail(models.Model):
     # paytm creds
@@ -83,6 +86,18 @@ class Student(models.Model):
             + " | College: "
             + str(self.college.institute_name)
         )
+
+
+
+class FeePayment(models.Model):
+    # feepayment status of student on the institute
+    paid_fee = models.IntegerField(default=0)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    institute = models.ForeignKey(Institute, on_delete=models.CASCADE,  null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
+    
+    def __str__(self):
+        return("student: "+ str(self.student) + "paid fee: "+ str(self.paid_fee) +"college: "+str(self.institute)+ "day: "+ str(self.created_at.date()))
 
 
 class Store(models.Model):
@@ -237,6 +252,7 @@ class BulkRechargeMail(models.Model):
     created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     active = models.BooleanField(default=False)
     college = models.ForeignKey(Institute, on_delete=models.CASCADE)
-
+    account_status = models.BooleanField(default=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE,  null=True, blank=True)
     def __str__(self):
         return "Bulk recharge: " + str(self.email) + " | status: " + str(self.active)

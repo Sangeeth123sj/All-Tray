@@ -251,13 +251,13 @@
 
               <nav class="site-navigation text-right ml-auto d-none d-lg-block" role="navigation">
                 <ul class="site-menu main-menu js-clone-nav ml-auto ">
-                  <li class="active"><a href="{% url 'entry' %}" class="nav-link ">Home</a></li>
-                  <li><a href="{% url 'your_orders' %}" class="nav-link ">Your Orders</a></li>
-                  <li><a href="{% url 'pay' %}" class="nav-link ">Recharge Card</a></li>
-                  <li><a href="{% url 'fee_payment' %}" class="nav-link ">Fee Payment</a></li>
-                  <li><a href="{% url 'student_pin_edit' %}" class="nav-link ">Edit Pin</a></li>
+                  <li class="active"><a href="{% url 'store_home' %}" class="nav-link ">Home</a></li>
+                  <li><a href="{% url 'billing' %}" class="nav-link ">Billing</a></li>
+                  <li><a href="{% url 'store_edit_details' %}" class="nav-link ">Edit Store</a></li>
+                  <li><a href="{% url 'store_order_list' %}" class="nav-link ">Order List</a></li>
+                  <li><a href="{% url 'store_bills' %}" class="nav-link ">Store Bills</a></li>
                   <li><a href="{% url 'home' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
-                  <li><a href="{% url 'student_logout' %}" class="nav-link ">Logout</a></li>
+                  <li><a href="{% url 'store_logout' %}" class="nav-link ">Logout</a></li>
                   
                   <li><a href="#" class="nav-link ">Contact</a></li>
                 </ul>
@@ -294,7 +294,7 @@
 
 </center>
 
-{% block footer %}
+{% comment %} {% block footer %}
   <!--Footer-->
   <footer class="bg-dark text-center text-white">
     <!-- Grid container -->
@@ -347,7 +347,7 @@
   </footer>
 </center>
  
-  {% endblock %} 
+  {% endblock %}  {% endcomment %}
     
 
     <!--script src="js/jquery-3.3.1.min.js"></script>

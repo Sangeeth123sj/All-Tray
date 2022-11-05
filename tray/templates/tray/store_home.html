@@ -1,9 +1,9 @@
-{% extends "tray/base.html" %}
+{% extends "tray/store_homepage_layout.html" %}
 
 
 {% block title %} Store Home {% endblock %}
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -33,7 +33,7 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 {% block content %}
@@ -54,8 +54,8 @@ if(performance.navigation.type == 2){
  }
 </script>
 
-<h3>{{store.store_name}}<span id="status">({{status}})</span></h3>
-<p style="font-style:unset;">Welcome to your {{store_name}}</p><br/>
+<h2>{{store.store_name}}<span id="status">({{status}})</span></h2>
+<h5 style="font-style:unset;">Welcome to {{store_name}}</h5><br/>
 <h4>Store status</h4>
 <!--My switch from scratch-->
 <button  type="button" id="store_status_button" style="width: fit-content;" class="btn btn-success">Store Open! </button>
@@ -65,13 +65,12 @@ if(performance.navigation.type == 2){
 
 <div class="btn-group" role="group" >
     <a href="{% url 'store_add_item' %}" class="btn btn-success">Add Items</a>
-    <a href="{% url 'store_item_pickup' %}" class="btn btn-primary">Item pickup</a>
-    <a href="{% url 'store_edit_details' %}" class="btn btn-success">Edit Store</a>
+    <a href="{% url 'store_item_pickup' %}" class="btn btn-primary">Item Pickup</a>
   </div>
 <br/>  <br/>  
 
 {% if items %}
-<table  id="item_table" width="40%">
+<table  id="item_table" width="50%">
 <thead>
     <tr>
         <th>Item </th>
@@ -119,8 +118,7 @@ if(performance.navigation.type == 2){
 
         <div class="btn-group" role="group" >   
             <a href="{% url 'store_add_item' %}" class="btn btn-success">Add Items</a>
-            <a href="{% url 'store_order_list' %}" class="btn btn-primary">Order list</a>
-            <a href="{% url 'store_item_pickup' %}" class="btn btn-success">Store item pickup</a>
+            <a href="{% url 'store_item_pickup' %}" class="btn btn-primary">Item Pickup</a>
         </div>
 
 {% endif %}

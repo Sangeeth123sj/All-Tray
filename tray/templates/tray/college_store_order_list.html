@@ -1,7 +1,7 @@
-{% extends 'tray/base.html'%}
+{% extends 'tray/college_homepage_layout.html'%}
 
 
-{% block navbar %} 
+{% comment %} {% block navbar %} 
  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <li class="nav-item active">
         <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
@@ -26,7 +26,7 @@
         
     </div>
     </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 
@@ -35,7 +35,7 @@
 <h2>{{store.store_name}} orders are:</h2>
 <strong id="no_delete_condition" style="color: red;"></strong>
 <br/>
-<table>
+<table  width="20%" >
     <thead>
         <th>
             Month
@@ -63,7 +63,7 @@
 
         {% if is_order_day %}
                
-                    <table id='table' width="30%">
+                    <table id='table' width="50%">
                     <thead>
                         
                         <th>
@@ -299,4 +299,7 @@ $(document).ready(function(){
 </script>
 
 </center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

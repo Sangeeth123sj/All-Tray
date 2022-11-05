@@ -1,4 +1,4 @@
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
 {% block head %}
     <h1>Bulk Recharge</h1>
@@ -6,15 +6,78 @@
 {% block content %}
 <center>
 <h2>Enter recharge amount</h2>
-<input type="number" id="amount"  name="amount">
+<input type="number" id="amount"  name="amount" required >
 
 <br><br/>
-<h2>Enter each mail id <br> of students & press enter</h2>
+<h2>Enter each mail id <br> of students & click add</h2>
 <textarea id="mails"   name="mails" rows="4" cols="50"></textarea>
+<br/>
+<button id="add" class="btn btn-success" >Add</button>
 <br><br>
-<button id='submit' name="submit" class='btn btn-success'>Add mails</button>
-<br>
-<p id='ml'></p>
+<input id='submit' name="submit" type="submit" class='btn btn-darker' value="submit">
+<br/><br/>
+<h4 id='ml'></h4>
+<hr class="my-4">
+<h2>Alltray Bulk Recharge Student list:</h2>
+<strong id="no_delete_condition" style="color: red;"></strong>
+<br/>
+<!--Testing daterange-->
+{% load item_filters %}
+
+
+<table id='table' width="50%">
+    <thead>
+        <th>
+            Student
+        </th>
+        <th>
+            Recharge status
+        </th>
+        <th>
+            Recharge Amount
+        </th>
+        <th>
+            Account
+        </th>
+        <th>
+            date
+        </th>
+    </thead>
+    <tbody>
+        {% for recharge in college_bulk_recharge_list %}                
+            <tr height="50px" id="{{order.id}}">
+                <td align="center">
+                    {% if recharge.account_status and recharge.student.name%}
+                        {{recharge.student.name}}
+                    {% else %}
+                        {{recharge.email}}
+                    {% endif %}
+                </td>
+                <td align="center">
+                    {% if recharge.active %}
+                        recharge done
+                    {% else %}
+                        recharge not done
+                    {% endif %}
+                </td>
+                <td align="center">
+                    {{recharge.recharge_amount}}
+                </td>
+                <td align="center">
+                    {% if recharge.account_status %}
+                        registered student 
+                    {% else %}
+                        student not registered
+                    {% endif %}
+                </td>
+                <td>
+                    {{recharge.created_at}}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <script>
     
 
@@ -25,10 +88,20 @@ $(document).ready(function(){
 //mail adding to list on enter press and clearing input
     $("#mails").keyup(function(e){
         if (e.keyCode == 13){
-            console.log('pressed enter')
             var mail = document.getElementById('mails')
             mail_valid_flag = checkemail(mail.value.trim())
-            if (mail_valid_flag){
+            if(mail.value.trim().indexOf(" ") > -1){
+                alert('enter each mail id and press add')
+            }
+            if (mails.includes(String(mail.value.trim()))){
+                alert("this mail has already been added")
+                return;
+            }
+            if (mail.value.trim().indexOf(",")  > -1) {
+                alert("please add each mail and click add")
+                return;
+            }
+            if ( (mail_valid_flag) && (mail.value.trim().indexOf(" ")  == -1) ) {
                 mails.push(mail.value.trim())
                 console.log(mails)
                 const pm = document.createElement("button"); 
@@ -37,10 +110,42 @@ $(document).ready(function(){
                 document.getElementById('ml').appendChild(pm);
                 mail.value = ''
             }
-            else{
+            
+            if (mail_valid_flag == false){
                 alert('invalid email please try again')
             }
         }
+    });
+
+
+//mail adding to list on clicking add and clearing input
+    $('#add').click(function(){
+        var mail = document.getElementById('mails')
+            mail_valid_flag = checkemail(mail.value.trim())
+            if(mail.value.trim().indexOf(" ") > -1){
+                alert('enter each mail id and press add')
+            }
+            if (mails.includes(String(mail.value.trim()))){
+                alert("this mail has already been added")
+                return;
+            }
+            if (mail.value.trim().indexOf(",")  > -1) {
+                alert("please add each mail and click add")
+                return;
+            }
+            if ( (mail_valid_flag) && (mail.value.trim().indexOf(" ")  == -1) ) {
+                mails.push(mail.value.trim())
+                console.log(mails)
+                const pm = document.createElement("button"); 
+                pm.innerHTML =mail.value + '<span  style="color:black">x</span>'
+                pm.setAttribute('class','bubble')
+                document.getElementById('ml').appendChild(pm);
+                mail.value = ''
+            }
+            
+            if (mail_valid_flag == false){
+                alert('invalid email please try again')
+            }
     });
 
 
@@ -56,11 +161,21 @@ $(document).ready(function(){
         console.log('mail array: '+ mails)
     });
 
+    function checkemail(email) 
+    {
+        var re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    }
+
     $('#submit').click(function(){
         if (mails.length>0){
             var recharge_amount = $("#amount").val();
             console.log(recharge_amount)
-            
+            if (recharge_amount < 1 ){
+                alert("please enter a valid amount")
+                return
+            }
+
             $.ajax({
                 url: '/ajax/bulk_recharge/',
                 data: {
@@ -93,4 +208,7 @@ $(document).ready(function(){
 
 </script>
 </center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

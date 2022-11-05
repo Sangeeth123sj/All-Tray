@@ -3,115 +3,145 @@
 
 {% block title %} Recharge a card {% endblock %}
 
-{% comment %} {% block navbar %} 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <li class="nav-item active">
-        <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
-    </li>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'college_break_edit' %}">Edit break</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'college_logout' %}">Logout</a>
-        </li>
-        
-        </ul>
-        
-    </div>
-    </nav> 
-{% endblock %} {% endcomment %}
-
 
 {% block content %}
+<script>
+
+    
+    function validateForm() {
+        var email = document.forms["form"]["email"].value;
+        var card_number = document.forms["form"]["card_number"].value;
+        
+        if (card_number == "" && email == "") {
+            alert("please scan the card or add email and submit");
+            return false;
+        }
+    }
+
+     
+    </script>
+
+
+
 <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card shadow-2-strong" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
             <br/><br/><br/>
-            <h2>Enter student details</h2>
+            <h2>Enter student email or rfid card</h2>
             <br/> <br/>
-            <form class="form" method="POST">
+            <form method="POST" name="form">
                 {% csrf_token %}
             <br/>
-           
-                <input type="email" class="form-control form-control-lg" id="email" name="email" required>
+                <!--email input-->
+                <input type="email" class="form-control form-control-lg" id="email" name="email">
+                <!--rfid card input-->
                 <label class="form-label">Email</label>
-                <br/> <br/>
-                <input type="submit" id="enter" name="enter" class="btn btn-darker" value="enter">
                 <br/>
+                <input name="card_number" type="password" id="card_number"  class="hideme" />
+               
+                <br/> <br/>
+                <button id="scan_card" type="button" name="scan_card" class="btn btn-success"  > Scan Card </button>
+               
                 <hr class="my-4">
+
+                <input type="button" id="enter" name="enter" class="btn btn-darker" value="submit">
+
                 {% if error %}
-                <p id="incorrect_alert" style="color:red" >"{{ error }}"</p>
+                <p style="color:red" >"{{ error }}"</p>
                 {% endif %}
-    
-                <!--input type="text" id="email" name="email" autofocus-- >
-            <br/>
+                <br/>
+                <p id="alert" style="color:green" ></p>
+                <p id="incorrect_alert" style="color:red" ></p>
+
 
 
             </form>
+            
         </div>
     </div>
   </div>
 </div>
 </div>
-            <script>
-                $(document).ready(function(){
+
+
+    <script>
+                
+            
+
+            $(document).ready(function(){
+                //focus on hidden card field to enter scan the card
+                $("#scan_card").click(function(event){
+                    document.getElementById("card_number").focus();
+                });
+                //on entering input to card field show message as card received
+                $('#card_number').on('input', function() {
+                    text = $('#card_number').val();
+                    document.getElementById("alert").innerHTML = "Card received please click submit";
+                });
+
                 $("#enter").click(function(event){
                     console.log("test on enter button");
-                    if ($("#email").val() == ""){
-                        $("#email").css("border-color","red");
-                        document.getElementById("incorrect_alert").innerHTML = "Please enter email."
-                        $('#incorrect_alert').fadeToggle(2000);
+                    if (  $("#email").val() == "" && $("#card_number").val() == "" ) {
+                        document.getElementById("incorrect_alert").innerHTML = "Please enter email or scan card and submit"
                         event.preventDefault();
                     }
             
                     else{   
                             email = $("#email").val()
+                            card = $("#card_number").val()
                             console.log("test on enter button in else");
-                //sending form fields in ajax for checking if registered email
-                        $.ajax({
-                            url: '/ajax/validate_recharge/',
-                            data: {
-                                'email': email,
-                            },
-                            dataType: 'json',
-                            success: function (data){
-                                if (data.email_status == "incorrect"){
-                                    alert("Sorry incorrect email");
-                                    //window.location.href = " ";
-                                    event.preventDefault();
+                         //sending form fields in ajax for checking if registered email
+                            $.ajax({
+                                url: '/ajax/validate_recharge/',
+                                data: {
+                                    'email': email,
+                                    'card' : card,
+                                },
+                                dataType: 'json',
+                                success: function (data){
+                                    if (data.status == "card incorrect"){
+                                        alert("Sorry incorrect card please try again");
+                                        location.reload();
+                                        event.preventDefault();
+                                    }
+                                    if (data.status == "email incorrect"){
+                                        alert("Sorry incorrect email please try again");
+                                        event.preventDefault();
+                                    }
+                                    if (data.status == "both email and card incorrect"){
+                                        alert("Sorry incorrect email and card please try again");
+                                        event.preventDefault();
+                                    }
+                                    if(data.status == "card correct" || data.status == "email correct"){
+                                        $("form").submit();
+                                    }
+                
+                
                                 }
-                                if(data.email_status == "correct"){
-                                    $("form").submit();
-                                }
-            
-            
-                            }
-                                
-                        });
+                                    
+                            });
                     } 
             
                 }); 
-                });
+
+
+
+                
+
+            });
+
+                  
                     
     
-            </script>
+    </script>
     
     
-            <a type="button" href="{% url 'college_home' %}" class="btn btn-darker">Back</a>
+            <!--a type="button" href="{% url 'college_home' %}" class="btn btn-darker">Back</a-->
         
         
-        </div>
-        </div>
-    
-    </center>
+
 
 
 

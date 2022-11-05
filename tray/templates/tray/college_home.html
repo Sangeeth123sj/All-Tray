@@ -52,7 +52,7 @@
     </script> 
             <h3>Welcome {{college.institute_name}}</h3>
 
-            <br/>
+            <br/> <br/> <br/>
 
             {% if not merchant_credentials %}
             <a href="{% url 'college_merchant_creds_form' %}" class="blue-button">Setup online payments</a>
@@ -71,10 +71,11 @@
                     <div class="row">
                         <div class="col-sm-12">
                 {% for store in stores %}
-                    <button type="submit" id="store_button" class="white-button" name="store_id" value="{{store.id}}"> 
-                        <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/> 
-                        {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
-                        {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>
+                    <button type="submit" id="store_button" class="white-button long-button" name="store_id" value="{{store.id}}"> 
+                        <strong style="font-size: 20px;">{{store.store_name}} </strong> <br/>
+                        {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/> {% endif %}
+                        {% if not store.store_status %}<span style="color: rgb(218, 106, 98);">(Closed now) </span>  <br/> {% endif %} 
+                        <br/>
                         {{store.store_details}}
                     </button>
                     <!--input type="submit" name="" value="{{store.store_name}}" class="button store-button" type="button"-->
@@ -85,6 +86,11 @@
             </div>
         </form>
         <br/>
-        <a href="{% url 'college_recharge' %}" class="green-button">Recharge a card</a>
+        <hr class="my-4">
+        <br/>
+        <a href="{% url 'college_recharge' %}" class="btn btn-success">Recharge a card</a>
     </center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}
