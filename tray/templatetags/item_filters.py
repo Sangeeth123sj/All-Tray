@@ -39,7 +39,7 @@ def break_checker(context, day, format_string):
     orders = context["orders"]
     check = orders.filter(
         created_at__date=day.date(), pickup_time=format_string
-    ).count()
+    ).exists()
     return check
 
 @register.simple_tag(takes_context=True)

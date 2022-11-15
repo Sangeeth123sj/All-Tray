@@ -1,0 +1,49 @@
+{% extends "tray/homepage_layout.html" %}
+
+
+{% block title %} Edit Student {% endblock %}
+
+
+
+{% block content %}
+<center>
+
+<h2>Student Profile</h2>
+<br/>
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>Student</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Name : {{student.name}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Semester : {{student.sem}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Branch : {{student.branch}}</strong></h5>
+      <br/>
+      <a href={% url 'student_edit_details' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+<br/>
+
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>User</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Email : {{student.user.email}}</strong></h5>
+      <br/>
+      <a href={% url 'user_edit' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+<br/>
+
+
+{% endblock %}
+
+
+
+{% block footer %}
+{% endblock %}

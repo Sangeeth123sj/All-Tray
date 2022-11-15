@@ -63,6 +63,14 @@ urlpatterns = [
     path(
         "college_login_verify/", views.college_login_verify, name="college_login_verify"
     ),
+    path("store_profile/", views.store_profile, name="store_profile"),
+    path("student_profile/", views.student_profile, name="student_profile"),
+    path("student_edit_details/", views.student_edit_details, name="student_edit_details"),
+    path("user_edit/", views.user_edit, name="user_edit"),
+    
+    path("college_home/", views.college_home, name="college_home"),
+    path("college_profile/", views.college_profile, name="college_profile"),
+    path("college_edit_details/", views.college_edit_details, name="college_edit_details"),
     path("college_home/", views.college_home, name="college_home"),
     path("college_subscription_form/", views.college_subscription_form, name="college_subscription_form"),
     path("college_subscription_checkout/", views.college_subscription_checkout, name="college_subscription_checkout"),
@@ -89,10 +97,12 @@ urlpatterns = [
         views.college_break_edit_post,
         name="college_break_edit_post",
     ),
+    
     path("college_feepayment_list/", views.college_feepayment_list, name="college_feepayment_list"),
     path("college_feepayment_details/<int:student_id>", views.college_feepayment_details, name="college_feepayment_details"),
     path("college_alltray_revenue_student_list/", views.college_alltray_revenue_student_list, name="college_alltray_revenue_student_list"),
     path("college_alltray_revenue_student_details/<int:student_id>/", views.college_alltray_revenue_student_details, name="college_alltray_revenue_student_details"),
+    path("institute_kiosk/<str:institute_name>",views.institute_kiosk, name="institute_kiosk"),
     path("college_recharge/", views.college_recharge, name="college_recharge"),
     path(
         "college_recharge_post/",
@@ -104,6 +114,12 @@ urlpatterns = [
         views.college_recharge_details,
         name="college_recharge_details",
     ),
+    path(
+        "college_payment_creds_edit/",
+        views.college_payment_creds_edit,
+        name="college_payment_creds_edit",
+    ),
+    
     path("student_pin_edit/", views.student_pin_edit, name="student_pin_edit"),
     path(
         "student_pin_edit_post/",
@@ -114,6 +130,16 @@ urlpatterns = [
     path("invoice_print/", views.invoice_print, name="invoice_print"),
     path("qr_code/", views.qr_code, name="qr_code"),
     # ajaxify using jquery_____________________________________________________________________________________________
+    path(
+        "ajax/user_edit_validate/",
+        views.user_edit_validate,
+        name="user_edit_validate",
+    ),
+    path(
+        "ajax/college_edit_validate/",
+        views.college_edit_validate,
+        name="college_edit_validate",
+    ),
     path(
         "ajax/validate_store_item/",
         views.validate_store_item,

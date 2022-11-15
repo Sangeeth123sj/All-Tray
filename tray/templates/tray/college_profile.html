@@ -1,0 +1,87 @@
+{% extends "tray/college_homepage_layout.html" %}
+
+
+{% block title %} Edit Institute {% endblock %}
+
+
+
+{% block content %}
+<center>
+
+<h2>Institute Profile</h2>
+<br/>
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>Institute</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Name : {{institute.institute_name}}</strong></h5>
+      <br/>
+      <a href={% url 'college_edit_details' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+<br/>
+
+
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>Recess times</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>First Break : {{break.first_break}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Lunch Break : {{break.lunch_break}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Last Break : {{break.last_break}}</strong></h5>
+      <br/>
+      <a href={% url 'college_break_edit' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+
+<br/>
+
+
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>Paytm credentails</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Paytm Merchant Id: {{payment_credential.paytm_merchant_id}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Paytm Channel Id: {{payment_credential.paytm_channel_id}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Paytm Website: {{payment_credential.paytm_website}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Paytm Industry Type: {{payment_credential.paytm_industry_type}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Paytm Secret Key: {{payment_credential.paytm_secret_key}}</strong></h5>
+      <br/>
+      <a href={% url 'college_payment_creds_edit' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+
+<br/>
+
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>User</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Email : {{institute.user.email}}</strong></h5>
+      <br/>
+      <a href={% url 'user_edit' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+<br/>
+
+
+{% endblock %}
+
+
+
+{% block footer %}
+{% endblock %}

@@ -1,8 +1,8 @@
-{% extends "tray/base.html" %}
+{% extends "tray/store_homepage_layout.html" %}
 
 {% block title%} Order list {% endblock %}
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <li class="nav-item active">
     <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
@@ -29,7 +29,7 @@
     
   </div>
 </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 
@@ -60,7 +60,7 @@
 <br/> <br/>
 
 <!--Testing daterange-->
-{% load item_filters %}
+{% comment %} {% load item_filters %}
 {% date_range as the_days %}
 
 {% for day in the_days %}
@@ -87,7 +87,7 @@
                             Status
                         </th>
                         <th>
-                            Revenue
+                            Cost
                         </th>
                     </thead>
                 
@@ -100,7 +100,9 @@
                         <td colspan="6" align="center" style="background-color: #4eb7d4;">Orders now</td>
                     </tr>
                     {% endif %}  
-            {% for order in orders %}
+                    
+            {% for order in page_order_object %}
+                
                 {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
                 
                     <tr height="50px" id="{{order.id}}">
@@ -125,7 +127,7 @@
                             {% endif %}
                         </td>
                         <td align="center">
-                            {{order.revenue}}
+                            {{order.cost}}
                         </td>
                     </tr>
                 {% endif %}
@@ -140,7 +142,7 @@
                     </tr>
                     {% endif %}
 
-            {% for order in orders %}
+            {% for order in page_order_object %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
    
                     <tr height="50px" id="{{order.id}}">
@@ -164,7 +166,7 @@
                             {% endif %}
                         </td>
                         <td align="center">
-                            {{order.revenue}}
+                            {{order.cost}}
                         </td>
                     </tr>
 
@@ -179,7 +181,7 @@
             </tr> 
             {% endif %}
 
-            {% for order in orders %}
+            {% for order in page_order_object %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
                 
                     <tr height="50px" id="{{order.id}}">
@@ -203,7 +205,7 @@
                             {% endif %}
                         </td>
                         <td align="center">
-                            {{order.revenue}}
+                            {{order.cost}}
                         </td>
                     </tr>
                 {% endif %}
@@ -217,7 +219,7 @@
             </tr>
             {% endif %}
 
-            {% for order in orders %}
+            {% for order in page_order_object %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
                 
                     <tr height="50px" id="{{order.id}}">
@@ -241,7 +243,7 @@
                             {% endif %}
                         </td>
                         <td align="center">
-                            {{order.revenue}}
+                            {{order.cost}}
                         </td>
                     </tr>
                 {% endif %}
@@ -252,8 +254,99 @@
         {% endif %} 
                 </tbody>
 {% endfor %}
-</table>
+</table> {% endcomment %}
 
+
+
+
+
+{% regroup order_list by created_at|date:"Y-m-d" as objects_by_day %}
+{% for day in objects_by_day %}
+<br/><br/>
+<p>{{day.grouper}}</p>
+<table id="table" width="30%">
+    <thead>
+        <th>
+            Id
+        </th>
+        <th>
+            Item
+        </th>
+        <th>
+            Quantity
+        </th>
+        <th>
+            Buyer
+        </th>
+        <th>
+            Status
+        </th>
+        <th>
+            Cost
+        </th>
+    </thead>
+
+
+
+    {% regroup day.list by pickup_time as order_list %}
+            {% for order in order_list %}
+    <tbody >
+        <tr>
+             <td colspan=6 align="center" style="background-color: #4eb7d4;"><strong>{{order.grouper}}</strong></td>
+        </tr>
+        {% for o in order.list %}
+        <tr height="50px" id="{{o.id}}">
+            <td align="center">
+                {{o.purchase_id}}
+            </td> 
+            <td align="center">
+                {{order.item}}
+            </td>
+            <td align="center">
+                {{o.quantity}}
+            </td>
+            <td align="center">
+                {{o.student.name}}
+            </td>
+            <td align="center">
+                {% if o.status %}
+                <span style="color: #4d9167;">Delivered</span>
+                {% else %}
+                <span style="color: #c05e40;">Not Delivered</span>
+                {% endif %}
+            </td>
+            <td align="center">
+                {{o.cost}}
+            </td>
+        </tr>
+    </tbody>
+    {% endfor %}
+    {% endfor %}
+    </table>
+{% endfor %}
+
+    
+
+
+
+
+<div class="pagination">
+    <span class="step-links">
+        {% if order_list.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ order_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ order_list.number }} of {{ order_list.paginator.num_pages }}.
+        </span>
+
+        {% if order_list.has_next %}
+            <a href="?page={{ order_list.next_page_number }}">next</a>
+            <a href="?page={{ order_list.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 
 
 

@@ -141,7 +141,7 @@
 
     <h4>Branch</h4>
     <br/>
-<select name="branch_name" id="branch_name" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" style="background-color: azure;" class="form-control" >
+<select name="branch_name" id="branch_name" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" class="form-select" >
     <option input value="Electronics & Communication">Electronics & Communication</option>
     <option input value="Computer Science">Computer Science</option>
     <option input value="Civil Engineering">Civil Engineering</option>
@@ -150,7 +150,7 @@
 <br/><br/>
 
 <h4>Semester:</h4>
-<select name="semester" id="semester" class="btn dropdown-toggle" class="form-control"  required style="background-color: white;">
+<select name="semester" id="semester" class="btn dropdown-toggle" class="form-control"  required style="background-color: #d6d6f5;">
 <option input value="semester 1">semester 1</option>
 <option input value="semester 2">semester 2</option>
 <option input value="semester 3">semester 3</option>
@@ -185,7 +185,7 @@
 
 <h4>College</h4>
 
-<select id="college_id" name="college_id" id="college_id" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: white;" >
+<select id="college_id" name="college_id" id="college_id" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: #d6d6f5;">
                     
                     
     <option value="" selected disabled hidden> 
@@ -197,7 +197,7 @@
 {% endfor %}
 </select>
 <br/><br/>
-<input type="button" id="submit_button" value="Submit" class="btn btn-primary" class="form-control">
+<input type="button" id="submit_button" value="Submit" class="btn orange-button" class="form-control">
 <p id="alerter"></p>
 
 </form>

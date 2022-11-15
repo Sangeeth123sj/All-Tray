@@ -1,10 +1,8 @@
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
 {% block title %} Add Paytm credentials{% endblock %}
 
-{% block background %}
-<div class="bg_infinite">
-{% endblock %}
+
 
 {% block content %}
 <center>
@@ -51,27 +49,35 @@
 <br/>
 {% if error %} <strong style="color:red">something went wrong please contact support</strong> {% endif %}
 <h4>please visit and signup with <a href="https://business.paytm.com/payment-gateway-campaign1?utm_source=Google&utm_medium=cpc&utm_campaign=Google_Sign_Up_sitelink&redirectUrl=instant-onboard&gclid=Cj0KCQjwhsmaBhCvARIsAIbEbH6J0lpyFYmqbcKMDWj8LKfGoZvW7FyTFpAqW9jvAkcw_qk37h3bINQaAgxNEALw_wcB" target="_blank" rel="noreferrer noopener">paytm payment gateway</a> <br/>and fill up the credentials from paytm account in this page.</h4><br/>
-<div class="form-group centered">
-<form action="/college_merchant_creds_form/" name="form" method="POST" onsubmit="return validateForm()">
-{% csrf_token %}
-<h3>Paytm merchant id</h3>
-<input type="text" name="paytm_merchant_id" id="paytm_merchant_id" class="form-control"><br/><br/>
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <form action="/college_merchant_creds_form/" name="form" method="POST" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <h3>Paytm merchant id</h3>
+            <input type="text" name="paytm_merchant_id" id="paytm_merchant_id" class="form-control" value={{payment_creds.paytm_merchant_id}}><br/><br/>
 
-<h3>Paytm secret key</h3>
-<input type="text" name="paytm_secret_key" id="paytm_secret_key" class="form-control"><br/><br/>
+            <h3>Paytm secret key</h3>
+            <input type="text" name="paytm_secret_key" id="paytm_secret_key" class="form-control"  value={{payment_creds.paytm_secret_key}}><br/><br/>
 
-<h3>Paytm website</h3>
-<input type="text" name="paytm_website" id="paytm_website" class="form-control"><br/><br/>
+            <h3>Paytm website</h3>
+            <input type="text" name="paytm_website" id="paytm_website" class="form-control"  value={{payment_creds.paytm_website}}><br/><br/>
 
-<h3>Paytm channel id</h3>
-<input type="text" name="paytm_channel_id" id="paytm_channel_id" class="form-control"><br/><br/>
+            <h3>Paytm channel id</h3>
+            <input type="text" name="paytm_channel_id" id="paytm_channel_id" class="form-control"  value={{payment_creds.paytm_channel_id}}><br/><br/>
 
-<h3>Paytm industry type id</h3>
-<input type="text" name="paytm_industry_type" id="paytm_industry_type" class="form-control"><br/><br/>
+            <h3>Paytm industry type id</h3>
+            <input type="text" name="paytm_industry_type" id="paytm_industry_type" class="form-control"  value={{payment_creds.paytm_industry_type}}><br/><br/>
 
-<input type="button" id="submit_button" class="btn btn-success" value="Submit" >
-{% comment %} <button type="submit" class="btn btn-success" value="Submit" onclick=message() >Submit</button> {% endcomment %}
-</form>
+            <input type="button" id="submit_button" class="btn btn-success" value="Submit" >
+            {% comment %} <button type="submit" class="btn btn-success" value="Submit" onclick=message() >Submit</button> {% endcomment %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 <script>
     $(document).ready(function(){
@@ -82,7 +88,13 @@
             var paytm_channel_id = $("#paytm_channel_id").val();
             var paytm_industry_type = $("#paytm_industry_type").val();    
             //submit the form        
-            $("form").submit();
+            Swal.fire(
+                            'Submit Successful',
+                            '',
+                            'success'
+                            ).then(function() {
+                                form.submit()
+            });
         });
        
 });
@@ -92,5 +104,7 @@
 </script>
 
 
-</center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

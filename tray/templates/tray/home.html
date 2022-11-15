@@ -73,7 +73,11 @@
                     <!-- {% if store.store_status %}<span style="color: rgb(132, 199, 123);">(Open now) </span> <br/>
                     {% else %}<span style="color: rgb(218, 106, 98);">(Closed now)</span>  {% endif %} <br/>    --> 
                     </div>
+                    {% if store.store_details == "Add store description to display to buyer." %}
+                      <h4>No store description yet.</h4>
+                    {% else %}
                     {{store.store_details}}
+                    {% endif %}
                 </button>
                
            

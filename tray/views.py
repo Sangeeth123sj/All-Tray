@@ -16,8 +16,10 @@ import razorpay
 from django.conf import settings
 import uuid
 from django.contrib.auth.hashers import check_password
+from django.core.paginator import Paginator
 
 from .models import (
+    InstituteEvent,
     Bill,
     Break,
     BulkRechargeMail,
@@ -37,6 +39,7 @@ from .models import (
 )
 
 User = get_user_model()
+setattr(User, 'backend', 'tray.backend.MyBackend')
 import json
 import random
 import string
@@ -131,6 +134,9 @@ def home_post(request):
         request.session["email"] = email
         request.session["password"] = password
         user = authenticate(request, email=email, password=password)
+        print("user",user)
+        if user is None:
+            return redirect("entry")
         login(request, user)
         print("Student " + str(user) + " just logged in")
         return redirect(home)
@@ -165,6 +171,86 @@ def home(request):
 
 
 @login_required
+def student_profile(request):
+    student = request.user.student
+    context = {
+        "student":student
+    }
+    return render(request, "tray/student_profile.html", context)
+
+
+
+
+@login_required
+def college_edit_details(request):
+    if request.method == "POST":
+        institute = request.user.institute
+        name = request.POST.get("name")
+        institute.institute_name = name
+        institute.save()
+        print(institute, "edit saved")
+        return redirect("college_home")
+    
+    institute = request.user.institute
+    context = {
+        "institute":institute
+    }
+    return render(
+        request,
+        "tray/college_edit_details.html",
+        context
+    )
+
+@login_required
+def college_payment_creds_edit(request):
+    institute = request.user.institute
+    try:
+        payment_creds = InstituteMerchantCredentail.objects.get(college=institute)
+    except:
+        payment_creds = None
+    context = {"payment_creds":payment_creds}
+    return render(request, "tray/college_merchant_creds_form.html",context)
+
+@login_required
+def college_edit_validate(request):
+    name = request.GET.get("name")
+    present_name = request.user.institute.institute_name
+    institute_present = Institute.objects.filter(institute_name=name).exclude(institute_name=present_name).exists()
+    data = {"institute_taken": institute_present}
+    return JsonResponse(data)
+
+
+@login_required
+def student_edit_details(request):
+    if request.method == "POST":
+        student = request.user.student
+        name = request.POST.get("name")
+        branch = request.POST.get("branch")
+        semester = request.POST.get("semester")
+        card = request.POST.get("card")
+        student.name = name
+        student.branch = branch
+        student.sem = semester
+        student.pin_no = card
+        student.save()
+        print(student, "saved")
+        return redirect("home")
+    
+    student = request.user.student
+    context = {
+        "name": student.name,
+        "branch":student.branch,
+        "semester":student.sem,
+        "card":student.pin_no
+    }
+    return render(
+        request,
+        "tray/student_edit_details.html",
+        context
+    )
+
+
+@login_required
 def your_orders_post(request):
     if request.method == "POST":
         student_id = request.POST["student_id"]
@@ -174,17 +260,23 @@ def your_orders_post(request):
 
 @login_required
 def your_orders(request):
-    # student_id = request.session["student_id"]
-    # student_object = Student.objects.get(id=student_id)
     student_object = request.user.student
     print(request.user.student)
     orders = Order.objects.filter(student=student_object)
+    sorted_orders = orders.order_by("-created_at")
+     # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(sorted_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
     order_exist = Order.objects.filter(student=student_object).exists()
     if order_exist:
         otp = orders.first().otp
     else:
         otp = ""
-    return render(request, "tray/your_orders.html", {"orders": orders, "otp": otp})
+    return render(request, "tray/your_orders.html", {"orders": sorted_orders, "order_list":page_order_list,  "otp": otp})
 
 
 @login_required
@@ -248,6 +340,8 @@ def student_logout(request):
 # store views_______________________________________________________________________________
 
 
+
+
 def open_store(request):
     colleges = Institute.objects.all()
     return render(request, "tray/open_store.html", {"colleges": colleges})
@@ -303,6 +397,39 @@ def store_login_processing(request):
         return HttpResponse(c)
 
 
+
+@login_required
+def store_profile(request):
+    store = request.user.store
+    context = {
+        "store":store
+    }
+    return render(request, "tray/store_profile.html", context)
+
+@login_required
+def user_edit(request):
+    # common user edit method
+    if request.method == "POST":
+        email = request.POST.get("email")
+        user = request.user
+        user.email = email
+        user.save()
+        student_user = Student.objects.filter(user=user).exists()
+        if student_user:
+            return redirect("home")
+        store_user = Store.objects.filter(user=user).exists()
+        if store_user:
+            return redirect("store_home")
+        college_user = Institute.objects.filter(user=user).exists()
+        if college_user:
+            return redirect("college_home")
+        
+    user = request.user
+    context = {
+        "user": user
+    }
+    return render(request, "tray/user_edit.html", context)
+    
 @login_required
 def store_home(request):
     # store_id = request.session["store_id"]
@@ -310,6 +437,14 @@ def store_home(request):
     store = request.user.store
     store_name = store.store_name
     items = store.item_set.all()
+     # pagination logic
+    page = request.GET.get('page')
+    items_paginated = Paginator(items, 20)
+    if page is None:
+        page_items = items_paginated.page(1)
+    else:
+        page_items = items_paginated.page(page)
+
     status = store.store_status
     if status == True:
         c = "Open"
@@ -323,7 +458,7 @@ def store_home(request):
             "store_name": store_name,
             "store_id": store.id,
             "status": c,
-            "items": items,
+            "items": page_items,
         },
     )
 
@@ -335,7 +470,7 @@ def store_billing(request):
     store = request.user.store
     print("entering billing store: " + str(store))
     store_name = store.store_name
-    items = store.item_set.all()
+    items = store.item_set.filter(available=True)
     context = {"store": store, "store_name": store_name, "items": items}
     return render(request, "tray/store_billing.html", context)
 
@@ -371,8 +506,6 @@ def invoice_number_gen(store):
 
 @login_required
 def billing_invoice(request):
-    # store_id = request.session["store_id"]
-    # store = Store.objects.get(id=store_id)
     store = request.user.store
     store_name = store.store_name
     load = json.loads(request.GET["order_list_json"])
@@ -384,14 +517,16 @@ def billing_invoice(request):
         student_check = Student.objects.filter(pin_no=pin_no).exists()
         print("student check " + str(student_check))
         if student_check == False:
+            print("entered card false response")
             data = {"card_status": "card_invalid"}
             return JsonResponse(data)
-        elif student_check:
+
+        elif student_check == True:
             student = get_object_or_404(Student, pin_no=pin_no)
             if int(student.balance) < int(total):
                 data = {"card_status": "low_balance"}
                 return JsonResponse(data)
-
+            
     request.session["device"] = device
     # generating incremented invoice no
 
@@ -407,15 +542,51 @@ def billing_invoice(request):
     objects = []
     new_object = []
     # assigning invoice number and other details
+    if cash_or_card == "card":
+        order_group = OrderGroup(store = store, student = student, order_group_total=0)
+    else:
+        order_group = OrderGroup(store = store, order_group_total=0)
+
     for i in load:
-        new_object = Bill(
-            item=i["item"],
-            price=i["price"],
-            quantity=i["quantity"],
-            invoice_no=new_invoice_no,
-            invoice=file,
-            store=store,
-        )
+        if cash_or_card == "card":
+            student = get_object_or_404(Student, pin_no=pin_no)
+            new_object = Bill(
+                item=i["item"],
+                price=i["price"],
+                quantity=i["quantity"],
+                invoice_no=new_invoice_no,
+                invoice=file,
+                store=store,
+                student=student
+            )
+        else:
+             new_object = Bill(
+                item=i["item"],
+                price=i["price"],
+                quantity=i["quantity"],
+                invoice_no=new_invoice_no,
+                invoice=file,
+                store=store,
+            )
+        # creating order groups for tracking revenue
+        order_group.order_group_total += (i["price"]*i["quantity"])
+        order_group.save()
+        institute=store.college
+        free_trial_expiry_date = institute.created_at.date() + relativedelta(months=2)
+        if date.today() < free_trial_expiry_date:
+            # conditional block to calculate revenue after free trial
+            try:
+                if cash_or_card == "card":
+                    revenue = Revenue.objects.filter(created_at__date=date.today(), student = student, institute=institute).first()
+                    revenue.total = revenue.total + order_group.order_group_total
+                    revenue.day_revenue = revenue.total * 0.01
+                    revenue.save()
+                    print("incrementing revenue", revenue.day_revenue, "present revenue:",revenue.day_revenue)
+            except:
+                if cash_or_card == "card":
+                    day_order_groups_total = OrderGroup.objects.filter(created_at__date=date.today(),student=student).aggregate(Sum('order_group_total'))
+                    print("group total",day_order_groups_total)
+                    revenue = Revenue.objects.create(total=int(day_order_groups_total["order_group_total__sum"]), day_revenue= float(day_order_groups_total["order_group_total__sum"] *0.01), student = student,institute=institute)
         objects.append(new_object)
         item = Item.objects.get(item=i["item"])
         # initializing stock of item variable
@@ -428,7 +599,6 @@ def billing_invoice(request):
             item.available = False
             item.save()
         if cash_or_card == "card":
-            pin_no = request.GET["pin_no"]
             # updating store balance
             cost = i["quantity"] * i["price"]
             store.store_balance = store.store_balance + cost
@@ -442,7 +612,7 @@ def billing_invoice(request):
     # print(load[0]["item"])
     request.session["invoice_name"] = new_invoice_no
 
-    data = {}
+    data = {"card_status":"transaction_completed"}
     return JsonResponse(data)
 
 
@@ -503,7 +673,11 @@ def store_add_item_save(request):
         price = request.POST["price"]
         # store_object = Store.objects.get(id=store_id)
         store_object = request.user.store
-        new_item = Item(item=item_name, stock=stock, price=price, store=store_object)
+        if int(stock) <=5 :
+            available = False
+        else:
+            available = True
+        new_item = Item(item=item_name, stock=stock,available=available, price=price, store=store_object)
         new_item.save()
     return redirect(store_home)
 
@@ -554,7 +728,14 @@ def store_order_list(request):
     # store_object = Store.objects.get(id=store_id)
     store_object = request.user.store
     orders = Order.objects.filter(store=store_object)
-    sorted_orders = orders.order_by("student", "pickup_time")
+    sorted_orders = orders.order_by("-created_at")
+     # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(sorted_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
     current_month = datetime.today().strftime("%h")
     current_month_number = datetime.today().month
     # month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
@@ -563,11 +744,13 @@ def store_order_list(request):
     for order in month_orders:
         total = order.cost * order.quantity
         month_total = month_total + total
+    print(page_order_list)
     return render(
         request,
         "tray/store_order_list.html",
         {
-            "orders": sorted_orders,
+            "order_list": page_order_list,
+            "page_order_object":page_order_list,
             "current_month": current_month,
             "month_total": month_total,
         },
@@ -576,42 +759,62 @@ def store_order_list(request):
 
 @login_required
 def store_item_pickup(request):
-    return render(request, "tray/store_item_pickup.html")
+    store = request.user.store
+    first_break_orders = Order.objects.filter(store=store,status=False, pickup_time="First Break", created_at__date=date.today()).count()
+    lunch_break_orders = Order.objects.filter(store=store,status=False, pickup_time="Lunch Break", created_at__date=date.today()).count()
+    last_break_orders = Order.objects.filter(store=store,status=False, pickup_time="Last Break", created_at__date=date.today()).count()
+    other_orders = Order.objects.filter(store=store,status=False, pickup_time="Now", created_at__date=date.today()).count()
+    context = {
+        "first_break_orders":first_break_orders,
+        "lunch_break_orders":lunch_break_orders,
+        "last_break_orders":last_break_orders,
+        "other_orders":other_orders
+    }
+    return render(request, "tray/store_item_pickup.html",context)
 
 
 @login_required
 def store_item_pickup_validate(request):
-    otp_or_card = request.GET["otp_or_card"]
-    print("otp or card: " + str(type(otp_or_card)))
-    check_otp = Order.objects.filter(
-        otp=otp_or_card, created_at__date=date.today()
-    ).exists()
-    print("check otp " + str(check_otp))
-    if check_otp:
-        request.session["otp_or_card_selected"] = "otp"
-        data = {
-            "incorrect_status": "correct_otp",
+    store = request.user.store
+    otp = request.GET.get("otp")
+    card = request.GET.get("card")
+    print("otp: " + str(otp))
+    print("card: " + str(card))
+    if otp:
+        check_otp = Order.objects.filter(
+            otp=otp, store=store, created_at__date=date.today()
+        ).exists()
+        print("check otp " + str(check_otp))
+        if check_otp:
+            request.session["otp_or_card_selected"] = "otp"
+            data = {
+                "incorrect_status": "correct_otp",
+            }
+            return JsonResponse(data)
+        else:
+            data = {
+            "incorrect_status": "incorrect_otp",
         }
         return JsonResponse(data)
-    else:
-        check_student_valid = Student.objects.filter(pin_no=otp_or_card).exists()
+    
+    if card:
+        check_student_valid = Student.objects.filter(pin_no=card).exists()
         print("check student: " + str(check_student_valid))
         if check_student_valid:
-            check_student = Student.objects.get(pin_no=otp_or_card)
+            student = Student.objects.get(pin_no=card)
             check_card = Order.objects.filter(
-                student=check_student, created_at__date=date.today()
+                student=student, created_at__date=date.today()
             ).exists()
-            # order = Order.objects.filter( created_at__date = date.today(), student = student)
-
         else:
             check_card = False
+            
     if check_card:
         request.session["otp_or_card_selected"] = "card"
-        data = {"card_pin": "correct_card_pin"}
+        data = {"incorrect_status": "correct_card"}
         return JsonResponse(data)
     else:
         data = {
-            "incorrect_status": "incorrect_otp_and_card",
+            "incorrect_status": "incorrect_card",
         }
         return JsonResponse(data)
 
@@ -619,8 +822,12 @@ def store_item_pickup_validate(request):
 @login_required
 def user_pickup_orders_post(request):
     if request.method == "POST":
-        otp_or_card = request.POST["otp_or_card"]
-        request.session["otp_or_card"] = otp_or_card
+        otp= request.POST.get("otp")
+        card= request.POST.get("pin_no")
+        if card:
+            request.session["otp_or_card"] = card
+        if otp:
+            request.session["otp_or_card"] = otp
         return redirect(user_pickup_orders)
 
 
@@ -647,12 +854,35 @@ def store_bills(request):
     # store_id = request.session["store_id"]
     # store_object = Store.objects.get(id=store_id)
     store_object = request.user.store
-    store_bills = Bill.objects.filter(store=store_object)
-    # sorted_orders = orders.order_by('student', 'pickup_time')
+    orders = Bill.objects.filter(store=store_object)
+    sorted_orders = orders.order_by("-created_at")
+     # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(sorted_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
+    current_month = datetime.today().strftime("%h")
+    current_month_number = datetime.today().month
+    # month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
+    month_orders = orders.filter(created_at__month=current_month_number)
+    month_total = 0
+    
+    for order in month_orders:
+        total = order.price * order.quantity
+        month_total = month_total + total
+    context = {
+        "current_month":current_month,
+        "month_total":month_total,
+        "store": store_object,
+        "order_list": page_order_list,
+        "page_order_list":page_order_list
+    }
     return render(
         request,
         "tray/store_bills.html",
-        {"store": store_object, "store_bills": store_bills},
+        context
     )
 
 
@@ -675,13 +905,13 @@ def register_college_success(request):
         username = request.POST["username"]
         email = request.POST["email"]
         password = request.POST["password"]
-        plan = request.POST.get("plan_type",None)
+        # plan = request.POST.get("plan_type",None)
         user = User.objects.create_user(email, password)
         user.save()
         institute = Institute(
             institute_name=college,
             user=user,
-            plan= plan,
+            # plan= "basic",
         )
         institute.save()
         break_time = Break(
@@ -704,6 +934,23 @@ def login_college(request):
     else:
         return redirect("entry")
 
+
+def college_profile(request):
+    institute = request.user.institute
+    try:
+        payment_credential = InstituteMerchantCredentail.objects.get(college=institute)
+    except:
+        payment_credential = None
+    try:
+        break_object = Break.objects.get(college=institute)
+    except:
+        break_object = None
+    context = {
+        "institute":institute,
+        "payment_credential":payment_credential,
+        "break":break_object
+    }
+    return render(request,"tray/college_profile.html",context)
 
 def college_login_verify(request):
     username = request.POST["username"]
@@ -833,7 +1080,15 @@ def college_bulk_recharge(request):
     # institute = Institute.objects.get(id = college_id)
     institute = request.user.institute
     college_bulk_recharge_list = BulkRechargeMail.objects.filter(college=institute)
-    context = {"institute": institute, "college_bulk_recharge_list": college_bulk_recharge_list}
+    
+    # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(college_bulk_recharge_list, 10)
+    if page is None:
+        page_college_bulk_recharge_list = orders_paginated.page(1)
+    else:
+        page_college_bulk_recharge_list = orders_paginated.page(page)
+    context = {"institute": institute, "college_bulk_recharge_list": page_college_bulk_recharge_list}
     return render(request, "tray/college_bulk_recharge.html", context)
 
 @login_required
@@ -841,9 +1096,11 @@ def college_merchant_creds_form(request):
     if request.method == "GET":
         return render(request, "tray/college_merchant_creds_form.html")
     if request.method == "POST":
-        razorpay_merchant_id = request.POST.get("razorpay_merchant_id")
-        razorpay_key_secret = request.POST.get("razorpay_key_secret")
-        razorpay_key_id = request.POST.get("razorpay_key_id")
+        paytm_merchant_id = request.POST.get("paytm_merchant_id")
+        paytm_secret_key = request.POST.get("paytm_secret_key")
+        paytm_website = request.POST.get("paytm_website")
+        paytm_channel_id = request.POST.get("paytm_channel_id")
+        paytm_industry_type = request.POST.get("paytm_industry_type")
         college = request.user.institute
         # college_id = request.session["college_id"]
         # college = Institute.objects.get(id= college_id)
@@ -852,9 +1109,11 @@ def college_merchant_creds_form(request):
             InstituteMerchantCredentail.objects.update_or_create(
             college=college,
             defaults={
-                "razorpay_merchant_id" : razorpay_merchant_id,
-                "razorpay_key_secret" : razorpay_key_secret,
-                "razorpay_key_id" : razorpay_key_id,
+                "paytm_merchant_id":paytm_merchant_id,
+                "paytm_secret_key":paytm_secret_key,
+                "paytm_website":paytm_website,
+                "paytm_channel_id":paytm_channel_id,
+                "paytm_industry_type":paytm_industry_type
             }
             )
             return redirect(college_home)
@@ -877,7 +1136,14 @@ def college_store_order_list(request):
     store_id = request.session["store_id"]
     store_object = Store.objects.get(id=store_id)
     orders = Order.objects.filter(store=store_object)
-    sorted_orders = orders.order_by("student", "pickup_time")
+    sorted_orders = orders.order_by("-created_at")
+     # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(sorted_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
     current_month = datetime.today().strftime("%h")
     current_month_number = datetime.today().month
     # month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
@@ -894,6 +1160,7 @@ def college_store_order_list(request):
         "tray/college_store_order_list.html",
         {
             "orders": sorted_orders,
+            "page_order_list":page_order_list,
             "store": store_object,
             "current_month": current_month,
             "month_total": month_total,
@@ -905,7 +1172,14 @@ def college_store_order_list(request):
 def college_feepayment_list(request):
     college_feepayment_list = FeePayment.objects.filter(institute=request.user.institute)
     print(college_feepayment_list)
-    context = {"college_feepayment_list":college_feepayment_list}
+    # pagination logic
+    page = request.GET.get('page')
+    revenues_paginated = Paginator(college_feepayment_list, 20)
+    if page is None:
+        page_college_feepayment_list = revenues_paginated.page(1)
+    else:
+        page_college_feepayment_list = revenues_paginated.page(page)
+    context = {"college_feepayment_list":page_college_feepayment_list}
     return render(request, "tray/college_feepayment_list.html", context)
 
 @login_required
@@ -917,21 +1191,34 @@ def college_feepayment_details(request,student_id):
 
 @login_required
 def college_alltray_revenue_student_list(request):
-    # institute_id = request.session.get("institute_id")
-    # institute = get_object_or_404(Institute,id=institute_id)
     institute = request.user.institute
     students = Student.objects.filter(college=institute)
-    context = {"students":students}
-    # revenues = Revenue.objects.filter(institute=institute)
+    # pagination logic
+    page = request.GET.get('page')
+    students_paginated = Paginator(students, 20)
+    if page is None:
+        page_students = students_paginated.page(1)
+    else:
+        page_students = students_paginated.page(page)
+    context = {
+        "students":page_students,
+        "student_page_object": page_students
+        }
     return render(request, "tray/college_alltray_revenue_student_list.html", context)
 
 @login_required
 def college_alltray_revenue_student_details(request,student_id):
-    # institute_id = request.session.get("institute_id")
-    # institute = get_object_or_404(Institute,id=institute_id)
     institute = request.user.institute
     student = get_object_or_404(Student,id=student_id)
     revenues = Revenue.objects.filter(institute=institute,student=student)
+    # pagination logic
+    page = request.GET.get('page')
+    revenues_paginated = Paginator(revenues, 20)
+    if page is None:
+        page_revenues = revenues_paginated.page(1)
+    else:
+        page_revenues = revenues_paginated.page(page)
+
     current_month = datetime.today().strftime("%h")
     month_revenue_total = revenues.aggregate(Sum('day_revenue'))
     try:
@@ -939,7 +1226,7 @@ def college_alltray_revenue_student_details(request,student_id):
         rounded_month_revenue_total = round(month_revenue_total.get('day_revenue__sum'),2)
     except:
         rounded_month_revenue_total = 0
-    context = {"student":student, "revenues":revenues, "current_month": current_month, "month_revenue_total": rounded_month_revenue_total}
+    context = {"student":student, "revenues":revenues,"page_revenues":page_revenues, "current_month": current_month, "month_revenue_total": rounded_month_revenue_total}
     return render(request, "tray/college_alltray_revenue_student_details.html", context)
 
 
@@ -1104,6 +1391,16 @@ def college_logout(request):
 def validate_store_item(request):
     item_name = request.GET["item_name"]
     data = {"is_taken": Item.objects.filter(item=item_name).exists()}
+    return JsonResponse(data)
+
+
+
+@login_required
+def user_edit_validate(request):
+    email = request.GET.get("email")
+    present_email = request.user.email
+    user_present = User.objects.filter(email=email).exclude(email=present_email).exists()
+    data = {"email_taken": user_present}
     return JsonResponse(data)
 
 
@@ -1294,6 +1591,7 @@ def cart(request):
         return JsonResponse(data)
 
     if request.GET["status"] == "confirm_order":
+        print("reached confirm")
         time = request.GET["time"]
         store_id = request.GET["store_id"]
         store = Store.objects.get(id=store_id)
@@ -1302,6 +1600,7 @@ def cart(request):
         total = request.GET["total"]
         # revenue = request.GET["revenue"]
         student = Student.objects.get(id=student_id)
+        print(student)
         # cart_items = CartItem.objects.filter(student = student)
         if int(student.balance) > int(total):
             # generating otp for the cart of items
@@ -1316,7 +1615,7 @@ def cart(request):
             # taking orders as json
             load = json.loads(request.GET["order_list_json"])
             # passing json load to bulk create on orders db
-            # creating bill orders on db
+            # creating orders on db
             objects = []
             new_object = []
             purchase_id = purchase_id_generator(store)
@@ -1336,22 +1635,6 @@ def cart(request):
                     order_group=order_group,
                 )
                 order_group.save()
-                free_trial_expiry_date = institute.created_at.date() + relativedelta(months=2)
-                if date.today() > free_trial_expiry_date:
-                    # conditional block to calculate revenue after free trial
-                    try:
-                        revenue = Revenue.objects.get(created_at__date=date.today(), student = student, institute=institute)
-                        revenue.total = revenue.total + order_group.order_group_total
-                        revenue.day_revenue = revenue.total * 0.01
-                        revenue.save()
-                        print("incrementing revenue", revenue.day_revenue)
-                    except:
-                        day_order_groups_total = OrderGroup.objects.filter(created_at__date=date.today(),student=student).aggregate(Sum('order_group_total'))
-                        print("initial revenue total",day_order_groups_total)
-                        revenue = Revenue.objects.create(total=int(day_order_groups_total["order_group_total__sum"]), day_revenue= float(day_order_groups_total["order_group_total__sum"] *0.01), student = student)
-                        print("creating revenue value of the day", revenue.day_revenue)
-                
-                # new_object = Bill(item=i['item'], price=i['price'], quantity=i['quantity'], invoice_no=new_invoice_no,invoice=file , store=store)
                 objects.append(new_object)
                 item = Item.objects.get(item=i["item"])
                 # initializing stock of item variable
@@ -1370,6 +1653,21 @@ def cart(request):
                 # updating student balance
                 student.balance = student.balance - (cost + (order_group.order_group_total * 0.01) )
                 student.save()
+            # setting and checking the free trial period
+            free_trial_expiry_date = institute.created_at.date() + relativedelta(months=2)
+            if date.today() < free_trial_expiry_date:
+                # conditional block to calculate revenue after free trial
+                try:
+                    revenue = Revenue.objects.get(created_at__date=date.today(), student = student, institute=institute)
+                    revenue.total = revenue.total + order_group.order_group_total
+                    revenue.day_revenue = revenue.total * 0.01
+                    revenue.save()
+                    print("incrementing revenue", revenue.day_revenue)
+                except:
+                    day_order_groups_total = OrderGroup.objects.filter(created_at__date=date.today(),student=student).aggregate(Sum('order_group_total'))
+                    print("initial revenue total",day_order_groups_total)
+                    revenue = Revenue.objects.create(total=int(day_order_groups_total["order_group_total__sum"]), day_revenue= float(day_order_groups_total["order_group_total__sum"] *0.01), student = student)
+                    print("creating revenue value of the day", revenue.day_revenue)
             # saving orders to db
             Order.objects.bulk_create(objects)
 
@@ -1582,3 +1880,22 @@ def home_store_status_update(request):
     else:
         data = {"store_status": "closed"}
         return JsonResponse(data)
+
+
+def institute_kiosk(request,institute_name):
+    try:
+        institute = Institute.objects.get(institute_name=institute_name)
+    except:
+        context = {
+            "error":"Incorrect institute name in url"
+        }
+        return render(request, "tray/institute_kiosk.html",context)
+    events = InstituteEvent.objects.filter(institute=institute )
+    upcoming_events = InstituteEvent.objects.exclude( created_at__date=date.today()).filter(institute=institute)
+    today_events = InstituteEvent.objects.filter(institute=institute, created_at__date=date.today())
+    context = {
+        "institute":institute,
+        "today_events":today_events,
+        "upcoming_events":upcoming_events,
+    }
+    return render(request, "tray/institute_kiosk.html",context)

@@ -26,7 +26,7 @@
                        <input type="password" id="password" name="password" class="form-control form-control-lg"> 
                       <label class="form-label" for="typePasswordX-2">Password</label>
                     </div>
-                    <p id="incorrect_alert" style="color:red"></p>
+                    <p id="incorrect_alert" style="color:red">{% if error %}{{error}}{% endif %}</p>
                     <!-- Checkbox -->
                     <!--div class="form-check d-flex justify-content-start mb-4">
                       <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
@@ -39,8 +39,7 @@
                         
                     <br/><br/>
 
-                    <button class="btn btn-darker">Sign in with Google</button>
-                    <br/><br/>
+                    
                      <hr class="my-4">
                     <a href="{% url 'register_card' %}" class="btn btn-success">Signup as student</a>
                     <br/>
@@ -170,5 +169,5 @@ $(document).ready(function(){
 
 </script>
 
-
+<br/><br/>
 {% endblock %}

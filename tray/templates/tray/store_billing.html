@@ -118,14 +118,14 @@
 
 <h4>Payment:</h4>
 
-<input type="button"  class='confirm btn btn-primary' value="Cash" data-id="cash"> 
-<input type="button" class='confirm btn btn-warning' value="Rfid Card" data-id="card"> 
+<input type="button" class='confirm btn btn-primary' value="Cash" data-id="cash"> 
+<button id="scan_card" class='confirm btn btn-warning'  data-id="card" >Rfid Card </button>
 
-<div id="card_section" hidden>
-<br/><br/>
-<input type="text" id='pin_no'>
-<br/><br/>
-<input type="button" id="card_submit" value="Submit" >
+<div id="card_section">
+<input type="text" id='pin_no' class=hideme >
+<p id="alert" style="color:green" ></p>
+<br/>
+<input type="button" class="btn btn-success" id="card_submit" value="Submit" >
 </div>
 {% with student_id=student.id  %}
 {% with store_id=store.id %}
@@ -140,12 +140,12 @@
 </iframe>
 <embed src="{% static 'tray/pdf/tester5.pdf' %}" type="application/pdf" width="40%" height="600px" />
 <iframe src="{% static 'tray/pdf/tester5.pdf' %}" title="description"></iframe-->
-<br/><br/>
+{% comment %} <br/><br/>
 <p id="print">
     <a href="{% static 'tray/pdf/tester5.pdf' %}"  value="Print Invoice" download >
     <!--button class="green-button" >Print</button-->
     </a>
-</p>
+</p> {% endcomment %}
 <script>
 
     //add items to cart
@@ -154,6 +154,18 @@
             var buy_clicked = false;
             var order_list = [];
 
+        
+        $("#scan_card").click(function(event){
+            document.getElementById("alert").innerHTML =""
+            document.getElementById("pin_no").focus();
+        });
+        //on entering input to card field show message as card received
+        $('#pin_no').on('input', function() {
+            text = $('#pin_no').val();
+            document.getElementById("alert").innerHTML = "Card received please click submit";
+        });
+
+        
            
         $("#customer_cash").keyup(function(){
             customer_balance();
@@ -173,319 +185,301 @@
 
 
 
-        //function to calculate commission on adding item
-            function alltray_revenue(total){
-
-                if (total>0 && total<=10){
-                    commission = 0.01 * total;
-                }
-                else if (total>10 && total<=50){
-                    commission = 0.5;
-                }
-                else if (total>50 && total<=100){
-                    commission = 1;
-                }
-                else if (total>100 && total<=400){
-                    commission = 0.01 * total;
-                }
-                else if (total>=400){
-                    commission = 4;
-                }
-                else{
-                    commission = 0;
-                }
-
-                return commission;
-            };
-
-
-                    $("#add").click(function(event){
-                        var item = $("#item").val();
-                        var quantity = parseInt( $("#quantity").val() );
-                        console.log("item selected: "+item);
-                        console.log("quantity: "+quantity);
-                        var new_item = true; 
-                        //check_exist_in_cart(item);
-                        if (isNaN(quantity) || quantity < 1  ){
-                            alert ("please select atleast one in quantity");
-                            return;
+        $("#add").click(function(event){
+            var item = $("#item").val();
+            var quantity = parseInt( $("#quantity").val() );
+            console.log("item selected: "+item);
+            console.log("quantity: "+quantity);
+            var new_item = true; 
+            //check_exist_in_cart(item);
+            if (isNaN(quantity) || quantity < 1  ){
+                alert ("please select atleast one in quantity");
+                return;
+            }
+            console.log("entering exist check function: "+ typeof item);
+            check_exist_in_cart(item)
+            //checking if item already in cart and incrementing the item
+            function check_exist_in_cart(item){
+                $("#cart_body").find(id="#item").each(function(){
+                        console.log("checking through each"+$(this).text());
+                        cart_item = $(this).text()
+                        if(cart_item == item)
+                        {
+                            console.log("already existing"+cart_item);
+                            new_item = false;
+                            quantity_in_cart = parseInt($(this).next().text());
+                            quantity_in_cart += quantity;
+                            console.log("quantity is"+ quantity_in_cart);
+                            $(this).next().text(quantity_in_cart);
+                            let price = $(this).next().next().text();
+                            //console.log("updater item price"+ price);
+                            let cost = price * quantity_in_cart;
+                            $(this).next().next().next().text(cost);
+                            update_total();
+                            order_list_update(item,quantity,price,cost);
                         }
-                        console.log("entering exist check function: "+ typeof item);
-                        check_exist_in_cart(item)
-                        //checking if item already in cart and incrementing the item
-                        function check_exist_in_cart(item){
-                            $("#cart_body").find(id="#item").each(function(){
-                                    console.log("checking through each"+$(this).text());
-                                    cart_item = $(this).text()
-                                    if(cart_item == item)
-                                    {
-                                        console.log("already existing"+cart_item);
-                                        new_item = false;
-                                        quantity_in_cart = parseInt($(this).next().text());
-                                        quantity_in_cart += quantity;
-                                        console.log("quantity is"+ quantity_in_cart);
-                                        $(this).next().text(quantity_in_cart);
-                                        let price = $(this).next().next().text();
-                                        //console.log("updater item price"+ price);
-                                        let cost = price * quantity_in_cart;
-                                        $(this).next().next().next().text(cost);
+                    
+                    
+                });
+            } 
+
+        
+                        //adding order to list if it is a new item
+            if (new_item){
+                        //sending item selected through ajax to get back the price of item.
+                            $.ajax({
+                                url: '/ajax/billing/item_price/',
+                                data: {
+                                    'item_name' : item,
+                                    'store_id' : '{{store.id}}'
+                                },
+                                dataType: 'json',
+                                success: function (data){
+                                        let i = 0;
+                                        var item_price = data.item_price;
+                                        let cost = quantity * item_price;
+                                        console.log("new item added & total:"+total);
+                                        var item_row = '<tr id='+i+'> <td id="item">'+item+'</td> <td>'+quantity+'</td> <td>'+ item_price +'</td> <td id="cost">'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
+                                        $("#cart_table").find('tbody').append(item_row);
                                         update_total();
-                                        order_list_update(item,quantity,price,cost);
-                                    }
-                                
-                                
+                                        i++;
+
+
+                                        order_obj = {
+                                        "item":item,
+                                        "quantity":quantity,
+                                        "price": item_price,
+                                        "cost": cost,
+                                        }
+
+                                        order_list_push(order_obj);
+                                }
                             });
-                        } 
-
-                    
-                                    //adding order to list if it is a new item
-                        if (new_item){
-                                    //sending item selected through ajax to get back the price of item.
-                                        $.ajax({
-                                            url: '/ajax/billing/item_price/',
-                                            data: {
-                                                'item_name' : item,
-                                                'store_id' : '{{store.id}}'
-                                            },
-                                            dataType: 'json',
-                                            success: function (data){
-                                                    let i = 0;
-                                                    var item_price = data.item_price;
-                                                    let cost = quantity * item_price;
-                                                    console.log("new item added & total:"+total);
-                                                    var item_row = '<tr id='+i+'> <td id="item">'+item+'</td> <td>'+quantity+'</td> <td>'+ item_price +'</td> <td id="cost">'+cost+'</td> <td><input type="checkbox" name="record"></td> </tr>';
-                                                    $("#cart_table").find('tbody').append(item_row);
-                                                    update_total();
-                                                    i++;
-
-
-                                                    order_obj = {
-                                                    "item":item,
-                                                    "quantity":quantity,
-                                                    "price": item_price,
-                                                    "cost": cost,
-                                                    }
-
-                                                    order_list_push(order_obj);
-                                            }
-                                        });
-                        } 
-                        
-                        //alltray_revenue(total);
-                        
-                    });
-                    
-                    function update_total(){
-                        total = 0;
-                        /*$("#cart_body").find(id="#cost").each(function(){
-                            cost = parseInt($(this).text());
-                            console.log("traversing through"+ )
-                            console.log("new item during totalling: "+ item);
-                            console.log("cost of new item: "+cost);*/
-                        var table = document.getElementById('cart_body');
-                        var rowLength = table.rows.length;
-                        for(let c=0; c<rowLength; c+=1){
-                            var row = table.rows[c];
-                            //cost cell on each row
-                            var cost = row.cells[3].innerHTML;
-                            console.log("cell: "+cost);
-                            total += parseInt(cost);
-                            console.log("UPDATED total_________________________________"+total);
-                            $("#total").text("Total: "+total);
-                        }
-                    }
-                    
+            }
+            
+        });
+        
+        function update_total(){
+            total = 0;
+            /*$("#cart_body").find(id="#cost").each(function(){
+                cost = parseInt($(this).text());
+                console.log("traversing through"+ )
+                console.log("new item during totalling: "+ item);
+                console.log("cost of new item: "+cost);*/
+            var table = document.getElementById('cart_body');
+            var rowLength = table.rows.length;
+            for(let c=0; c<rowLength; c+=1){
+                var row = table.rows[c];
+                //cost cell on each row
+                var cost = row.cells[3].innerHTML;
+                console.log("cell: "+cost);
+                total += parseInt(cost);
+                console.log("UPDATED total_________________________________"+total);
+                $("#total").text("Total: "+total);
+            }
+        }
+        
 
 
 
-                    function order_list_push(){
-                        order_list.push(order_obj);
-                        for(let i in order_list){
-                            console.log(i+" item: "+order_list[i].item+" quantity:"+order_list[i].quantity+" price:"+order_list[i].price+" cost"+ order_list[i].cost)
-                        }
-                    } 
+        function order_list_push(){
+            order_list.push(order_obj);
+            for(let i in order_list){
+                console.log(i+" item: "+order_list[i].item+" quantity:"+order_list[i].quantity+" price:"+order_list[i].price+" cost"+ order_list[i].cost)
+            }
+        } 
 
-                    function order_list_update(item,quantity, price, cost){
-                        index_of_update_item = order_list.findIndex(a => (a.item === item && a.quantity === a.quantity));
-                        update_item = order_list[index_of_update_item];
-                        update_item.quantity +=  quantity;
-                        update_item.cost = cost;
-                        console.log("updated item in order_list: "+ update_item.item+" quantity: " + update_item.quantity+" price:"+update_item.price+" cost"+ update_item.cost);
-                    }  
+        function order_list_update(item,quantity, price, cost){
+            index_of_update_item = order_list.findIndex(a => (a.item === item && a.quantity === a.quantity));
+            update_item = order_list[index_of_update_item];
+            update_item.quantity +=  quantity;
+            update_item.cost = cost;
+            console.log("updated item in order_list: "+ update_item.item+" quantity: " + update_item.quantity+" price:"+update_item.price+" cost"+ update_item.cost);
+        }  
 
-                    
+        
 
-                    $("#delete").click(function(){
-                        $("#cart_body").find('input[name="record"]').each(function(){
-                            if($(this).is(":checked")){
-                                var delete_item_id = $(this).closest('tr').attr('id');
-                                var item_cost = $(this).parent().prev().text();
-                                var item_name = $(this).parent().prev().prev().prev().prev().text();
-                                console.log(delete_item_id+ "testeritem: "+item_name+" deleting with cost : " +item_cost);
-                                //removing from cart table
-                                $(this).parents("tr").remove();
-                                //removing the item from order list array
-                                total = total - item_cost;
-                                console.log("total after deleting item:"+total+"item_cost:"+item_cost );
-                                $("#total").text("Total: "+total);
-                                delete_from_order_list(item_name, item_cost);
-                            }
-                        });
-                    });
+        $("#delete").click(function(){
+            $("#cart_body").find('input[name="record"]').each(function(){
+                if($(this).is(":checked")){
+                    var delete_item_id = $(this).closest('tr').attr('id');
+                    var item_cost = $(this).parent().prev().text();
+                    var item_name = $(this).parent().prev().prev().prev().prev().text();
+                    console.log(delete_item_id+ "testeritem: "+item_name+" deleting with cost : " +item_cost);
+                    //removing from cart table
+                    $(this).parents("tr").remove();
+                    //removing the item from order list array
+                    total = total - item_cost;
+                    console.log("total after deleting item:"+total+"item_cost:"+item_cost );
+                    $("#total").text("Total: "+total);
+                    delete_from_order_list(item_name, item_cost);
+                }
+            });
+        });
 
-                            function delete_from_order_list(item_name, item_cost)
-                            {
-                                console.log("entered delete function, item name:"+item_name+item_cost);
-                                //item to be removed be prepared as this object on delete click
-                                //remobj = {item:"samosa", quantity:"2", time:"Now" }
-                                find_index = order_list.findIndex(a => (a.item === item_name && a.quantity === a.quantity));
-                                console.log("index check"+find_index);
-                                if (find_index !== -1){
-                                    order_list.splice(find_index,1);
-                                    console.log("removed");
-                                }
-                                console.log("total:"+total);
-                                
-                                for(i in order_list){
-                                    console.log("item:"+i+" "+order_list[i].item+" quantity:"+order_list[i].quantity+" prcie:"+order_list[i].price)
-                                }
-                                
-                        
-                            }
-                    
+        function delete_from_order_list(item_name, item_cost)
+        {
+            console.log("entered delete function, item name:"+item_name+item_cost);
+            //item to be removed be prepared as this object on delete click
+            //remobj = {item:"samosa", quantity:"2", time:"Now" }
+            find_index = order_list.findIndex(a => (a.item === item_name && a.quantity === a.quantity));
+            console.log("index check"+find_index);
+            if (find_index !== -1){
+                order_list.splice(find_index,1);
+                console.log("removed");
+            }
+            console.log("total:"+total);
+            
+            for(i in order_list){
+                console.log("item:"+i+" "+order_list[i].item+" quantity:"+order_list[i].quantity+" prcie:"+order_list[i].price)
+            }
+            
+    
+        }
+            
             
 
-            //confirming purchase and saving to order table
-            $(".confirm").click(function(){
-                        if (order_list.length !== 0){
-                                    console.log("entered If");
-                                    buy_clicked = true;
-                                    /*store_detail_object = {
-                                        'store': '{{store.id}}',
-                                    };
-                                    order_list.unshift(store_detail_object);*/
-                                    order_list_json = JSON.stringify(order_list);
-                                    console.log(order_list_json);
-                                    cash_or_card = $(this).data("id")
-                                    console.log(cash_or_card)
-                                    if (cash_or_card == 'card')
-                                        {
-                                            $('#card_section').attr("hidden",false);
-                                            pin_no = $('#pin_no').val()
-                                            return
-                                        }
-                                    //device check
-                                    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-                                        // true for mobile device
-                                        console.log("mobile device");
-                                        var device = 'mobile'
+        //confirming purchase and saving to order table
+        $(".confirm").click(function(){
+                    if (order_list.length !== 0){
+                                console.log("entered If");
+                                buy_clicked = true;
+                                /*store_detail_object = {
+                                    'store': '{{store.id}}',
+                                };
+                                order_list.unshift(store_detail_object);*/
+                                order_list_json = JSON.stringify(order_list);
+                                console.log(order_list_json);
+                                cash_or_card = $(this).data("id")
+                                console.log(cash_or_card)
+                                if (cash_or_card == 'card')
+                                    {
+                                        $('#card_section').attr("hidden",false);
+                                        pin_no = $('#pin_no').val()
+                                        return
                                     }
-                                    else{
-                                        // false for not mobile device
-                                        console.log("not mobile device");
-                                        var device = 'desktop'
-                                    }
+                                //device check
+                                if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+                                    // true for mobile device
+                                    console.log("mobile device");
+                                    var device = 'mobile'
+                                }
+                                else{
+                                    // false for not mobile device
+                                    console.log("not mobile device");
+                                    var device = 'desktop'
+                                }
 
 
-                                    $.ajax({
-                                        url: '/ajax/billing/invoice/',
-                                        data:{
-                                            'order_list_json':order_list_json,
-                                            'total': total,
-                                            'device': device,
-                                            'cash_or_card': cash_or_card,
-                                        },
-                                        dataType: 'json',
-                                        success: function (data){
-                                            Swal.fire(
-                                                'Bill confirmed',
-                                                '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
-                                                'success'
-                                            ).then(function() {
-                                                $("form").submit();
-                                            });
-                                        }
-                                    });
-                                    
-                        }   
-                        if (order_list.length === 0){
-                            alert("no item in bill");
-                        }  
-             });
-            $('#card_submit').click(function(){
-                //device check
-                if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-                    // true for mobile device
-                    console.log("mobile device");
-                    var device = 'mobile'
-                }
-                else{
-                    // false for not mobile device
-                    console.log("not mobile device");
-                    var device = 'desktop'
-                }
-                pin_no = $('#pin_no').val()
-                if (pin_no == ''){
-                    alert('please enter card pin')
-                    return
-                }
-                $.ajax({
-                    url: '/ajax/billing/invoice/',
-                    data:{
-                        'order_list_json':order_list_json,
-                        'total': total,
-                        'device': device,
-                        'cash_or_card': cash_or_card,
-                        'pin_no': pin_no,
-                    },
-                    dataType: 'json',
-                    success: function (data){
-                        if (data.card_status == 'card_invalid'){
-                            Swal.fire(
-                            'Invalid card',
-                            'please try again',
-                            'error',
-                            )
-                            return
-                        }
-                        if (data.card_status == 'low_balance'){
-                            Swal.fire(
-                            'Oops',
-                            'Low balance on card',
-                            'error',
-                            )
-                            return
-                        }
-                        else{
-                            Swal.fire(
-                                'Bill confirmed',
-                                '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
-                                'success'
-                            ).then(function() {
-                                $("form").submit();
-                            });
-                        }
-                    }
-                });
+                                $.ajax({
+                                    url: '/ajax/billing/invoice/',
+                                    data:{
+                                        'order_list_json':order_list_json,
+                                        'total': total,
+                                        'device': device,
+                                        'cash_or_card': cash_or_card,
+                                    },
+                                    dataType: 'json',
+                                    success: function (data){
+                                        Swal.fire(
+                                            'Bill confirmed',
+                                            '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
+                                            'success'
+                                        ).then(function() {
+                                            $("form").submit();
+                                            location.reload();
+                                        });
+                                    }
+                                });
                                 
+                    }   
+                    if (order_list.length === 0){
+                        alert("no item in bill");
+                    }  
             });
-
-
-
-
-
-
-        //clear cart on exit 
-        window.onbeforeunload = function(event) {
-            if (buy_clicked == false){
-                event.returnValue = "exit";
-                total = 0;
-                subtotal = 0;
+        $('#card_submit').click(function(){
+            //device check
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+                // true for mobile device
+                console.log("mobile device");
+                var device = 'mobile'
+            }
+            else{
+                // false for not mobile device
+                console.log("not mobile device");
+                var device = 'desktop'
+            }
+            pin_no = $('#pin_no').val()
+            if (pin_no == ''){
+                alert('please enter card pin')
+                return
+            }
+            $.ajax({
+                url: '/ajax/billing/invoice/',
+                data:{
+                    'order_list_json':order_list_json,
+                    'total': total,
+                    'device': device,
+                    'cash_or_card': cash_or_card,
+                    'pin_no': pin_no,
+                },
+                dataType: 'json',
+                success: function (data){
+                    console.log(data.card_status)
+                    console.log(typeof data.card_status)
+                    if (data.card_status == 'card_invalid'){
+                        Swal.fire(
+                        'Invalid card',
+                        'please click rfid button & try again',
+                        'error',
+                        ).then(function(){
+                            document.getElementById("pin_no").value = ""
+                            document.getElementById("alert").innerHTML =""
+                            document.getElementById("pin_no").focus();
+                            
+                            return false
+                        })
+                    }
+                    if (data.card_status == 'low_balance'){
+                        Swal.fire(
+                        'Oops',
+                        'Low balance on card',
+                        'error',
+                        )
+                        return
+                    }
+                    if (data.card_status == "transaction_completed"){
+                        console.log(data.card_status)
+                        Swal.fire(
+                            'Bill confirmed',
+                            '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
+                            'success'
+                        ).then(function() {
+                            $("form").submit();
+                            location.reload();
+                        });
+                    }
                 }
-        }
+            });
+                            
+        });
 
 
-    });    
+
+
+
+
+    //clear cart on exit 
+    window.onbeforeunload = function(event) {
+        if (buy_clicked == false){
+            event.returnValue = "exit";
+            total = 0;
+            subtotal = 0;
+            }
+    }
+
+
+});    
   
         
 </script>

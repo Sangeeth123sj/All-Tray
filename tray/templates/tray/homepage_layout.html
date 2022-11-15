@@ -60,6 +60,13 @@
 
       }
 
+      .orange-button{
+        background-color: orange;
+        color:white;
+        border-radius:5px;
+        padding: 15px 32px;
+      }
+
 
       table{
         -moz-box-shadow: 0 0 2px 2px #888;
@@ -100,6 +107,13 @@
         font-color:black;
         border-radius:5px;
         padding: 2px,2px,2px,2px;
+      }
+
+      .select-input{
+        background-color: white;
+        color: black;
+        outline-style: solid;
+        outline-color: black;
       }
 
       .black-button {
@@ -255,8 +269,8 @@
                   <li><a href="{% url 'your_orders' %}" class="nav-link ">Your Orders</a></li>
                   <li><a href="{% url 'pay' %}" class="nav-link ">Recharge Card</a></li>
                   <li><a href="{% url 'fee_payment' %}" class="nav-link ">Fee Payment</a></li>
-                  <li><a href="{% url 'student_pin_edit' %}" class="nav-link ">Edit Pin</a></li>
-                  <li><a href="{% url 'home' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
+                  <li><a href="{% url 'student_pin_edit' %}" class="nav-link ">Edit Password</a></li>
+                  <li><a href="{% url 'student_profile' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
                   <li><a href="{% url 'student_logout' %}" class="nav-link ">Logout</a></li>
                   
                   <li><a href="#" class="nav-link ">Contact</a></li>

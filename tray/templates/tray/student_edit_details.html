@@ -1,0 +1,116 @@
+{% extends "tray/homepage_layout.html" %}
+
+
+{% block title %} Edit Student {% endblock %}
+
+
+
+{% block content %}
+<center>
+
+
+
+<h2>Edit Student</h2>
+<br/>
+<div class="container py-5 h-100">
+  <div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+      <div class="card shadow-2-strong" style="border-radius: 1rem;">
+        <div class="card-body p-5 text-center">
+          <form method="POST" name="form">
+          {% csrf_token %}
+          <div class="form-outline mb-4">
+            <input type="text" class="form-control form-control-lg" id="name" name="name" value={{name}} >
+            <label class="form-label">Name</label>
+          </div>
+          <div class="form-outline mb-4">
+            <input type="text" class="form-control form-control-lg" id="card" name="card" value={{card}} >
+            <label class="form-label">Card Pin</label>
+          </div>
+          <div class="form-outline mb-4">
+            <select name="branch" id="branch" class="btn dropdown-toggle" class="btn btn-outline-primary" aria-placeholder="selects" class="form-select" style="background-color: #d6d6f5;" value={{branch}}>
+                <option input value="Electronics & Communication">ECE</option>
+                <option input value="Computer Science">CSE</option>
+                <option input value="Civil Engineering">CE</option>
+                <option input value="Mechanical Engineering">ME</option>
+            </select>
+            <br/>
+            <label class="form-label">Branch</label>
+          </div>
+          <div class="form-outline mb-4">
+            <select name="semester" id="semester" class="btn dropdown-toggle" class="form-control"   style="background-color: #d6d6f5;" value={{semester}}>
+                <option input value="semester 1">semester 1</option>
+                <option input value="semester 2">semester 2</option>
+                <option input value="semester 3">semester 3</option>
+                <option input value="semester 4">semester 4</option>
+                <option input value="semester 5">semester 5</option>
+                <option input value="semester 6">semester 6</option>
+                <option input value="semester 7">semester 7</option>
+                <option input value="semester 8">semester 8</option>
+                </select>
+            <br/>
+            <label class="form-label">Semester</label>
+            <br/>
+            <p id="incorrect_alert" style="color: rgba(207, 77, 77, 0.774);" ></p>
+          </div>
+          <input type="button" class="btn btn-success" value="submit" id="submit_button">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+    <script>
+        $(document).ready(function(){
+    
+            $("#submit_button").click(function (event) {
+                var name = $("#name").val();
+                var card = $("#card").val();
+
+                if (name == ""){
+                    document.getElementById("incorrect_alert").innerHTML = "Please enter a valid name"
+                    $("#name").css("border-color","red");
+                    return false
+                }
+                if (card == ""){
+                    document.getElementById("incorrect_alert").innerHTML = "Please enter a valid card pin"
+                    $("#card").css("border-color","red");
+                    return false
+                }
+                else{
+                    Swal.fire(
+                    'Edit Successful',
+                    '',
+                    'success'
+                    ).then(function() {
+                        form.submit()
+                    });
+                    
+                }
+               
+            });
+        });  
+        
+        
+        
+    </script>
+    <a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
+        </div>
+        </div>
+
+
+</center>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

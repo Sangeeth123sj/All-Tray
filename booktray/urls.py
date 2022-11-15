@@ -18,7 +18,8 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
-
+from django.conf import settings
+from django.conf.urls.static import static
 # import this
 
 urlpatterns = [
@@ -59,6 +60,9 @@ urlpatterns = [
         csrf_exempt(GraphQLView.as_view(graphiql=True)),
     ),
 ]
+
+if settings.DEBUG:
+     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 admin.site.site_title = "Alltray admin"
 admin.site.site_header = "Alltray Admin"
 admin.site.index_title = "welcome to Alltray admin"

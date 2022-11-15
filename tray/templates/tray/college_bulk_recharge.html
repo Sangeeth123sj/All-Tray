@@ -78,6 +78,26 @@
     </tbody>
 </table>
 
+
+<div class="pagination">
+    <span class="step-links">
+        {% if college_bulk_recharge_list.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ college_bulk_recharge_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ college_bulk_recharge_list.number }} of {{ college_bulk_recharge_list.paginator.num_pages }}.
+        </span>
+
+        {% if college_bulk_recharge_list.has_next %}
+            <a href="?page={{ college_bulk_recharge_list.next_page_number }}">next</a>
+            <a href="?page={{ college_bulk_recharge_list.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+
 <script>
     
 

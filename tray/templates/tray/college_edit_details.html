@@ -1,0 +1,94 @@
+{% extends "tray/college_homepage_layout.html" %}
+
+
+{% block title %} Edit Institute {% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+<h2>Edit Institute</h2>
+<br/>
+<div class="container py-5 h-100">
+  <div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+      <div class="card shadow-2-strong" style="border-radius: 1rem;">
+        <div class="card-body p-5 text-center">
+          <form method="POST" name="form">
+          {% csrf_token %}
+          <div class="form-outline mb-4">
+            <input type="text" class="form-control form-control-lg" id="name" name="name" value={{institute.institute_name}} >
+            <label class="form-label">Name</label>
+          </div>
+            <p id="incorrect_alert" style="color: rgba(207, 77, 77, 0.774);" ></p>
+         
+          <br/>
+          <input type="button" class="btn btn-success" value="submit" id="submit_button">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
+
+
+
+
+
+
+
+
+
+    <script>
+        $(document).ready(function(){
+    
+            $("#submit_button").click(function (event) {
+                var name = $("#name").val();
+
+                if (name == ""){
+                    document.getElementById("incorrect_alert").innerHTML = "Please enter a valid name"
+                    $("#name").css("border-color","red");
+                    return false
+                }
+                $.ajax({
+                    url: '/ajax/college_edit_validate/',
+                    data: {
+                        "name":name
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.institute_taken) {
+                            alert("That name is already taken, try another name");
+                            return false;
+                        }
+                        else{
+                          Swal.fire(
+                            'Edit Successful',
+                            '',
+                            'success'
+                            ).then(function() {
+                                form.submit()
+                            });
+                        }
+                    }
+                });
+               
+            });
+        });  
+        
+        
+        
+    </script>
+
+
+
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

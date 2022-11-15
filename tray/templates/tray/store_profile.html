@@ -1,0 +1,42 @@
+{% extends "tray/store_homepage_layout.html" %}
+
+
+{% block title %} Edit Store {% endblock %}
+
+
+
+{% block content %}
+<center>
+
+<h2>Store Profile</h2>
+<br/>
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>Store</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Name : {{store.store_name}}</strong></h5>
+      <br/>
+      <h5 class="card-text"><strong>Description : {{store.store_name}}</strong></h5>
+      <br/>
+      <a href={% url 'store_edit_details' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+<br/>
+
+<div class="card" style="width: 30rem;">
+    <div class="card-header">
+      <h4>User</h4>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <h5 class="card-text"><strong>Email : {{store.user.email}}</strong></h5>
+      <br/>
+      <a href={% url 'user_edit' %} class="btn btn-darker">edit</a>
+    </div>
+</div>
+<br/>
+
+
+{% endblock %}

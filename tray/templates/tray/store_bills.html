@@ -1,32 +1,8 @@
-{% extends 'tray/base.html' %}
+{% extends 'tray/store_homepage_layout.html' %}
 
 {% block title%} Store bills {% endblock %}
 
-{% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <li class="nav-item active">
-    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
-  </li>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'billing' %}">Billing</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_edit_details' %}">Edit Store</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_logout' %}">Logout</a>
-      </li>
-    </ul>
-    
-  </div>
-</nav>
-{% endblock %}
 
 {% block content %}
 <h1>{{store.store_name}} Bills</h1>
@@ -55,7 +31,7 @@
 <br/> <br/>
 
 <!--Testing daterange-->
-{% load item_filters %}
+{% comment %} {% load item_filters %}
 {% date_range as the_days %}
 
 {% for day in the_days %}
@@ -66,9 +42,6 @@
                
                     <table id="table" width="30%">
                     <thead>
-                        <th>
-                            Id
-                        </th>
                         <th>
                             Item
                         </th>
@@ -81,28 +54,17 @@
                         <th>
                             Status
                         </th>
-                        <th>
-                            Revenue
-                        </th>
                     </thead>
                 
                 <tbody >
                     <br/> <p>{{day.date}} </p>
-                    <!--Now-->
-                    {% break_checker day "Now" as is_break %}
-                    {% if is_break %}
-                    <tr>
-                        <td colspan="6" align="center" style="background-color: #4eb7d4;">Orders now</td>
-                    </tr>
-                    {% endif %}  
-            {% for order in store_bills %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
+
+            {% for order in order_list %}
+
+                {% if order.created_at.date == day.date %}
                 
                     <tr height="50px" id="{{order.id}}">
-                        
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
+
                         <td align="center">
                             {{order.item}}
                         </td>
@@ -110,7 +72,11 @@
                             {{order.quantity}}
                         </td>
                         <td align="center">
-                            {{order.student.name}}
+                            {% if order.student.name %}
+                                {{order.student.name}}
+                            {% else %}
+                                spot payed
+                            {% endif %}
                         </td>
                         <td align="center">
                             {% if order.status %}
@@ -119,137 +85,93 @@
                             <span style="color: #c05e40;">Not Delivered</span>
                             {% endif %}
                         </td>
-                        <td align="center">
-                            {{order.revenue}}
-                        </td>
                     </tr>
                 {% endif %}
             {% endfor %}
 
-
-                    <!--First Break-->
-                    {% break_checker day "First Break" as is_break %}
-                    {% if is_break %}
-                    <tr>
-                        <td colspan="6" align="center" style="background-color: #4eb7d4;">First Break</td>
-                    </tr>
-                    {% endif %}
-
-            {% for order in store_bills %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
-   
-                    <tr height="50px" id="{{order.id}}">
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.revenue}}
-                        </td>
-                    </tr>
-
-                {% endif %}
-            {% endfor %}
-
-            <!--Lunch Break-->
-            {% break_checker day "Lunch Break" as is_break %}
-            {% if is_break %}
-            <tr>
-                <td colspan="6" align="center" style="background-color: #4eb7d4;">Lunch Break</td>
-            </tr> 
-            {% endif %}
-
-            {% for order in store_bills %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
-                
-                    <tr height="50px" id="{{order.id}}">
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.revenue}}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-
-            <!--Last Break-->
-            {% break_checker day "Last Break" as is_break %}
-            {% if is_break %}
-            <tr>
-                <td colspan="6" align="center" style="background-color: #4eb7d4;">Last Break</td>
-            </tr> 
-            {% endif %}
-
-            {% for order in store_bills %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
-                
-                    <tr height="50px" id="{{order.id}}">
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.revenue}}
-                        </td>
-                    </tr>
-                {% endif %}
-
-            {% endfor %}
 
                 
         {% endif %} 
                 </tbody>
 {% endfor %}
+</table> {% endcomment %}
+
+
+
+
+
+{% regroup order_list by created_at|date:"Y-m-d" as objects_by_day %}
+{% for day in objects_by_day %}
+<br/><br/>
+<p>{{day.grouper}}</p>
+<table id="table" width="30%">
+    <thead>
+        <th>
+            Item
+        </th>
+        <th>
+            Quantity
+        </th>
+        <th>
+            Buyer
+        </th>
+        <th>
+            Status
+        </th>
+    </thead>
+    {% comment %} {% regroup day.list by pickup_time as order_list %} {% endcomment %}
+    {% for order in day.list %}
+<tbody >
+    
+  
+   <tr height="50px" id="{{o.id}}">
+        <td align="center">
+            {{order.item}}
+        </td>
+        <td align="center">
+            {{order.quantity}}
+        </td>
+        <td align="center">
+            {% if order.student.name %}
+                {{order.student.name}}
+            {% else %}
+                spot payed
+            {% endif %}
+        </td>
+        <td align="center">
+            {% if order.status %}
+            <span style="color: #4d9167;">Delivered</span>
+            {% else %}
+            <span style="color: #c05e40;">Not Delivered</span>
+            {% endif %}
+        </td>
+    </tr>
+</tbody>
+
+{% endfor %}
 </table>
+{% endfor %}
 
 
+
+
+<div class="pagination">
+    <span class="step-links">
+        {% if order_list.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ order_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ order_list.number }} of {{ order_list.paginator.num_pages }}.
+        </span>
+
+        {% if order_list.has_next %}
+            <a href="?page={{ order_list.next_page_number }}">next</a>
+            <a href="?page={{ order_list.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 
 
 <br/>

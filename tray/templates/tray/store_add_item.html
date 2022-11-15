@@ -41,20 +41,28 @@
 
 <h3>Add Item</h3>
 <br/>
-
-<div class="form-group centered">
-<form action="/store_add_item_save/" name="form" method="POST" onsubmit="return validateForm()">
-    {% csrf_token %}
-    <h4>item</h4>
-    <input type="text" id="add_item_name" name="item_name" class="form-control" required><br/><br/>
-    <h4>Price</h4>
-    <input type="number" id="add_price" name="price" min="0" class="form-control" required><br/><br/>
-    <h4>Stock</h4>
-    <input type="number" id="add_stock" name="stock" min="1" class="form-control" required><br/><br/>
-    <input type="hidden" name="store_id" value="{{store_id}}">
-    <input type="button" id="submit_button" value="submit" class="btn btn-success">
-</form>
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <form action="/store_add_item_save/" name="form" method="POST" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <h4>item</h4>
+                <input type="text" id="add_item_name" name="item_name" class="form-control" required><br/><br/>
+                <h4>Price</h4>
+                <input type="number" id="add_price" name="price" min="0" class="form-control" required><br/><br/>
+                <h4>Stock</h4>
+                <input type="number" id="add_stock" name="stock" min="1" class="form-control" required><br/><br/>
+                <input type="hidden" name="store_id" value="{{store_id}}">
+                <input type="button" id="submit_button" value="submit" class="btn btn-success">
+            </form>
+        </div>
+    </div>
+  </div>
 </div>
+</div>
+
 <div class="row">
     
 <div class="col-sm-5">
@@ -70,7 +78,7 @@
 $(document).ready(function(){
 
     //filling fields with values on reload from browser session storage
-    window.onload=set_fields(); 
+   /* window.onload=set_fields(); 
 
     function set_fields(){
         var add_item_name = sessionStorage.getItem('add_item_name');
@@ -79,7 +87,7 @@ $(document).ready(function(){
         if (add_price !== null) $('#add_price').val(add_price);
         var add_stock = sessionStorage.getItem('add_stock');
         if (add_stock !== null) $('#add_stock').val(add_stock);
-    }
+    } 
 
 
 
@@ -89,11 +97,21 @@ $(document).ready(function(){
         sessionStorage.setItem("add_price", $('#add_price').val());
         sessionStorage.setItem("add_stock", $('#add_stock').val());
         // ...
-    }
+    }*/
 
-    $("#submit_button").click(function () {
-
+    //$("#submit_button").click(function () {
+    $("#submit_button").on("click", function (e) {
         var item_name = $("#add_item_name").val();
+        var stock = $("#add_stock").val();
+        var price = $("#add_price").val();
+        if (stock < 1){
+            alert("stock can't be less than one.")
+            return false
+        }
+        if (price < 0){
+            alert("price can't be less than zero.")
+            return false
+        }
         //alert("entered the button region "+item_name);
         $.ajax({
             url: '/ajax/validate_store_item/',
@@ -104,7 +122,7 @@ $(document).ready(function(){
             success: function (data) {
                 if (data.is_taken) {
                     alert("Item already exists in store");
-                    location.reload();
+                    return false
                 }
                 else {
                     $("form").submit();

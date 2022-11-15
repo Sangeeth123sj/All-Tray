@@ -1,10 +1,63 @@
-{% extends "tray/base.html" %}
+{% extends "tray/homepage_layout.html" %}
 
-{% block title %} Your Store {% endblock %}
+{% block title %} College Signup {% endblock %}
 
-{% block background %}
-<div class="bg_infinite">
+
+
+{% block navbar %}
+
+<div class="site-mobile-menu site-navbar-target">
+    <div class="site-mobile-menu-header">
+      <div class="site-mobile-menu-close mt-3">
+        <span class="icon-close2 js-menu-toggle"></span>
+      </div>
+    </div>
+    <div class="site-mobile-menu-body"></div>
+  </div>
+
+
+
+  <header class="home-site-navbar home-site-navbar-target" role="banner">
+
+    <div class="container">
+      <div class="row align-items-center position-relative">
+
+        <div class="col-3">
+          <div class="home-site-logo">
+            <a href="{% url 'entry' %}" class="display-3">AllTray</a>
+          </div>
+        </div>
+
+        <div class="col-9  text-right">
+          
+
+          <span class="d-inline-block d-lg-none"><a href="#" class="text-primary site-menu-toggle js-menu-toggle py-5"><span class="icon-menu h2"></span></a></span>
+
+
+          <nav class="site-navigation text-right ml-auto d-none d-lg-block" role="navigation">
+            <ul class="site-menu main-menu js-clone-nav ml-auto ">
+              <li class="active"><a href="{% url 'entry' %}" class="nav-link ">Home</a></li>
+              <!--li><a href="{% url 'your_orders' %}" class="nav-link ">Your Orders</a></li>
+              <li><a href="{% url 'pay' %}" class="nav-link ">Recharge Card</a></li>
+              <li><a href="{% url 'home' %}" class="nav-link ">Fee Payment</a></li>
+              <li><a href="{% url 'student_pin_edit' %}" class="nav-link ">Edit Pin</a></li>
+              <li><a href="{% url 'home' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
+              <li><a href="{% url 'student_logout' %}" class="nav-link ">Logout</a></li-->
+              
+              <li><a href="#" class="nav-link ">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        
+      </div>
+    </div>
+
+    </header>
+
 {% endblock %}
+
+
 
 {% block content %}
 <center>
@@ -54,7 +107,7 @@
                 }
             }
     
-    function displayRadioValue() {
+    {% comment %} function displayRadioValue() {
         var ele = document.getElementsByName('plan_type');
             
         for(i = 0; i < ele.length; i++) {
@@ -65,45 +118,54 @@
             }
         }
         return false;
-    }
+    } {% endcomment %}
 </script>
 
 <h4> <strong> Register Your Institute </strong></h4>
 
-<div class="form-group centered">
-<form action="/register_college_success/" name="form" method="POST" onsubmit="return validateForm()">
-{% csrf_token %}
-<h3>Institute name</h3>
-<input type="text" name="college_name" id="college_name" class="form-control"><br/><br/>
-<h3>Plan type</h3>
-    <div class="form-check">
-        <input class="form-check-input" value="basic" type="radio" name="plan_type" id="flexRadioDefault1" checked>
-        <label class="form-check-label" for="flexRadioDefault1">
-        Basic
-        </label>
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+                <form action="/register_college_success/" name="form" method="POST" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <h3>Institute name</h3>
+                <input type="text" name="college_name" id="college_name" class="form-control"><br/><br/>
+                <!--h3>Plan type</h3>
+                    <div class="form-check">
+                        <input class="form-check-input" value="basic" type="radio" name="plan_type" id="flexRadioDefault1" checked>
+                        <label class="form-check-label" for="flexRadioDefault1">
+                        Basic
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" value="standard" type="radio" name="plan_type" id="flexRadioDefault2">
+                        <label class="form-check-label" for="flexRadioDefault2">
+                        Standard
+                        </label>
+                    </div>
+                <br/><br/-->
+                <h3>First Break</h3>
+                <input type="time" name="first_break" id="first_break" class="form-control"><br/><br/>
+                <h3>Lunch break</h3>
+                <input type="time" name="lunch_break" id="lunch_break" class="form-control"><br/><br/>
+                <h3>Last break</h3>
+                <input type="time" name="last_break" id="last_break" class="form-control"><br/><br/>
+                <h3>username</h3>
+                <input type="text" name="username" id="username" class="form-control"><br/><br/>
+                <h3>email id</h3>
+                <input type="email" name="email" id="email" class="form-control"><br/><br/>
+                <h3>password</h3>
+                <input type="password" name="password" id="password" class="form-control"><br/><br/>
+                <input type="button" id="submit_button" value="Submit" class="btn btn-success">
+                </form>
+            </div>
+        </div>
+      </div>
     </div>
-    <div class="form-check">
-        <input class="form-check-input" value="standard" type="radio" name="plan_type" id="flexRadioDefault2">
-        <label class="form-check-label" for="flexRadioDefault2">
-        Standard
-        </label>
-    </div>
-<br/><br/>
-<h3>First Break</h3>
-<input type="time" name="first_break" id="first_break" class="form-control"><br/><br/>
-<h3>Lunch break</h3>
-<input type="time" name="lunch_break" id="lunch_break" class="form-control"><br/><br/>
-<h3>Last break</h3>
-<input type="time" name="last_break" id="last_break" class="form-control"><br/><br/>
-<h3>username</h3>
-<input type="text" name="username" id="username" class="form-control"><br/><br/>
-<h3>email id</h3>
-<input type="email" name="email" id="email" class="form-control"><br/><br/>
-<h3>password</h3>
-<input type="password" name="password" id="password" class="form-control"><br/><br/>
-<input type="button" id="submit_button" value="Submit" class="btn btn-success">
-</form>
 </div>
+                
 <script>
     $(document).ready(function(){
 
@@ -148,7 +210,7 @@
             var email = $("#email").val();
             //console.log(email);
             var flag = checkemail(email);
-            var plan = displayRadioValue();
+            var plan = "basic"
             console.log(flag);
             if (plan == false){
                 alert("Please select a plan");
@@ -196,4 +258,8 @@
 
 
 </center>
+{% endblock %}
+
+
+{% block footer %}
 {% endblock %}

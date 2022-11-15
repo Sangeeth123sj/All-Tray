@@ -37,7 +37,7 @@
 <br/> <br/>
 
 <!--Testing daterange-->
-{% load item_filters %}
+{% comment %} {% load item_filters %}
 
 {%pickup_date_range as today %}
 {% for day in today %}
@@ -311,9 +311,9 @@
             <tr>
                 <td colspan="5" align="center" style="background-color: #4eb7d4;">Last Break</td>
             </tr> 
-            {% endif %}
+            {% endif %} {% endcomment %}
 
-            {% for order in orders %}
+            {% comment %} {% for order in orders %}
                 {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
                 
                     <tr height="50px" >
@@ -328,7 +328,9 @@
                         <td align="center">
                             {{order.otp}}
                         </td>
-                        
+                        <td align="center" >
+                            <button class="btn btn-warning" id="cancel" name="cancel">Cancel</button>
+                        </td>
                     </tr>
                 {% endif %}
 
@@ -338,10 +340,94 @@
         {% endif %} 
                 </tbody>
 {% endfor %}
+</table> {% endcomment %}
 
 
 
-</table>
+
+{% regroup order_list by created_at|date:"Y-m-d" as objects_by_day %}
+{% for day in objects_by_day %}
+    <br/><br/>
+    <p>{{day.grouper}}</p>
+        <table id='table' width="50%">
+            <thead>
+                <th>
+                    Item
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Buyer
+                </th>
+                <th>
+                    Otp
+                </th>
+                <th>
+                    Cancellation
+                </th>
+                
+            </thead>
+        
+            {% regroup day.list by pickup_time as order_list %}
+                {% for order in order_list %}
+                <tbody>
+                    <tr>
+                        <td colspan=5 align="center" style="background-color: #4eb7d4;"><strong>{{order.grouper}}</strong></td>
+                    </tr>
+                    {% for o in order.list %}
+                
+                    <tr height="50px" id="{{o.id}}">
+                        <td align="center">
+                            <p id="order_id" hidden>{{o.id}}</p>
+                            {{o.item}}
+                        </td>
+                        <td align="center">
+                            {{o.quantity}}
+                        </td>
+                        <td align="center" id="name">
+                            {{o.student.name}}
+                        </td>
+                        <td align="center">
+                            {{o.otp}}
+                        </td>
+                        <td align="center" >
+                            <button class="btn btn-warning" id="cancel" name="cancel">Cancel</button>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+
+                {% endfor %}
+                {% endfor %}
+        </table>
+{% endfor %}
+
+
+
+
+
+
+<div class="pagination">
+    <span class="step-links">
+        {% if order_list.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ order_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ order_list.number }} of {{ order_list.paginator.num_pages }}.
+        </span>
+
+        {% if order_list.has_next %}
+            <a href="?page={{ order_list.next_page_number }}">next</a>
+            <a href="?page={{ order_list.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+
+
 
 
 <script>
@@ -351,8 +437,8 @@
 
 $(document).ready(function(){     
             //table otp grouping 
-            table_grouper(2,'table');  
-            table_grouper(2,'table2');
+            //table_grouper(2,'table');  
+            //table_grouper(2,'table2');
             
         
             function table_grouper(grouping_cell,table_id){
@@ -460,7 +546,7 @@ $(document).ready(function(){
     });
 
 </script>
-</center>
+
 {% endblock %}
 
 {% block footer %} {% endblock %}

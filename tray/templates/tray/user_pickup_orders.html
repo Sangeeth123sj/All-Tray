@@ -1,12 +1,12 @@
-{% extends "tray/base.html" %}
+{% extends "tray/store_homepage_layout.html" %}
 
 {% block title%} Order list {% endblock %}
 
-{% block navbar %}
+{% comment %} {% block navbar %}
 <nav class="navbar navbar-dark bg-dark">
     <a class="navbar-brand" href="{% url 'store_home' %}">Store</a>
   </nav>
-{% endblock %}
+{% endblock %} {% endcomment %}
 
 
 {% block content %}
@@ -218,8 +218,8 @@
     
 $(document).ready(function(){
 
-    table_grouper(3,'table')
-    table_grouper(2,'table')
+   // table_grouper(3,'table')
+   // table_grouper(2,'table')
     $("tr #deliver").on("click",function(){
             $(this).attr("class", "btn btn-success");
             var order_id = $(this).parent().parent().find("#order_id").html().trim();

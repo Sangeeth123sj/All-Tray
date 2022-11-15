@@ -78,6 +78,12 @@
         font-family: Georgia, serif;
       }
 
+
+      .hideme{
+        opacity: 0;
+      }
+
+      
       .white-box {
         background-color: #4CAF50;
         border: 3px;
@@ -256,7 +262,7 @@
                   <li><a href="{% url 'store_edit_details' %}" class="nav-link ">Edit Store</a></li>
                   <li><a href="{% url 'store_order_list' %}" class="nav-link ">Order List</a></li>
                   <li><a href="{% url 'store_bills' %}" class="nav-link ">Store Bills</a></li>
-                  <li><a href="{% url 'home' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
+                  <li><a href="{% url 'store_profile' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
                   <li><a href="{% url 'store_logout' %}" class="nav-link ">Logout</a></li>
                   
                   <li><a href="#" class="nav-link ">Contact</a></li>
@@ -282,7 +288,7 @@
         
 
                 
-                    <hr class="my-4">
+                    <hr class="my-4"/>
         
                    
 
@@ -350,10 +356,5 @@
   {% endblock %}  {% endcomment %}
     
 
-    <!--script src="js/jquery-3.3.1.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.sticky.js"></script>
-    <script src="js/main.js"></script-->
   </body>
 </html>

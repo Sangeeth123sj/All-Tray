@@ -1,6 +1,61 @@
-{% extends "tray/base.html" %}
+{% extends "tray/homepage_layout.html" %}
 
 {% block title %} Your Store {% endblock %}
+
+
+
+{% block navbar %}
+
+<div class="site-mobile-menu site-navbar-target">
+    <div class="site-mobile-menu-header">
+      <div class="site-mobile-menu-close mt-3">
+        <span class="icon-close2 js-menu-toggle"></span>
+      </div>
+    </div>
+    <div class="site-mobile-menu-body"></div>
+  </div>
+
+
+
+  <header class="home-site-navbar home-site-navbar-target" role="banner">
+
+    <div class="container">
+      <div class="row align-items-center position-relative">
+
+        <div class="col-3">
+          <div class="home-site-logo">
+            <a href="{% url 'entry' %}" class="display-3">AllTray</a>
+          </div>
+        </div>
+
+        <div class="col-9  text-right">
+          
+
+          <span class="d-inline-block d-lg-none"><a href="#" class="text-primary site-menu-toggle js-menu-toggle py-5"><span class="icon-menu h2"></span></a></span>
+
+
+          <nav class="site-navigation text-right ml-auto d-none d-lg-block" role="navigation">
+            <ul class="site-menu main-menu js-clone-nav ml-auto ">
+              <li class="active"><a href="{% url 'entry' %}" class="nav-link ">Home</a></li>
+              <!--li><a href="{% url 'your_orders' %}" class="nav-link ">Your Orders</a></li>
+              <li><a href="{% url 'pay' %}" class="nav-link ">Recharge Card</a></li>
+              <li><a href="{% url 'home' %}" class="nav-link ">Fee Payment</a></li>
+              <li><a href="{% url 'student_pin_edit' %}" class="nav-link ">Edit Pin</a></li>
+              <li><a href="{% url 'home' %}" class="nav-link "><i class="fa fa-user" aria-hidden="true"></i></a></li>
+              <li><a href="{% url 'student_logout' %}" class="nav-link ">Logout</a></li-->
+              
+              <li><a href="#" class="nav-link ">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        
+      </div>
+    </div>
+
+    </header>
+
+{% endblock %}
 
 
 
@@ -43,38 +98,46 @@
 
 
 <h3><strong> Register Your Store </strong></h3>
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <form  action="/register_store_success/" name="form" method="POST" onsubmit="return validateForm()" >
+            {% csrf_token %}
+            <h4>Store name</h4>
+            <input type="text" id="store_name" name="store_name" class="form-control" required ><br/><br/>
+            <h4>Store Description</h4>
+            <textarea id="store_description" name="store_description" class="form-control" rows="5">Add store description to display to buyer.</textarea>
+            <br/><br/>
+            <h4>username</h4>
+            <input type="text" name="username" id="username" class="form-control" required><br/><br/>
+            <h4>email id</h4>
+            <input type="email" name="email" id="email" class="form-control" required><br/><br/>
+            <h4>password</h4>
+            <input type="password" name="password" id="password" class="form-control" required><br/><br/>
+            <h4>College</h4>
 
-<div class="form-group centered" >
-<form  action="/register_store_success/" name="form" method="POST" onsubmit="return validateForm()" >
-{% csrf_token %}
-<h4>Store name</h4>
-<input type="text" id="store_name" name="store_name" class="form-control" required ><br/><br/>
-<h4>Store Description</h4>
-<textarea id="store_description" name="store_description" class="form-control" rows="5">Add store description to display to buyer.</textarea>
-<br/><br/>
-<h4>username</h4>
-<input type="text" name="username" id="username" class="form-control" required><br/><br/>
-<h4>email id</h4>
-<input type="email" name="email" id="email" class="form-control" required><br/><br/>
-<h4>password</h4>
-<input type="password" name="password" id="password" class="form-control" required><br/><br/>
-<h4>College</h4>
+            <select id="college_id" name="college_id" id="item" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: #d6d6f5;" required>
+                                
+                                
+                <option value="select" selected disabled hidden> 
+                    Select an Option 
+                </option>
 
-<select id="college_id" name="college_id" id="item" class="btn dropdown-toggle" aria-placeholder="selects" style="background-color: azure;" required>
-                    
-                    
-    <option value="" selected disabled hidden> 
-        Select an Option 
-    </option> 
-
-{% for college in colleges %}
-<option input value="{{college.id}}" required>{{college.institute_name}}</option>
-{% endfor %}
-</select>
-<br/><br/><br/>
-<input type="button" id="submit_button" value="Submit" class="green-button">
-</form>
+            {% for college in colleges %}
+            <option input value="{{college.id}}" required>{{college.institute_name}}</option>
+            {% endfor %}
+            </select>
+            <br/><br/><br/>
+            <input type="button" id="submit_button" value="Submit" class="btn orange-button">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
+
 
 <script>
     $(document).ready(function(){
@@ -164,4 +227,7 @@
     
         </script>
 </center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

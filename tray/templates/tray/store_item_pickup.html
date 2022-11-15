@@ -3,65 +3,64 @@
 {% block title%} Welcome to All Tray {% endblock %}
 
 
-{% comment %} {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <li class="nav-item active">
-    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
-  </li>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'billing' %}">Billing</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_order_list' %}">Order list</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_bills' %}">Store bills</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_logout' %}">Logout</a>
-      </li>
-    </ul>
-    
-  </div>
-</nav>
-{% endblock %} {% endcomment %}
-
-
 {% block content %}
 <center>
 <br/><br/><br/>
-<h1>enter otp of customer or scan card</h1>
+<h1>enter otp of customer or scan card and submit</h1>
 <h5>(this page can find only today's orders,<br/>
     to find orders from past please use 'Order list' option)</h5>
 <br/>
 <form action="/user_pickup_orders_post/" class="form" method="POST">
     {% csrf_token %}
-<h3>OTP/Card</h3>
+<h3>OTP</h3>
 <br/> 
-<input type="text" id="otp_or_card" name="otp_or_card"> 
+<input type="text" id="otp" name="otp">
 <br/> 
-
+<input type="text" id="pin_no" name="pin_no" class="hideme">
+<p id="alert" style="color:green" ></p>
 <p id="incorrect_alert" style="color: rgba(207, 77, 77, 0.774); font-weight: 1000; width: fit-content;" ></p>
-<br/>
-<input type="button" id="enter" class="btn btn-primary" value="Enter">
-</form>
+<button id="scan_card" type="button" class='confirm btn btn-warning'  data-id="card" >Rfid Card </button>
+<br/> <br/>
+<input type="button" id="enter" class="btn btn-primary" value="Submit">
 
+</form>
+<br/><br/>
+
+<div class="card" style="width:22rem;">
+  <div class="card-header">
+    <h4>Store orders left today</h4>
+  </div>
+  <div class="card-body" style="text-align:left">
+    <h5 class="card-title"></h5>
+    <li class="card-text"><strong>First Break:</strong> {{first_break_orders}}</li>
+    <li class="card-text"><strong>Lunch Break:</strong> {{lunch_break_orders}}</li>
+    <li class="card-text"><strong>Last Break:</strong> {{last_break_orders}}</li>
+    <li class="card-text"><strong>Other time Orders:</strong> {{other_orders}}</li>
+  </div>
+</div>
+
+<br/>
 <script>
 //checking if pin or id card entered
     $(document).ready(function(){
+      $("#scan_card").click(function(event){
+        document.getElementById("pin_no").focus();
+    });
+    //on entering input to card field show message as card received
+    $('#pin_no').on('input', function() {
+        text = $('#pin_no').val();
+        document.getElementById("alert").innerHTML = "Card received please click submit";
+    });
+
+
         $("#enter").click(function(event){
-            var otp_or_card = $("#otp_or_card").val();
-            console.log(otp_or_card+" otp value");
-    if (otp_or_card==""){
+            var otp = $("#otp").val();
+            var card = $("#pin_no").val();
+            console.log(otp+" otp value");
+    if (otp=="" && card==""){
             document.getElementById("incorrect_alert").innerHTML = "Please enter otp or card"
-            $('#incorrect_alert').fadeOut(4000);
-            $('#otp').css("border-color","red");
+            //$('#incorrect_alert').fadeOut(4000);
+            //$('#otp').css("border-color","red");
             event.preventDefault();
         }
 
@@ -71,21 +70,24 @@
             $.ajax({
                 url: '/ajax/store_item_pickup_validate/',
                 data: {
-                    'otp_or_card': otp_or_card,
+                    'otp': otp,
+                    'card' : card
                 },
                 dataType: 'json',
                 success: function (data){
-                    if (data.incorrect_status == "incorrect_otp_and_card"){
+                    console.log(data.incorrect_status)
+                    if (data.incorrect_status == "incorrect_otp"){
                         //document.getElementById("incorrect_alert").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
-                        alert("Sorry incorrect otp or card, please try again");
+                        alert("Sorry incorrect otp, please try again");
                         event.preventDefault();
                     }
-                    if (data.incorrect_status == "incorrect_card_pin"){
+                    if (data.incorrect_status == "incorrect_card"){
                       //document.getElementById("incorrect_alert").innerHTML = "Sorry incorrect pin or unregistered card, please register if not registered and try again"
-                      alert("Sorry incorrect otp, please try again");
-                      event.preventDefault();
-                  }
-                    if(data.incorrect_status == "correct_otp" || data.card_pin == "correct_card_pin"){
+                      alert("Sorry incorrect card, please try again");
+                      location.reload()
+                    }
+
+                    if(data.incorrect_status == "correct_otp" || data.incorrect_status == "correct_card"){
                         $("form").submit();
                     }
 

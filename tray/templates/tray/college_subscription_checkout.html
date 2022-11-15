@@ -1,37 +1,9 @@
 <!DOCTYPE html>
-{% extends "tray/base.html" %}
+{% extends "tray/college_homepage_layout.html" %}
 
 
 
-{% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #112d32;">
-  <li class="nav-item active">
-    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
-  </li>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'your_orders' %}">Your Orders</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'student_pin_edit' %}">Edit Pin</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="">Recharge</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'student_logout' %}">Logout</a>
-      </li>
-      
-    </ul>
-    
-  </div>
-</nav>
-{% endblock %}
 
 {% block title%} Subscription Checkout  {% endblock %}
 
@@ -100,4 +72,7 @@
   //}); 
 </script>
 </center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

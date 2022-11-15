@@ -1,19 +1,9 @@
-{% extends "tray/base.html" %}
+{% extends "tray/store_homepage_layout.html" %}
 
 {% block title %} Order {% endblock %}
 
-{% block navbar %}
-<nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="{% url 'store_home' %}">Store</a>
-</nav>
-{% endblock %}
 
 
-{% block javascript %}
-
-
-
-{% endblock %}
 
 
 {% block content %}
@@ -44,20 +34,28 @@
 <h3>Edit Item</h3>
 <br/>
 
-<div class="form-group centered">
-<form action="/edit_item_save/" name="form" method="POST" onsubmit="return validateForm()">
-    {% csrf_token %}
-    <h4>item</h4>
-    <input type="text" id="item_name" name="item_name" value= '{{item.item}}' class="form-control" required><br/><br/>
-    <h4>Price</h4>
-    <input type="number" id="price" name="price" min="0" value="{{item.price}}" class="form-control" required><br/><br/>
-    <h4>Stock</h4>
-    <input type="number" id="stock" name="stock" min="1" value="{{item.stock}}" class="form-control" required><br/><br/>
-    <input type="hidden" name="store_id" value='{{store_id}}' >
-    <input type="hidden" name="item_id" value='{{item.id}}'>
-    <input type="button" id="submit_button" value="submit" class="btn btn-success">
-
-</form>
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <form action="/edit_item_save/" name="form" method="POST" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <h4>item</h4>
+                <input type="text" id="item_name" name="item_name" value= '{{item.item}}' class="form-control" required><br/><br/>
+                <h4>Price</h4>
+                <input type="number" id="price" name="price" min="0" value="{{item.price}}" class="form-control" required><br/><br/>
+                <h4>Stock</h4>
+                <input type="number" id="stock" name="stock" min="1" value="{{item.stock}}" class="form-control" required><br/><br/>
+                <input type="hidden" name="store_id" value='{{store_id}}' >
+                <input type="hidden" name="item_id" value='{{item.id}}'>
+                <input type="button" id="submit_button" value="submit" class="btn btn-success">
+                <br/><br/>
+            </form>
+          <div/>
+        <div/>
+      <div/>
+    <div/>
 </div>
 
     <a href="{% url 'store_home' %}" class="btn btn-info">Store Home</a>
@@ -117,4 +115,7 @@
     });
 </script>
 </center>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

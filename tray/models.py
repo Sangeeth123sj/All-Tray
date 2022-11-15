@@ -39,6 +39,8 @@ SEMESTERS = (
 
 PLANS = (("basic", "basic"), ("standard", "standard"))
 
+TIME_TYPE = (("today", "today"), ("upcoming", "upcoming"))
+
 
 class Institute(models.Model):
     institute_name = models.CharField(max_length=200)
@@ -100,6 +102,19 @@ class FeePayment(models.Model):
         return("student: "+ str(self.student) + "paid fee: "+ str(self.paid_fee) +"college: "+str(self.institute)+ "day: "+ str(self.created_at.date()))
 
 
+
+class InstituteEvent(models.Model):
+    # events to show on kiosk of the institute
+    institute = models.ForeignKey(Institute, on_delete=models.CASCADE,  null=True, blank=True)
+    type = models.CharField(max_length=200, choices=TIME_TYPE)
+    event_image = models.ImageField(upload_to ='uploads/% Y/% m/% d/')
+    created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
+    title= models.CharField(max_length=300)
+    detail=models.TextField(null=True, blank=True)
+    def __str__(self):
+        return("college: "+str(self.institute)+"day: "+ str(self.created_at.date()))
+
+
 class Store(models.Model):
     store_name = models.CharField(max_length=200)
     store_status = models.BooleanField()
@@ -141,7 +156,7 @@ class Item(models.Model):
 class OrderGroup(models.Model):
     # to find which time purchase the orders belong to
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     otp = models.CharField(max_length=4,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     order_group_total = models.IntegerField(default=0)
@@ -156,6 +171,7 @@ class Order(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
+    # shows whether order fulfilled or not
     status = models.BooleanField(default=False)
     otp = models.CharField(max_length=4)
     purchase_id = models.IntegerField(default=0)
@@ -234,6 +250,7 @@ class Bill(models.Model):
     quantity = models.IntegerField(default=0)
     price = models.IntegerField(default=0)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     invoice_no = models.SlugField(max_length=10)
     invoice = models.FileField(
         upload_to="django_field_pdf",
