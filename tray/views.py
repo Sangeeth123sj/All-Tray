@@ -536,7 +536,7 @@ def billing_invoice(request):
     # creating innvoice pdf
     create_invoice(store_name, new_invoice_no, load, total)
     # preparing invoice file for Bill db
-    f = open("media/pdf/" + new_invoice_no, "rb")
+    f = open(settings.MEDIA_ROOT + "/pdf/" + new_invoice_no, "rb")
     file = File(f)
     # creating bill orders on db
     objects = []
@@ -620,7 +620,7 @@ def billing_invoice(request):
 def invoice_print(response):
     device = response.session["device"]
     invoice_name = response.session["invoice_name"]
-    pdf = open("media/pdf/" + invoice_name, "rb")
+    pdf = open(settings.MEDIA_ROOT + "/pdf/" + invoice_name, "rb")
     # device specific print or download
     if device == "desktop":
         response = FileResponse(pdf, content_type="application/pdf")
