@@ -17,6 +17,7 @@ from django.conf import settings
 import uuid
 from django.contrib.auth.hashers import check_password
 from django.core.paginator import Paginator
+from django.core.files import File
 
 from .models import (
     InstituteEvent,
@@ -509,7 +510,9 @@ def billing_invoice(request):
     store = request.user.store
     store_name = store.store_name
     load = json.loads(request.GET["order_list_json"])
+    request.session['load'] = load
     total = request.GET["total"]
+    request.session['total'] = total
     cash_or_card = request.GET["cash_or_card"]
     device = request.GET["device"]
     if cash_or_card == "card":
@@ -533,11 +536,10 @@ def billing_invoice(request):
     new_invoice_no = invoice_number_gen(store)
 
     # load is the list of orders
-    # creating innvoice pdf
-    create_invoice(store_name, new_invoice_no, load, total)
+    
     # preparing invoice file for Bill db
-    f = open(settings.MEDIA_ROOT + "/pdf/" + new_invoice_no, "rb")
-    file = File(f)
+    # f = open(settings.MEDIA_ROOT + "/pdf/" + new_invoice_no, "rb")
+    # file = File(f)
     # creating bill orders on db
     objects = []
     new_object = []
@@ -555,7 +557,7 @@ def billing_invoice(request):
                 price=i["price"],
                 quantity=i["quantity"],
                 invoice_no=new_invoice_no,
-                invoice=file,
+                # invoice=file,
                 store=store,
                 student=student
             )
@@ -565,7 +567,7 @@ def billing_invoice(request):
                 price=i["price"],
                 quantity=i["quantity"],
                 invoice_no=new_invoice_no,
-                invoice=file,
+                # invoice=file,
                 store=store,
             )
         # creating order groups for tracking revenue
@@ -617,17 +619,23 @@ def billing_invoice(request):
 
 
 @login_required
-def invoice_print(response):
-    device = response.session["device"]
-    invoice_name = response.session["invoice_name"]
-    pdf = open(settings.MEDIA_ROOT + "/pdf/" + invoice_name, "rb")
+def invoice_print(request):
+    device = request.session["device"]
+    invoice_name = request.session["invoice_name"]
+    load = request.session.get("load")
+    total = request.session.get("total")
+    # pdf = open(settings.MEDIA_ROOT + "/pdf/" + invoice_name, "rb")
+    # creating innvoice pdf
+    buffer = create_invoice(request.user.store.store_name, invoice_name, load, total)
     # device specific print or download
     if device == "desktop":
-        response = FileResponse(pdf, content_type="application/pdf")
+        print("desktop invoice print")
+        response = FileResponse(buffer, content_type="application/pdf")
         response["Content-Disposition"] = "inline"
 
     elif device == "mobile":
-        response = FileResponse(pdf)
+        print("mobile invoice print")
+        response = FileResponse(buffer)
         response["Content-Disposition"] = 'attachment; filename= "' + invoice_name + '"'
     return response
 

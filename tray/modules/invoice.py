@@ -4,6 +4,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import inch, letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfgen import canvas
+import io
 from reportlab.platypus import (
     Frame,
     Paragraph,
@@ -62,8 +63,10 @@ def add_orders(load):
 def create_invoice(store_name, new_invoice_no, load, total):
     # creating file name from invoice no
     filename = str(new_invoice_no)
+    buffer = io.BytesIO()
     # canvas size and filename
-    pdf = canvas.Canvas(settings.MEDIA_ROOT +"/pdf/canvas_pdf", pagesize=(200, 350))
+    # pdf = canvas.Canvas(settings.MEDIA_ROOT +"/pdf/canvas_pdf", pagesize=(200, 350))
+    pdf = canvas.Canvas(buffer, pagesize=(200, 350))
     # drawing title text
     pdf.setFontSize(15)
     pdf.drawCentredString(100, 325, store_name)
@@ -78,7 +81,8 @@ def create_invoice(store_name, new_invoice_no, load, total):
     for line in initLines:
         text.textLine(line)
 
-    doc = SimpleDocTemplate(settings.MEDIA_ROOT + "/pdf/" + filename, pagesize=(250, 350))
+    # doc = SimpleDocTemplate(settings.MEDIA_ROOT + "/pdf/" + filename, pagesize=(250, 350))
+    doc = SimpleDocTemplate(buffer, pagesize=(250, 350))
     # final array to print table
     elements = []
     order_titles = ["Item", "Qty", "Price", "Cost"]
@@ -134,6 +138,9 @@ def create_invoice(store_name, new_invoice_no, load, total):
     text.textLine(credits)
 
     pdf.drawText(text)
+    
     # save the pdf
 
     print("invoice created!")
+    buffer.seek(0)
+    return buffer

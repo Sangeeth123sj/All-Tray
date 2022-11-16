@@ -254,7 +254,7 @@ class Bill(models.Model):
     invoice_no = models.SlugField(max_length=10)
     invoice = models.FileField(
         upload_to="django_field_pdf",
-        max_length=254,
+        max_length=254,  null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True,  null=True, blank=True)
     status = models.BooleanField(default=False)
