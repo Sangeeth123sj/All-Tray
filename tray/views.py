@@ -639,7 +639,7 @@ def invoice_print(request):
     elif device == "mobile":
         print("mobile invoice print")
         response = FileResponse(buffer)
-        response["Content-Disposition"] = 'attachment; filename= "' + invoice_name + '"'
+        response["Content-Disposition"] = 'attachment; filename= "' + invoice_name + '".pdf"'
     return response
 
 
