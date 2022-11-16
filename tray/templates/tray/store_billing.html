@@ -39,7 +39,7 @@
 <p>Your balance: {{student.balance}}</p-->
 <h2>Billing</h2>
 <br/>
-<form method="POST" class="form" action="/invoice_print/">
+<form method="POST" class="form" >
 {% csrf_token %}
 <table style="width: 20%;" >
     <thead>
@@ -80,8 +80,7 @@
 
 <br/>
 
-<button class="btn btn-darker" type="button" id="add">Add to list<!--div class="fa-3x">
-  <i class="fas fa-spinner fa-spin"></i></div--> </button>
+<button class="btn btn-darker" type="button" id="add">Add to list</button>
 <br/> <br/>
 
 <h3>Cart<i class="fas fa-shopping-cart"></i></h3>
@@ -116,6 +115,7 @@
 <br/><br/>
 <h3 class="btn-grad" id="balance" >Balance: nil  </h3>
 
+
 <h4>Payment:</h4>
 
 <input type="button" class='confirm btn btn-primary' value="Cash" data-id="cash"> 
@@ -146,7 +146,40 @@
     <!--button class="green-button" >Print</button-->
     </a>
 </p> {% endcomment %}
+
+<template id="print-choice">
+    <swal-title>
+        Purchase confirmed!
+    </swal-title>
+    <swal-html>Do you want to print the bill?</swal-html>
+    <swal-icon type="success" color="#3085d6"></swal-icon>
+    <swal-button  id="print_confirm" type="confirm">
+      Print Bill 
+    </swal-button>
+    <swal-button id="print_cancel" type="cancel">
+      No leave
+    </swal-button>
+    <swal-param name="allowEscapeKey" value="false" />
+    <swal-param
+      name="customClass"
+      value='{ "popup": "my-popup" }' />
+    <swal-function-param
+      name="didOpen"
+      value="popup => console.log(popup)" />
+  </template>
+
+<form id="bill_print_form" action="/invoice_print/">
+    <h4>bill print form for submit</h4>
+    
+</form>
 <script>
+
+
+
+   
+
+    
+
 
     //add items to cart
     $(document).ready(function(){
@@ -154,7 +187,11 @@
             var buy_clicked = false;
             var order_list = [];
 
-        
+            $("print_confirm").click(function(event){
+                console("print clicked")
+            });
+
+
         $("#scan_card").click(function(event){
             document.getElementById("alert").innerHTML =""
             document.getElementById("pin_no").focus();
@@ -381,7 +418,7 @@
                                     },
                                     dataType: 'json',
                                     success: function (data){
-                                        Swal.fire(
+                                        /*Swal.fire(
                                             'Bill confirmed',
                                             '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
                                             'success'
@@ -389,6 +426,26 @@
                                             $("form").submit();
                                             location.reload();
                                         });
+                                        */
+
+                                        Swal.fire({
+                                            title: 'Purchase Completed!',
+                                            text: "Do you want to print the bill?",
+                                            icon: 'success',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#3085d6',
+                                            cancelButtonColor: '#d33',
+                                            confirmButtonText: 'Yes, print it'
+                                          }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                console.log("confirm pressed")
+                                               form = document.getElementById("bill_print_form")
+                                               form.submit()
+                                            }
+                                            else{
+                                                location.reload()
+                                            }
+                                          })
                                     }
                                 });
                                 
@@ -450,14 +507,26 @@
                     }
                     if (data.card_status == "transaction_completed"){
                         console.log(data.card_status)
-                        Swal.fire(
-                            'Bill confirmed',
-                            '<p>Invoice has been saved.<br/>(Direct printing option <br/> may not be available on smartphone browsers)<br/>You can find all bills at <strong>Your Bills</strong> option.<br/>Thanks for Shopping with Alltray!<p>',
-                            'success'
-                        ).then(function() {
-                            $("form").submit();
-                            location.reload();
-                        });
+                        
+                        Swal.fire({
+                            title: 'Purchase Completed!',
+                            text: "Do you want to print the bill?",
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, print it'
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                                console.log("confirm pressed")
+                               form = document.getElementById("bill_print_form")
+                               form.submit()
+                            }
+                            else{
+                                location.reload()
+                            }
+                          })
+                        
                     }
                 }
             });

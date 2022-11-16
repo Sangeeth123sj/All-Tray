@@ -1,5 +1,5 @@
 from itertools import islice
-
+from django.conf import settings
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import inch, letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -63,7 +63,7 @@ def create_invoice(store_name, new_invoice_no, load, total):
     # creating file name from invoice no
     filename = str(new_invoice_no)
     # canvas size and filename
-    pdf = canvas.Canvas("media/pdf/canvas_pdf", pagesize=(200, 350))
+    pdf = canvas.Canvas(settings.MEDIA_ROOT +"/pdf/canvas_pdf", pagesize=(200, 350))
     # drawing title text
     pdf.setFontSize(15)
     pdf.drawCentredString(100, 325, store_name)
@@ -78,7 +78,7 @@ def create_invoice(store_name, new_invoice_no, load, total):
     for line in initLines:
         text.textLine(line)
 
-    doc = SimpleDocTemplate("media/pdf/" + filename, pagesize=(250, 350))
+    doc = SimpleDocTemplate(settings.MEDIA_ROOT + "/pdf/" + filename, pagesize=(250, 350))
     # final array to print table
     elements = []
     order_titles = ["Item", "Qty", "Price", "Cost"]
