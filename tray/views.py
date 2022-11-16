@@ -359,6 +359,7 @@ def open_store_success(request):
         password = request.POST["password"]
         user = User.objects.create_user(email, password)
         user.save
+       
         store = Store(
             store_name=store_name,
             store_status=True,
@@ -366,6 +367,8 @@ def open_store_success(request):
             college=institute,
             user=user,
         )
+        # using first 2 letters of store name in uppercase for bill number generation
+        store.invoice_code = store.store_name[:2].upper()
         store.save()
         return redirect("entry")
 
