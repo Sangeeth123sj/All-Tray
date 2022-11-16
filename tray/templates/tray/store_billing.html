@@ -169,7 +169,6 @@
   </template>
 
 <form id="bill_print_form" action="/invoice_print/">
-    <h4>bill print form for submit</h4>
     
 </form>
 <script>
@@ -187,9 +186,14 @@
             var buy_clicked = false;
             var order_list = [];
 
-            $("print_confirm").click(function(event){
-                console("print clicked")
-            });
+            
+            if(performance.navigation.type == 2){
+               location.reload(true);
+            }
+
+        $("print_confirm").click(function(event){
+            console("print clicked")
+        });
 
 
         $("#scan_card").click(function(event){
@@ -441,6 +445,15 @@
                                                 console.log("confirm pressed")
                                                form = document.getElementById("bill_print_form")
                                                form.submit()
+                                               if (device == "mobile"){
+                                                    var rowCount = cart_table.rows.length;
+                                                    for (var i = rowCount - 1; i > 0; i--) {
+                                                        cart_table.deleteRow(i);
+                                                    }
+                                                    total = 0;
+                                                    subtotal = 0;
+                                                    order_list = []
+                                               }
                                             }
                                             else{
                                                 location.reload()
@@ -521,6 +534,16 @@
                                 console.log("confirm pressed")
                                form = document.getElementById("bill_print_form")
                                form.submit()
+                               if (device == "mobile"){
+                                var rowCount = cart_table.rows.length;
+                                for (var i = rowCount - 1; i > 0; i--) {
+                                    console.log("entered loop")
+                                    cart_table.deleteRow(i);
+                                }
+                                total = 0;
+                                subtotal = 0;
+                                order_list = []
+                                }
                             }
                             else{
                                 location.reload()
