@@ -45,6 +45,7 @@ urlpatterns = [
         name="store_edit_details_post",
     ),
     path("store_order_list/", views.store_order_list, name="store_order_list"),
+    path("store_order_list_search/", views.store_order_list_search, name="store_order_list_search"),
     path("store_item_pickup/", views.store_item_pickup, name="store_item_pickup"),
     path(
         "user_pickup_orders_post/",
