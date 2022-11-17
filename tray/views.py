@@ -734,12 +734,54 @@ def store_logout(request):
 
 
 @login_required
-def store_order_list(request):
-    # store_id = request.session["store_id"]
-    # store_object = Store.objects.get(id=store_id)
+def store_order_list_search(request):
+    print("search reaaached!!!")
     store_object = request.user.store
     orders = Order.objects.filter(store=store_object)
     sorted_orders = orders.order_by("-created_at")
+    search_name = request.GET.get("search_input")
+    if search_name is not None:
+        request.session['search_name'] = search_name
+    else:
+        search_name = request.session['search_name']
+    search_orders = sorted_orders.filter(student__name__icontains = search_name)
+    
+    month_total = request.session['month_total']
+    current_month = request.session['current_month']
+    page = request.GET.get('page')
+    orders_paginated = Paginator(search_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
+    context = {
+        "order_list": page_order_list,
+        "page_order_object":page_order_list,
+        "current_month": current_month,
+        "month_total": month_total,
+        "search_name": search_name
+    }
+    if len(search_orders) == 0:
+        context["search_status"] = "no results found"
+    return render(request, "tray/store_order_list.html", context)
+
+@login_required
+def store_order_list(request):
+    current_month = datetime.today().strftime("%h")
+    request.session['current_month'] = current_month
+    current_month_number = datetime.today().month
+    store_object = request.user.store
+    orders = Order.objects.filter(store=store_object)
+    sorted_orders = orders.order_by("-created_at")
+    # month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
+    month_orders = orders.filter(created_at__month=current_month_number)
+    month_total = 0
+    for order in month_orders:
+        total = order.cost * order.quantity
+        month_total = month_total + total
+        request.session['month_total'] = month_total
+                
+    
      # pagination logic
     page = request.GET.get('page')
     orders_paginated = Paginator(sorted_orders, 20)
@@ -747,14 +789,7 @@ def store_order_list(request):
         page_order_list = orders_paginated.page(1)
     else:
         page_order_list = orders_paginated.page(page)
-    current_month = datetime.today().strftime("%h")
-    current_month_number = datetime.today().month
-    # month_total = orders.filter(created_at__month = current_month_number ).aggregate(Sum('cost'))
-    month_orders = orders.filter(created_at__month=current_month_number)
-    month_total = 0
-    for order in month_orders:
-        total = order.cost * order.quantity
-        month_total = month_total + total
+    
     print(page_order_list)
     return render(
         request,
@@ -1185,11 +1220,11 @@ def college_feepayment_list(request):
     print(college_feepayment_list)
     # pagination logic
     page = request.GET.get('page')
-    revenues_paginated = Paginator(college_feepayment_list, 20)
+    fees_paginated = Paginator(college_feepayment_list, 20)
     if page is None:
-        page_college_feepayment_list = revenues_paginated.page(1)
+        page_college_feepayment_list = fees_paginated.page(1)
     else:
-        page_college_feepayment_list = revenues_paginated.page(page)
+        page_college_feepayment_list = fees_paginated.page(page)
     context = {"college_feepayment_list":page_college_feepayment_list}
     return render(request, "tray/college_feepayment_list.html", context)
 
@@ -1666,7 +1701,7 @@ def cart(request):
                 student.save()
             # setting and checking the free trial period
             free_trial_expiry_date = institute.created_at.date() + relativedelta(months=2)
-            if date.today() < free_trial_expiry_date:
+            if date.today() > free_trial_expiry_date:
                 # conditional block to calculate revenue after free trial
                 try:
                     revenue = Revenue.objects.get(created_at__date=date.today(), student = student, institute=institute)

@@ -216,7 +216,7 @@
                                 //var revenue = parseInt(alltray_revenue(total));
                                 //var tray_revenue_display = "tray revenue: "+revenue;
                                 //$("#tray_revenue").text(tray_revenue_display);
-                                $("#total").text("Total: "+total);
+                                //$("#total").text("Total: "+total);
                             
                             }
                             else if (data.added == 'failure'){
@@ -268,6 +268,8 @@
                     total += parseInt(cost);
                     console.log("UPDATED total_________________________________"+total);
                     $("#total").text("Total: "+total);
+                    revenue = total*0.01
+                    $("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
                 }
                 c = 0;
             }
@@ -285,11 +287,15 @@
                     delete_from_order_list(item_name, item_cost);
                     //removing from cart table
                     $(this).parents("tr").remove();
+                    total = total - item_cost;
                     console.log("total:"+total);
-                    update_total();
-                    console.log("total after deleting item:"+total+"item_cost:"+item_cost );
                     $("#total").text("Total: "+total);
-
+                    revenue = total*0.01
+                    $("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
+                    console.log("total after deleting item:"+total+"item_cost:"+item_cost );
+                    //$("#total").text("Total: "+total);
+                    //revenue = total*0.01
+                    //$("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
 
                 }
             });

@@ -2,36 +2,6 @@
 
 {% block title%} Order list {% endblock %}
 
-{% comment %} {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <li class="nav-item active">
-    <a class="navbar-brand" href="{% url 'entry' %}">Home</a>
-  </li>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'billing' %}">Billing</a>
-      </li>
-      <li class="nav-item">
-          <a class="nav-link" href="{% url 'store_bills' %}">Store bills</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_edit_details' %}">Edit Store</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'store_logout' %}">Logout</a>
-      </li>
-    </ul>
-    
-  </div>
-</nav>
-{% endblock %} {% endcomment %}
-
-
 
 {% block content %}
 <center>
@@ -57,7 +27,6 @@
 </table>
 <br/>
 <strong id="no_delete_condition" style="color: red;"></strong>
-<br/> <br/>
 
 <!--Testing daterange-->
 {% comment %} {% load item_filters %}
@@ -263,13 +232,18 @@
         <div class="card shadow-2-strong" style="border-radius: 1rem;">
           <div class="card-body p-5 text-center">
 
-            {% comment %} search bar {% endcomment %}
-            <div class="input-group">
-                <input type="search" class="form-control " placeholder="Search" /><i class="fa fa-search" aria-hidden="true"></i>
-                {% comment %} <span class="input-group-text border-0" id="search-addon"> {% endcomment %}
-                
-                {% comment %} </span> {% endcomment %}
+            <div class="input-box">
+                <form id="search_form" action="/store_order_list_search/">
+                    
+                <input type="text" class="form-control" placeholder= "search student name" id="search_input" name="search_input">
+                <i class="fa fa-search" id="search"></i> 
+                </form>   
+                <p id="alerter"></p>  
+                {% if search_status %}
+                <p>{{search_status}}<p>     
+                {% endif %}         
             </div>
+            
         </div>
     </div>
   </div>
@@ -378,10 +352,19 @@
 <script>
 $(document).ready(function(){
 
-table_grouper(0,'table')
-
-//follower_cell_grouper(0,3)
-
+    search_field = document.getElementById("search_input")
+    {% if search_name %}
+    search_field.value = "{{search_name}}"
+    {% endif %}
+    search_form = document.getElementById("search_form")
+    $('#search').click(function () {
+        if (search_field.value != ""){
+            search_form.submit()
+        }
+        else{
+            window.location.href = "/store_order_list"
+        }
+    });
 });
     
    

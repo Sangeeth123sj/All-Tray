@@ -185,7 +185,7 @@
             var total = 0;
             var buy_clicked = false;
             var order_list = [];
-
+            var revenue = 0
             
             if(performance.navigation.type == 2){
                location.reload(true);
@@ -317,6 +317,8 @@
                 total += parseInt(cost);
                 console.log("UPDATED total_________________________________"+total);
                 $("#total").text("Total: "+total);
+                revenue = total*0.01
+                $("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
             }
         }
         
@@ -353,6 +355,8 @@
                     total = total - item_cost;
                     console.log("total after deleting item:"+total+"item_cost:"+item_cost );
                     $("#total").text("Total: "+total);
+                    revenue = total*0.01
+                    $("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
                     delete_from_order_list(item_name, item_cost);
                 }
             });
@@ -454,6 +458,8 @@
                                                     subtotal = 0;
                                                     order_list = []
                                                     $("#total").text("Total: "+total);
+                                                    revenue = total*0.01
+                                                    $("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
                                                }
                                             }
                                             else{
@@ -545,6 +551,8 @@
                                 subtotal = 0;
                                 order_list = []
                                 $("#total").text("Total: "+total);
+                                revenue = total*0.01
+                                $("#tray_revenue").text("Revenue: "+ String(revenue.toFixed(2)) )
                                 }
                             }
                             else{
