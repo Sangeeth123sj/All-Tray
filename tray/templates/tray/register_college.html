@@ -232,22 +232,22 @@
                     success: function (data) {
                         if (data.college_name_taken) {
                             alert("College name already taken, try another name");
-                            location.reload();
+                            //location.reload();
                             return false;
                         }
                         if (data.email_taken) {
                             alert("mail id already taken, try another mail id");
-                            location.reload();
+                            //location.reload();
                             return false;
                         }
                         else{
-                            Swal.fire(
+                            /*Swal.fire(
                                 'Signup Successful',
                                 '',
                                 'success'
-                                ).then(function() {
+                                ).then(function() {*/
                                     $("form").submit();
-                                });
+                                //});
                         }
                         
                     }        

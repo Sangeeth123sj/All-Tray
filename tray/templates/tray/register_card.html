@@ -279,21 +279,14 @@
                     success: function (data) {
                         if (data.email_taken) {
                             alert("mail id already taken, try another mail id");
-                            location.reload();
                             return false;
                         }
                         else if (data.card_pin_taken){
                             alert('rfid card already registered please use another card')
+                            return false;
                         }
                         else{
-                            Swal.fire(
-                                'Signup Successful',
-                                '',
-                                'success'
-                                ).then(function() {
-                                    $("form").submit();
-                                });
-                            }
+                            $("form").submit();
                         }
                     
                 });
