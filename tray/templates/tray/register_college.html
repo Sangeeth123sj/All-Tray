@@ -121,7 +121,7 @@
     } {% endcomment %}
 </script>
 
-<h4> <strong> Register Your Institute </strong></h4>
+<h2> Register Your Institute</h2>
 
 <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -241,8 +241,15 @@
                             return false;
                         }
                         else{
-                            $("form").submit();
+                            Swal.fire(
+                                'Signup Successful',
+                                '',
+                                'success'
+                                ).then(function() {
+                                    $("form").submit();
+                                });
                         }
+                        
                     }        
         
                 });

@@ -26,75 +26,33 @@
         </tr>
     </tbody>
 </table>
-<br/>
-<strong id="no_delete_condition" style="color: red;"></strong>
-<br/> <br/>
-
-<!--Testing daterange-->
-{% comment %} {% load item_filters %}
-{% date_range as the_days %}
-
-{% for day in the_days %}
-   
-    {% order_day_checker day as is_order_day %}
-
-        {% if is_order_day %}
-               
-                    <table id="table" width="30%">
-                    <thead>
-                        <th>
-                            Item
-                        </th>
-                        <th>
-                            Quantity
-                        </th>
-                        <th>
-                            Buyer
-                        </th>
-                        <th>
-                            Status
-                        </th>
-                    </thead>
-                
-                <tbody >
-                    <br/> <p>{{day.date}} </p>
-
-            {% for order in order_list %}
-
-                {% if order.created_at.date == day.date %}
-                
-                    <tr height="50px" id="{{order.id}}">
-
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {% if order.student.name %}
-                                {{order.student.name}}
-                            {% else %}
-                                spot payed
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
 
 
-                
-        {% endif %} 
-                </tbody>
-{% endfor %}
-</table> {% endcomment %}
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        
+          <div class="card-body p-5 text-center">
+
+            <div class="input-box">
+                <form id="search_form" action="/store_bills_search/">
+                    
+                <input type="text" class="form-control" placeholder= "search student name" id="search_input" name="search_input">
+                <i class="fa fa-search" id="search"></i> 
+                </form>   
+                <p id="alerter"></p>  
+                {% if search_status %}
+                <p>{{search_status}}<p>     
+                {% endif %}         
+            </div>
+            
+        </div>
+
+  </div>
+</div>
+</div>
+
 
 
 
@@ -102,7 +60,7 @@
 
 {% regroup order_list by created_at|date:"Y-m-d" as objects_by_day %}
 {% for day in objects_by_day %}
-<br/><br/>
+<br/>
 <p>{{day.grouper}}</p>
 <table id="table" width="30%">
     <thead>
@@ -178,6 +136,25 @@
 
     <a href="{% url 'store_home' %}" class="btn btn-info">Back</a>
 
-</center>
-
+<script>
+    $(document).ready(function(){
+    
+        search_field = document.getElementById("search_input")
+        {% if search_name %}
+        search_field.value = "{{search_name}}"
+        {% endif %}
+        search_form = document.getElementById("search_form")
+        $('#search').click(function () {
+            if (search_field.value != ""){
+                search_form.submit()
+            }
+            else{
+                window.location.href = "/store_bills"
+            }
+        });
+    });
+        
+       
+    
+    </script>
 {% endblock %}

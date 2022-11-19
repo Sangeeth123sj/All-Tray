@@ -55,12 +55,12 @@
             <br/> <br/> <br/>
 
             {% if not merchant_credentials %}
-            <a href="{% url 'college_merchant_creds_form' %}" class="blue-button">Setup online payments</a>
+            <a href="{% url 'college_merchant_creds_form' %}" class="btn btn-darker">Setup online payments</a>
             <br/><br/>
             {% endif %}
 
             {% if not subscription %}
-            <a href="{% url 'college_subscription_form' %}" class="green-button">Setup subscription</a>
+            <a href="{% url 'college_subscription_form' %}" class="btn btn-primary">Setup subscription</a>
             <br/><br/>
             {% endif %}
 

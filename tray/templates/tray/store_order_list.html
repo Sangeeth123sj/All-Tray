@@ -28,208 +28,13 @@
 <br/>
 <strong id="no_delete_condition" style="color: red;"></strong>
 
-<!--Testing daterange-->
-{% comment %} {% load item_filters %}
-{% date_range as the_days %}
 
-{% for day in the_days %}
-   
-    {% order_day_checker day as is_order_day %}
-
-        {% if is_order_day %}
-               
-                    <table id="table" width="30%">
-                    <thead>
-                        <th>
-                            Id
-                        </th>
-                        <th>
-                            Item
-                        </th>
-                        <th>
-                            Quantity
-                        </th>
-                        <th>
-                            Buyer
-                        </th>
-                        <th>
-                            Status
-                        </th>
-                        <th>
-                            Cost
-                        </th>
-                    </thead>
-                
-                <tbody >
-                    <br/> <p>{{day.date}} </p>
-                    <!--Now-->
-                    {% break_checker day "Now" as is_break %}
-                    {% if is_break %}
-                    <tr>
-                        <td colspan="6" align="center" style="background-color: #4eb7d4;">Orders now</td>
-                    </tr>
-                    {% endif %}  
-                    
-            {% for order in page_order_object %}
-                
-                {% if order.created_at.date == day.date and order.pickup_time == 'Now' %}
-                
-                    <tr height="50px" id="{{order.id}}">
-                        
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.cost}}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-
-
-                    <!--First Break-->
-                    {% break_checker day "First Break" as is_break %}
-                    {% if is_break %}
-                    <tr>
-                        <td colspan="6" align="center" style="background-color: #4eb7d4;">First Break</td>
-                    </tr>
-                    {% endif %}
-
-            {% for order in page_order_object %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'First Break' %}
-   
-                    <tr height="50px" id="{{order.id}}">
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.cost}}
-                        </td>
-                    </tr>
-
-                {% endif %}
-            {% endfor %}
-
-            <!--Lunch Break-->
-            {% break_checker day "Lunch Break" as is_break %}
-            {% if is_break %}
-            <tr>
-                <td colspan="6" align="center" style="background-color: #4eb7d4;">Lunch Break</td>
-            </tr> 
-            {% endif %}
-
-            {% for order in page_order_object %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'Lunch Break' %}
-                
-                    <tr height="50px" id="{{order.id}}">
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.cost}}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-
-            <!--Last Break-->
-            {% break_checker day "Last Break" as is_break %}
-            {% if is_break %}
-            <tr>
-                <td colspan="6" align="center" style="background-color: #4eb7d4;">Last Break</td>
-            </tr>
-            {% endif %}
-
-            {% for order in page_order_object %}
-                {% if order.created_at.date == day.date and order.pickup_time == 'Last Break' %}
-                
-                    <tr height="50px" id="{{order.id}}">
-                        <td align="center">
-                            {{order.purchase_id}}
-                        </td> 
-                        <td align="center">
-                            {{order.item}}
-                        </td>
-                        <td align="center">
-                            {{order.quantity}}
-                        </td>
-                        <td align="center">
-                            {{order.student.name}}
-                        </td>
-                        <td align="center">
-                            {% if order.status %}
-                            <span style="color: #4d9167;">Delivered</span>
-                            {% else %}
-                            <span style="color: #c05e40;">Not Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {{order.cost}}
-                        </td>
-                    </tr>
-                {% endif %}
-
-            {% endfor %}
-
-                
-        {% endif %} 
-                </tbody>
-{% endfor %}
-</table> {% endcomment %}
 
 
 <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+        
           <div class="card-body p-5 text-center">
 
             <div class="input-box">
@@ -245,7 +50,7 @@
             </div>
             
         </div>
-    </div>
+    
   </div>
 </div>
 </div>
@@ -255,7 +60,7 @@
 
 {% regroup order_list by created_at|date:"Y-m-d" as objects_by_day %}
 {% for day in objects_by_day %}
-<br/><br/>
+<br/>
 <p>{{day.grouper}}</p>
 <table id="table" width="30%">
     <thead>
@@ -362,7 +167,7 @@ $(document).ready(function(){
             search_form.submit()
         }
         else{
-            window.location.href = "/store_order_list"
+            //window.location.href = "/store_order_list"
         }
     });
 });

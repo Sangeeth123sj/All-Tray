@@ -20,6 +20,7 @@ urlpatterns = [
     path("college_merchant_creds_form/", views.college_merchant_creds_form, name="college_merchant_creds_form"),
     path("your_orders_post/", views.your_orders_post, name="your_orders_post"),
     path("your_orders/", views.your_orders, name="your_orders"),
+    path("your_orders_search/", views.your_orders_search, name="your_orders_search"),
     path("order_page_post/", views.order_page_post, name="order_page_post"),
     path("order_page/", views.order_page, name="order_page"),
     path("store_add_item/", views.store_add_item, name="store_add_item"),
@@ -54,6 +55,7 @@ urlpatterns = [
     ),
     path("user_pickup_orders/", views.user_pickup_orders, name="user_pickup_orders"),
     path("store_bills/", views.store_bills, name="store_bills"),
+    path("store_bills_search/", views.store_bills_search, name="store_bills_search"),
     path("register_college/", views.register_college, name="register_college"),
     path(
         "register_college_success/",
@@ -81,6 +83,11 @@ urlpatterns = [
         views.college_bulk_recharge,
         name="college_bulk_recharge",
     ),
+    path(
+        "college_bulk_recharge_search/",
+        views.college_bulk_recharge_search,
+        name="college_bulk_recharge_search",
+    ),
 
     path(
         "college_store_order_list_post/",
@@ -100,8 +107,10 @@ urlpatterns = [
     ),
     
     path("college_feepayment_list/", views.college_feepayment_list, name="college_feepayment_list"),
+    path("college_feepayment_list_search/", views.college_feepayment_list_search, name="college_feepayment_list_search"),
     path("college_feepayment_details/<int:student_id>", views.college_feepayment_details, name="college_feepayment_details"),
     path("college_alltray_revenue_student_list/", views.college_alltray_revenue_student_list, name="college_alltray_revenue_student_list"),
+    path("college_alltray_revenue_student_list_search/", views.college_alltray_revenue_student_list_search, name="college_alltray_revenue_student_list_search"),
     path("college_alltray_revenue_student_details/<int:student_id>/", views.college_alltray_revenue_student_details, name="college_alltray_revenue_student_details"),
     path("institute_kiosk/<str:institute_name>",views.institute_kiosk, name="institute_kiosk"),
     path("college_recharge/", views.college_recharge, name="college_recharge"),

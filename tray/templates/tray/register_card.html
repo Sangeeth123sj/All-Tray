@@ -115,7 +115,7 @@
 
 
 
-<h3>Register as student</h3>
+<h2>Register as student</h2>
 
 <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -286,9 +286,16 @@
                             alert('rfid card already registered please use another card')
                         }
                         else{
-                            $("form").submit();
+                            Swal.fire(
+                                'Signup Successful',
+                                '',
+                                'success'
+                                ).then(function() {
+                                    $("form").submit();
+                                });
+                            }
                         }
-                    }
+                    
                 });
             }
             

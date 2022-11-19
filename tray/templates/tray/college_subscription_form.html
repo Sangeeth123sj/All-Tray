@@ -19,6 +19,7 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
+        <div class="hideme">
         <h3>Plan type</h3>
         <div class="form-check">
             <input class="form-check-input" value="basic" type="radio" name="plan_type" id="plan_basic" checked>
@@ -32,6 +33,7 @@
             Standard
             </label>
         </div>
+    </div>
         <br/><br/>
         <label id="amount" for="amount"> Monthly amount after free trial of 2 months </label>
         <br/>

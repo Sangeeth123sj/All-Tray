@@ -1,40 +1,38 @@
 {% extends 'tray/college_homepage_layout.html'%}
 
 
-{% comment %} {% block navbar %} 
- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <li class="nav-item active">
-        <a class="navbar-brand" href="{% url 'college_home' %}">Home</a>
-    </li>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'college_recharge' %}">Recharge</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'college_break_edit' %}">Edit break</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'college_logout' %}">Logout</a>
-        </li>
-        
-        </ul>
-        
-    </div>
-    </nav>
-{% endblock %}
-
- {% endcomment %}
-
 {% block content %}
 
 <h2>Student Fee Payment List</h2>
 <strong id="no_delete_condition" style="color: red;"></strong>
-<br/>
+
+
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        
+          <div class="card-body p-5 text-center">
+
+            <div class="input-box">
+                <form id="search_form" action="/college_feepayment_list_search/">
+                    
+                <input type="text" class="form-control" placeholder= "search student name" id="search_input" name="search_input">
+                <i class="fa fa-search" id="search"></i> 
+                </form>   
+                <p id="alerter"></p>  
+                {% if search_status %}
+                <p>{{search_status}}<p>     
+                {% endif %}         
+            </div>
+            
+        </div>
+    
+  </div>
+</div>
+</div>
+
+
 <!--Testing daterange-->
 {% load item_filters %}
 
@@ -93,6 +91,33 @@
         {% endif %}
     </span>
 </div>
+
+
+
+
+
+<script>
+    $(document).ready(function(){
+    
+        search_field = document.getElementById("search_input")
+        {% if search_name %}
+        search_field.value = "{{search_name}}"
+        {% endif %}
+        search_form = document.getElementById("search_form")
+        $('#search').click(function () {
+            if (search_field.value != ""){
+                search_form.submit()
+            }
+            else{
+                //window.location.href = "/store_order_list"
+            }
+        });
+    });
+        
+       
+    
+    </script>
+
 
 
 

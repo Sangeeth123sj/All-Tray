@@ -260,6 +260,39 @@ def your_orders_post(request):
 
 
 @login_required
+def your_orders_search(request):
+    student_object = request.user.student
+    print(request.user.student)
+    orders = Order.objects.filter(student=student_object)
+    sorted_orders = orders.order_by("-created_at")
+    search_item = request.GET.get("search_input")
+    if search_item is not None:
+        request.session['search_item'] = search_item
+    else:
+        try:
+            search_item = request.session['search_item']
+        except:
+            search_item = ""
+    search_orders = sorted_orders.filter(item__icontains = search_item)
+     # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(search_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
+    order_exist = Order.objects.filter(student=student_object).exists()
+    if order_exist:
+        otp = orders.first().otp
+    else:
+        otp = ""
+    context = {"orders": search_orders, "order_list":page_order_list,  "otp": otp, "search_item":search_item,"search_item":search_item}
+    if len(search_orders) == 0:
+        context["search_status"] = "no results found"
+    return render(request, "tray/your_orders.html", context )
+
+
+@login_required
 def your_orders(request):
     student_object = request.user.student
     print(request.user.student)
@@ -895,13 +928,63 @@ def user_pickup_orders(request):
         return render(request, "tray/user_pickup_orders.html", {"orders": orders})
 
 
+
 @login_required
-def store_bills(request):
-    # store_id = request.session["store_id"]
-    # store_object = Store.objects.get(id=store_id)
+def store_bills_search(request):
     store_object = request.user.store
     orders = Bill.objects.filter(store=store_object)
     sorted_orders = orders.order_by("-created_at")
+    
+    search_name = request.GET.get("search_input")
+    if search_name is not None:
+        request.session['bill_search_name'] = search_name
+    else:
+        try:
+            search_name = request.session['bill_search_name']
+        except:
+            search_name = ""
+        
+    search_orders = sorted_orders.filter(student__name__icontains = search_name)
+    
+    
+     # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(search_orders, 20)
+    if page is None:
+        page_order_list = orders_paginated.page(1)
+    else:
+        page_order_list = orders_paginated.page(page)
+    current_month = datetime.today().strftime("%h")
+    current_month_number = datetime.today().month
+    month_orders = orders.filter(created_at__month=current_month_number)
+    month_total = 0
+    
+    for order in month_orders:
+        total = order.price * order.quantity
+        month_total = month_total + total
+    context = {
+        "current_month":current_month,
+        "month_total":month_total,
+        "store": store_object,
+        "order_list": page_order_list,
+        "page_order_list":page_order_list,
+        "search_name": search_name
+    }
+    if len(search_orders) == 0:
+        context["search_status"] = "no results found"
+    return render(
+        request,
+        "tray/store_bills.html",
+        context
+    )
+
+
+@login_required
+def store_bills(request):
+    store_object = request.user.store
+    orders = Bill.objects.filter(store=store_object)
+    sorted_orders = orders.order_by("-created_at")
+    
      # pagination logic
     page = request.GET.get('page')
     orders_paginated = Paginator(sorted_orders, 20)
@@ -1121,12 +1204,39 @@ def receipt_number_generator():
     return str(res)
     
 @login_required
+def college_bulk_recharge_search(request):
+    # college_id = request.session.get("college_id")
+    # institute = Institute.objects.get(id = college_id)
+    institute = request.user.institute
+    college_bulk_recharge_list = BulkRechargeMail.objects.filter(college=institute)
+    search_email = request.GET.get("search_input")
+    if search_email is not None:
+        request.session['search_email'] = search_email
+    else:
+        try:
+            search_email = request.session['search_email']
+        except:
+            search_email = ""
+    search_bulk_recharge_list = college_bulk_recharge_list.filter(email__icontains = search_email)
+    # pagination logic
+    page = request.GET.get('page')
+    orders_paginated = Paginator(search_bulk_recharge_list, 10)
+    if page is None:
+        page_college_bulk_recharge_list = orders_paginated.page(1)
+    else:
+        page_college_bulk_recharge_list = orders_paginated.page(page)
+    context = {"institute": institute, "college_bulk_recharge_list": page_college_bulk_recharge_list, "search_email":search_email}
+    if len(search_bulk_recharge_list) == 0:
+        context["search_status"] = "no results found"
+    return render(request, "tray/college_bulk_recharge.html", context)
+
+
+@login_required
 def college_bulk_recharge(request):
     # college_id = request.session.get("college_id")
     # institute = Institute.objects.get(id = college_id)
     institute = request.user.institute
     college_bulk_recharge_list = BulkRechargeMail.objects.filter(college=institute)
-    
     # pagination logic
     page = request.GET.get('page')
     orders_paginated = Paginator(college_bulk_recharge_list, 10)
@@ -1183,7 +1293,7 @@ def college_store_order_list(request):
     store_object = Store.objects.get(id=store_id)
     orders = Order.objects.filter(store=store_object)
     sorted_orders = orders.order_by("-created_at")
-     # pagination logic
+    # pagination logic
     page = request.GET.get('page')
     orders_paginated = Paginator(sorted_orders, 20)
     if page is None:
@@ -1215,6 +1325,34 @@ def college_store_order_list(request):
 
 
 @login_required
+def college_feepayment_list_search(request):
+    college_feepayment_list = FeePayment.objects.filter(institute=request.user.institute)
+    print(college_feepayment_list)
+    search_name = request.GET.get("search_input")
+    if search_name is not None:
+        request.session['search_name'] = search_name
+    else:
+        try:
+            search_name = request.session['search_name']
+        except:
+            search_name = ""
+    search_feepayment_list = college_feepayment_list.filter(student__name__icontains = search_name)
+    # pagination logic
+    page = request.GET.get('page')
+    fees_paginated = Paginator(search_feepayment_list, 20)
+    if page is None:
+        page_college_feepayment_list = fees_paginated.page(1)
+    else:
+        page_college_feepayment_list = fees_paginated.page(page)
+    context = {"college_feepayment_list":page_college_feepayment_list,"search_name":search_name}
+    if len(search_feepayment_list) == 0:
+        context["search_status"] = "no results found"
+    return render(request, "tray/college_feepayment_list.html", context)
+
+
+
+
+@login_required
 def college_feepayment_list(request):
     college_feepayment_list = FeePayment.objects.filter(institute=request.user.institute)
     print(college_feepayment_list)
@@ -1229,10 +1367,69 @@ def college_feepayment_list(request):
     return render(request, "tray/college_feepayment_list.html", context)
 
 @login_required
+def college_feepayment_list_search(request):
+    college_feepayment_list = FeePayment.objects.filter(institute=request.user.institute)
+    print(college_feepayment_list)
+    search_name = request.GET.get("search_input")
+    if search_name is not None:
+        request.session['search_name'] = search_name
+    else:
+        try:
+            search_name = request.session['search_name']
+        except:
+            search_name = ""
+    search_feepayment_list = college_feepayment_list.filter(student__name__icontains = search_name)
+    # pagination logic
+    page = request.GET.get('page')
+    fees_paginated = Paginator(search_feepayment_list, 20)
+    if page is None:
+        page_college_feepayment_list = fees_paginated.page(1)
+    else:
+        page_college_feepayment_list = fees_paginated.page(page)
+    context = {"college_feepayment_list":page_college_feepayment_list, "search_name":search_name}
+    if len(search_feepayment_list) == 0:
+        context["search_status"] = "no results found"
+    return render(request, "tray/college_feepayment_list.html", context)
+
+
+
+
+@login_required
 def college_feepayment_details(request,student_id):
     student = Student.objects.get(id=student_id)
     context = {"student":student}
     return render(request, "tray/college_feepayment_details.html",context)
+
+
+
+@login_required
+def college_alltray_revenue_student_list_search(request):
+    institute = request.user.institute
+    students = Student.objects.filter(college=institute)
+    search_name = request.GET.get("search_input")
+    if search_name is not None:
+        request.session['search_name'] = search_name
+    else:
+        try:
+            search_name = request.session['search_name']
+        except:
+            search_name = ""
+    search_students = students.filter(name__icontains = search_name)
+    # pagination logic
+    page = request.GET.get('page')
+    students_paginated = Paginator(search_students, 20)
+    if page is None:
+        page_students = students_paginated.page(1)
+    else:
+        page_students = students_paginated.page(page)
+    context = {
+        "students":page_students,
+        "student_page_object": page_students,
+        "search_name": search_name
+        }
+    if len(search_students) == 0:
+        context["search_status"] = "no results found"
+    return render(request, "tray/college_alltray_revenue_student_list.html", context)
 
 
 @login_required
