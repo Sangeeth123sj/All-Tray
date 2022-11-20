@@ -151,6 +151,7 @@
     <swal-title>
         Purchase confirmed!
     </swal-title>
+    {% if student %} <swal-html>Payment done by {{student}}'s card</swal-html> {% endif %}
     <swal-html>Do you want to print the bill?</swal-html>
     <swal-icon type="success" color="#3085d6"></swal-icon>
     <swal-button  id="print_confirm" type="confirm">
@@ -435,9 +436,18 @@
                                             location.reload();
                                         });
                                         */
-
+                                        alert("reached ajax response")
+                                        console.log("student card:"+data.student)
+                                        if (data.student != null ){
+                                            var title =  'Purchase Completed! <br/> using '+data.student+"'s card"
+                                        }
+                                        else{
+                                            var title =  'Purchase Completed!'
+                                        }
+                                        
                                         Swal.fire({
-                                            title: 'Purchase Completed!',
+                                            
+                                            title: title,
                                             text: "Do you want to print the bill?",
                                             icon: 'success',
                                             showCancelButton: true,
@@ -478,12 +488,10 @@
             //device check
             if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
                 // true for mobile device
-                console.log("mobile device");
                 var device = 'mobile'
             }
             else{
                 // false for not mobile device
-                console.log("not mobile device");
                 var device = 'desktop'
             }
             pin_no = $('#pin_no').val()
@@ -502,8 +510,6 @@
                 },
                 dataType: 'json',
                 success: function (data){
-                    console.log(data.card_status)
-                    console.log(typeof data.card_status)
                     if (data.card_status == 'card_invalid'){
                         Swal.fire(
                         'Invalid card',
@@ -526,10 +532,16 @@
                         return
                     }
                     if (data.card_status == "transaction_completed"){
-                        console.log(data.card_status)
+                        console.log(data.student)
+                        if (data.student != null ){
+                            var title =  'Purchase Completed! <br/> using '+data.student+"'s card"
+                        }
+                        else{
+                            var title =  'Purchase Completed!'
+                        }
                         
                         Swal.fire({
-                            title: 'Purchase Completed!',
+                            title: title,
                             text: "Do you want to print the bill?",
                             icon: 'success',
                             showCancelButton: true,

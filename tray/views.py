@@ -649,8 +649,13 @@ def billing_invoice(request):
     print(store_name)
     # print(load[0]["item"])
     request.session["invoice_name"] = new_invoice_no
-
     data = {"card_status":"transaction_completed"}
+    if cash_or_card == "card":
+        data["student"] = student.name
+        
+    else:
+        data["student"] = None
+    print(data)
     return JsonResponse(data)
 
 

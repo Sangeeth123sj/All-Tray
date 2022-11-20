@@ -202,12 +202,12 @@
                     success: function (data) {
                         if (data.store_name_taken) {
                             alert("Store name already taken, try another name");
-                            location.reload();
+                            //location.reload();
                             return false;
                         }
                         else if (data.email_taken) {
                             alert("email already taken, try another mail id");
-                            location.reload();
+                            //location.reload();
                             return false;
                         }
                         else{
